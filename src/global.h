@@ -3,8 +3,10 @@
 /* {1: literate/architecture.weft:23} */
 /* Include files */
 
-#line 32 "literate/architecture.weft"
-/* {2: literate/architecture.weft:32} */
+#line 35 "literate/architecture.weft"
+/* {2: literate/architecture.weft:35} */
+
+#define _POSIX_C_SOURCE 200809L
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -18,18 +20,26 @@
 
 /* Type declarations */
 
-#line 51 "literate/architecture.weft"
-/* {3: literate/architecture.weft:51} */
+#line 56 "literate/architecture.weft"
+/* {3: literate/architecture.weft:56} */
 #ifndef FALSE
 #define FALSE 0
 #endif
 #ifndef TRUE
 #define TRUE 1
 #endif
+
+#if defined(__GNUC__) && __GNUC__ >= 7
+#define FALLTHROUGH __attribute__((fallthrough))
+#elif defined(__clang__)
+#define FALLTHROUGH __attribute__((fallthrough))
+#else
+#define FALLTHROUGH ((void)0)
+#endif
 /* {:3} */
 
-#line 491 "literate/parser.weft"
-/* {71: literate/parser.weft:491} */
+#line 492 "literate/parser.weft"
+/* {71: literate/parser.weft:492} */
 typedef int *Parameters;
 /* {:71} */
 
@@ -69,13 +79,13 @@ typedef struct name {
 } Name;
 /* {:298} */
 
-#line 1157 "literate/names.weft"
-/* {324: literate/names.weft:1157} */
+#line 1158 "literate/names.weft"
+/* {324: literate/names.weft:1158} */
 #define ARG_CHR '\001'
 /* {:324} */
 
-#line 1218 "literate/names.weft"
-/* {330: literate/names.weft:1218} */
+#line 1219 "literate/names.weft"
+/* {330: literate/names.weft:1219} */
 typedef struct arglist
 {Name * name;
 struct arglist * args;
@@ -83,16 +93,16 @@ struct arglist * next;
 } Arglist;
 /* {:330} */
 
-#line 1382 "literate/names.weft"
-/* {337: literate/names.weft:1382} */
+#line 1383 "literate/names.weft"
+/* {337: literate/names.weft:1383} */
 typedef struct embed {
    Scrap_Node * defs;
    Arglist * args;
 } Embed_Node;
 /* {:337} */
 
-#line 428 "literate/search-labels.weft"
-/* {368: literate/search-labels.weft:428} */
+#line 433 "literate/search-labels.weft"
+/* {368: literate/search-labels.weft:433} */
 typedef struct uses {
   struct uses *next;
   Name *defn;
@@ -113,8 +123,8 @@ typedef struct l_node
 
 /* Limits */
 
-#line 61 "literate/architecture.weft"
-/* {4: literate/architecture.weft:61} */
+#line 81 "literate/architecture.weft"
+/* {4: literate/architecture.weft:81} */
 
 #ifndef MAX_NAME_LEN
 #define MAX_NAME_LEN 1024
@@ -168,19 +178,19 @@ extern int nw_char;
 extern char *command_name;
 /* {:21} */
 
-#line 181 "literate/parser.weft"
-/* {47: literate/parser.weft:181} */
+#line 182 "literate/parser.weft"
+/* {47: literate/parser.weft:182} */
 extern unsigned char current_sector;
 extern unsigned char prev_sector;
 /* {:47} */
 
-#line 379 "literate/parser.weft"
-/* {61: literate/parser.weft:379} */
+#line 380 "literate/parser.weft"
+/* {61: literate/parser.weft:380} */
 extern char blockBuff[6400];
 /* {:61} */
 
-#line 400 "literate/latex-output.weft"
-/* {96: literate/latex-output.weft:400} */
+#line 402 "literate/latex-output.weft"
+/* {96: literate/latex-output.weft:402} */
 extern int extra_scraps;
 /* {:96} */
 
@@ -224,18 +234,18 @@ extern void pass1(char *file_name);
 extern void write_tex(char *file_name, char *tex_name, unsigned char sector);
 /* {:76} */
 
-#line 564 "literate/latex-output.weft"
-/* {107: literate/latex-output.weft:564} */
+#line 566 "literate/latex-output.weft"
+/* {107: literate/latex-output.weft:566} */
 void initialise_delimit_scrap_array(void);
 /* {:107} */
 
-#line 658 "literate/latex-output.weft"
-/* {112: literate/latex-output.weft:658} */
+#line 660 "literate/latex-output.weft"
+/* {112: literate/latex-output.weft:660} */
 void update_delimit_scrap(void);
 /* {:112} */
 
-#line 1082 "literate/latex-output.weft"
-/* {138: literate/latex-output.weft:1082} */
+#line 1085 "literate/latex-output.weft"
+/* {138: literate/latex-output.weft:1085} */
 extern int has_sector(Name *, unsigned char);
 /* {:138} */
 
@@ -263,8 +273,8 @@ extern int source_last;   /* what last source_get() returned. */
 extern int source_peek;   /* The next character to get */
 /* {:212} */
 
-#line 82 "literate/source-io.weft"
-/* {218: literate/source-io.weft:82} */
+#line 83 "literate/source-io.weft"
+/* {218: literate/source-io.weft:83} */
 extern void source_ungetc(int*);
 /* {:218} */
 
@@ -297,8 +307,8 @@ extern void add_to_use(Name * name, int current_scrap);
 Arglist *instance(Arglist *a, Arglist *par, char *arg[9], int *ch);
 /* {:261} */
 
-#line 1004 "literate/scraps.weft"
-/* {290: literate/scraps.weft:1004} */
+#line 1005 "literate/scraps.weft"
+/* {290: literate/scraps.weft:1005} */
 extern void collect_numbers(char *aux_name);
 /* {:290} */
 
@@ -315,33 +325,33 @@ extern void collect_lang_def(void);
 extern void collect_weave_format(void);
 /* {:301} */
 
-#line 223 "literate/names.weft"
-/* {307: literate/names.weft:223} */
+#line 224 "literate/names.weft"
+/* {307: literate/names.weft:224} */
 extern int robs_strcmp(char*, char*);
 /* {:307} */
 
-#line 1201 "literate/names.weft"
-/* {328: literate/names.weft:1201} */
+#line 1202 "literate/names.weft"
+/* {328: literate/names.weft:1202} */
 extern Name *install_args(Name *name, int argc, char *arg[9]);
 /* {:328} */
 
-#line 188 "literate/search-labels.weft"
-/* {357: literate/search-labels.weft:188} */
+#line 193 "literate/search-labels.weft"
+/* {357: literate/search-labels.weft:193} */
 extern void search(void);
 /* {:357} */
 
-#line 435 "literate/search-labels.weft"
-/* {369: literate/search-labels.weft:435} */
+#line 440 "literate/search-labels.weft"
+/* {369: literate/search-labels.weft:440} */
 extern void format_uses_refs(FILE *, int);
 /* {:369} */
 
-#line 490 "literate/search-labels.weft"
-/* {374: literate/search-labels.weft:490} */
+#line 495 "literate/search-labels.weft"
+/* {374: literate/search-labels.weft:495} */
 extern void format_defs_refs(FILE *, int);
 /* {:374} */
 
-#line 601 "literate/search-labels.weft"
-/* {382: literate/search-labels.weft:601} */
+#line 606 "literate/search-labels.weft"
+/* {382: literate/search-labels.weft:606} */
 void write_label(char label_name[], FILE * file);
 /* {:382} */
 

@@ -663,6 +663,7 @@ static Arglist *arglist_lookup(int idx)
   Parameters local_parameters = 0;
   int line_number = scrap_array(defs->scrap).file_line;
   reader.scrap = scrap_array(defs->scrap).slab;
+  reader.prev = NULL;
   reader.index = 0;
   @<Insert debugging information if required@>
   @<Insert section opening marker@>

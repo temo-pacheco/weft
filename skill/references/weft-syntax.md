@@ -24,7 +24,7 @@
 
 ## 1. What is weft
 
-weft is a **literate programming** tool descended from nuweb (by Preston Briggs). Its core premise is that the programmer writes **a single document** (a `.weft` file, or `.w` for short) combining prose documentation with source code in **any programming language**. From that document, weft produces:
+weft is a **literate programming** tool descended from nuweb (by Preston Briggs). Its core premise is that the programmer writes **a single document** (a `.weft` file) combining prose documentation with source code in **any programming language**. From that document, weft produces:
 
 - **Tangle** -> source code files ready to compile or execute.
 - **Weave** (optional, via `-w`) -> documentation in Markdown or LaTeX with automatically generated indices and cross-references.
@@ -374,7 +374,7 @@ In the generated index, each identifier appears with a list of all scraps using 
 weft [flags] file-name...
 ```
 
-One or more files may be processed at a time. If a file name has no extension, `.weft` will be appended (`.w` is also accepted).
+One or more files may be processed at a time. If a file name has no extension, `.weft` will be appended.
 
 **Default behavior**: weft **tangles only** (no documentation output). This differs from the original nuweb, which produced both tangle and weave by default. Use `-w` to activate weave output.
 

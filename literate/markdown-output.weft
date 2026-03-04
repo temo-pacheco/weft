@@ -113,10 +113,12 @@ Otherwise we output what we already consumed and continue.
           update_delimit_scrap();
           break;
     case 'O': big_definition = TRUE;
+              FALLTHROUGH;
     case 'o': @<Write md output file definition@>
               break;
     case 'Q':
     case 'D': big_definition = TRUE;
+              FALLTHROUGH;
     case 'q':
     case 'd': @<Write md macro definition@>
               break;

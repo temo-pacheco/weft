@@ -1,6 +1,6 @@
 
-#line 115 "literate/architecture.weft"
-/* {10: literate/architecture.weft:115} */
+#line 135 "literate/architecture.weft"
+/* {10: literate/architecture.weft:135} */
 #include "global.h"
 /* {:10} */
 
@@ -31,8 +31,8 @@ int source_get(void)
   source_last = c = source_peek;
   switch (c) {
     case EOF:  
-#line 207 "literate/source-io.weft"
-               /* {223: literate/source-io.weft:207} */
+#line 208 "literate/source-io.weft"
+               /* {223: literate/source-io.weft:208} */
 {
                  fclose(source_file);
                  if (include_depth) {
@@ -49,13 +49,14 @@ int source_get(void)
 
                return c;
     case '\n': source_line++;
+               FALLTHROUGH;
     default:
            if (c==nw_char)
              {
                /* Handle an ``at'' character */
                
-#line 103 "literate/source-io.weft"
-               /* {220: literate/source-io.weft:103} */
+#line 104 "literate/source-io.weft"
+               /* {220: literate/source-io.weft:104} */
 {
                  c = getc(source_file);
                  if (double_at) {
@@ -66,8 +67,8 @@ int source_get(void)
                  else
                    switch (c) {
                      case 'i': 
-#line 146 "literate/source-io.weft"
-                               /* {221: literate/source-io.weft:146} */
+#line 147 "literate/source-io.weft"
+                               /* {221: literate/source-io.weft:147} */
 {
                                  char name[FILENAME_MAX];
                                  char fullname[FILENAME_MAX];
@@ -80,8 +81,8 @@ int source_get(void)
                                  }
                                  /* Collect include-file name */
                                  
-#line 186 "literate/source-io.weft"
-                                 /* {222: literate/source-io.weft:186} */
+#line 187 "literate/source-io.weft"
+                                 /* {222: literate/source-io.weft:187} */
 {
                                      char *p = name;
                                      do
@@ -99,7 +100,7 @@ int source_get(void)
                                      }
                                  }/* {:222} */
 
-#line 156 "literate/source-io.weft"
+#line 157 "literate/source-io.weft"
 
                                  stack[include_depth].file = source_file;
                                  fullname[0] = '\0';
@@ -129,7 +130,7 @@ int source_get(void)
                                  c = source_get();
                                }/* {:221} */
 
-#line 112 "literate/source-io.weft"
+#line 113 "literate/source-io.weft"
 
                                break;
                      case '#': case 'f': case 'm': case 'u': case 'v':
@@ -163,7 +164,7 @@ int source_get(void)
                    }
                }/* {:220} */
 
-#line 70 "literate/source-io.weft"
+#line 71 "literate/source-io.weft"
 
                return c;
              }
@@ -173,8 +174,8 @@ int source_get(void)
 }
 /* {:217} */
 
-#line 87 "literate/source-io.weft"
-/* {219: literate/source-io.weft:87} */
+#line 88 "literate/source-io.weft"
+/* {219: literate/source-io.weft:88} */
 void source_ungetc(int *c)
 {
   ungetc(source_peek, source_file);
@@ -184,8 +185,8 @@ void source_ungetc(int *c)
 }
 /* {:219} */
 
-#line 226 "literate/source-io.weft"
-/* {224: literate/source-io.weft:226} */
+#line 227 "literate/source-io.weft"
+/* {224: literate/source-io.weft:227} */
 void source_open(char *name)
 {
   source_file = fopen(name, "r");

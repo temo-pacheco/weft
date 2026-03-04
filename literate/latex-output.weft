@@ -119,10 +119,12 @@ an eye peeled for \verb|@@|~characters, which signal a command sequence.
           update_delimit_scrap();
           break;
     case 'O': big_definition = TRUE;
+              FALLTHROUGH;
     case 'o': @<Write output file definition@>
               break;
     case 'Q':
     case 'D': big_definition = TRUE;
+              FALLTHROUGH;
     case 'q':
     case 'd': @<Write macro definition@>
               break;
@@ -683,6 +685,7 @@ this function. It updates the scrap formatting directives accordingly.
     case '-':
     case '*':
     case '|': @<Skip over index entries@>
+              FALLTHROUGH;
     case ',':
     case ')':
     case ']':

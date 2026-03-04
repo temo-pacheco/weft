@@ -173,13 +173,18 @@ else if (a->bgn) {
 }
 @}
 
+When the offset \verb|k| falls within the current slab we index it
+directly.  When \verb|k| is negative we must reach into the previous
+slab: since \verb|k| is already negative, \verb|SLAB_SIZE + k| yields
+the correct index (e.g.\ $k = -1$ gives \verb|chars[1023]|, the last
+element).
 @d Get the nth previous character from a scrap
 @{int k = m->index - n - 2;
 
 if (k >= 0)
    c = m->scrap->chars[k];
 else if (m->prev)
-   c = m->prev->chars[SLAB_SIZE - k];
+   c = m->prev->chars[SLAB_SIZE + k];
 @}
 
 \subsection{Building the Automata}

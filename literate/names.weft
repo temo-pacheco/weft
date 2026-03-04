@@ -142,6 +142,7 @@ Name *prefix_add(Name **rt, char *spelling, unsigned char sector)
                     break;
     case EQUAL:
                     found_name = node->spelling;
+                    FALLTHROUGH;
     case EXTENSION: if (node->sector > sector) {
                        rt = &node->rlink;
                        break;
@@ -820,8 +821,8 @@ any \verb|@@o| or \verb|@@d| directives that depend on it).
 
   /* Register the user language */
   if (user_lang_count < MAX_USER_LANGS) {
-    strncpy(user_lang_names[user_lang_count], name, 63);
-    user_lang_names[user_lang_count][63] = '\0';
+    snprintf(user_lang_names[user_lang_count],
+             sizeof(user_lang_names[user_lang_count]), "%s", name);
     user_langs[user_lang_count].name = user_lang_names[user_lang_count];
     user_langs[user_lang_count].comment = comment;
     user_langs[user_lang_count].line_directive = line_dir;

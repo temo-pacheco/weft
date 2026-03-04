@@ -64,6 +64,7 @@ int source_get(void)
     case EOF:  @<Handle \verb|EOF|@>
                return c;
     case '\n': source_line++;
+               FALLTHROUGH;
     default:
            if (c==nw_char)
              {

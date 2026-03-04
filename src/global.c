@@ -1,6 +1,6 @@
 
-#line 140 "literate/architecture.weft"
-/* {14: literate/architecture.weft:140} */
+#line 160 "literate/architecture.weft"
+/* {14: literate/architecture.weft:160} */
 #include "global.h"
 /* Operating System Dependencies */
 
@@ -22,7 +22,7 @@
 #endif
 /* {:16} */
 
-#line 141 "literate/architecture.weft"
+#line 161 "literate/architecture.weft"
 
 /* Global variable definitions */
 
@@ -68,19 +68,19 @@ int nw_char='@';
 char *command_name = NULL;
 /* {:22} */
 
-#line 186 "literate/parser.weft"
-/* {48: literate/parser.weft:186} */
+#line 187 "literate/parser.weft"
+/* {48: literate/parser.weft:187} */
 unsigned char current_sector = 1;
 unsigned char prev_sector = 1;
 /* {:48} */
 
-#line 383 "literate/parser.weft"
-/* {62: literate/parser.weft:383} */
+#line 384 "literate/parser.weft"
+/* {62: literate/parser.weft:384} */
 char blockBuff[6400];
 /* {:62} */
 
-#line 404 "literate/latex-output.weft"
-/* {97: literate/latex-output.weft:404} */
+#line 406 "literate/latex-output.weft"
+/* {97: literate/latex-output.weft:406} */
 int extra_scraps = 0;
  /* {:97} */
 
@@ -105,7 +105,7 @@ int scrap_ended_with;
 char pending_lang[64] = "";
 /* {:300} */
 
-#line 142 "literate/architecture.weft"
+#line 162 "literate/architecture.weft"
 
 /* {:14} */
 

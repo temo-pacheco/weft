@@ -128,6 +128,7 @@ immediately, warning if unexpected sequences are discovered.
               break;
     case 'Q':
     case 'q': quoted = 1;
+              FALLTHROUGH;
     case 'D':
     case 'd': @<Build fragment definition@>
               break;

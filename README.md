@@ -1,4 +1,4 @@
-# weft 1.0
+# weft
 
 **A Modern Literate Programming Tool**
 
@@ -50,7 +50,7 @@ language. weft **tangles** it into executable source files and, when asked,
 
 - **Tangle by default** — `weft myfile.weft` tangles only. Weave is
   requested explicitly with `-w`.
-- **`@@W` weave format declaration** — `@@W md` or `@@W tex` in the
+- **`@W` weave format declaration** — `@W md` or `@W tex` in the
   source file declares the weave format. `weft -w` uses this; `-w md`
   or `-w tex` on the command line overrides it.
 - **Markdown weave output** — `weft -w md` produces a `.md` file
@@ -386,7 +386,7 @@ Example prompts:
 
 > Show me the dependency graph of my literate project
 
-> Refactor this monolithic .weft into separate concept files
+> I have an existing Express app in src/. Reorganize it into .weft concept files so I can benefit from literate programming
 ```
 
 ## License

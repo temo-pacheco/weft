@@ -244,10 +244,10 @@ order:
 
 | Priority | Method | Example | Where |
 |----------|--------|---------|-------|
-| 1 (highest) | Explicit flags on `@o` | `@o file.c -d -cc` | `.weft` or `.w` |
-| 2 | `@l` override | `@l js` inside a scrap | `.weft` or `.w` |
+| 1 (highest) | Explicit flags on `@o` | `@o file.c -d -cc` | `.weft` |
+| 2 | `@l` override | `@l js` inside a scrap | `.weft` |
 | 3 (auto) | File extension | `.js`, `.py`, `.go`, etc. | Automatic |
-| 4 | `@L` definition | `@L nim #` in preamble | `.weft` or `.w` |
+| 4 | `@L` definition | `@L nim #` in preamble | `.weft` |
 
 If no language is detected, no markers are generated (backward
 compatible with older behavior).

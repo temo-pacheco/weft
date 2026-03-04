@@ -5,15 +5,15 @@ description: >
   Each .weft file is a self-contained narrative crossing all architectural
   layers. Pipeline: .weft → weft tangle → output files.
   Triggers: "literate programming", "programacion literaria", "weft",
-  "nuweb", ".weft files", ".w files", "weft skill", "literate skill".
+  "nuweb", ".weft files", "weft skill", "literate skill".
 ---
 
 
 # Literate Programming with weft
 
 A paradigm where **documentation is the source code**. You write `.weft` files
-(or `.w` as shorthand) as narratives with embedded code chunks. weft tangles
-them into executable output and optionally weaves them into documentation.
+as narratives with embedded code chunks. weft tangles them into executable
+output and optionally weaves them into documentation.
 
 This skill covers the generic paradigm (any language). It was itself
 built with weft.

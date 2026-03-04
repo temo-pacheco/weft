@@ -135,7 +135,7 @@ watchexec -e weft,w -- just tangle
 
 ### Using entr
 ```bash
-find . -name '*.weft' -o -name '*.w' | entr just tangle
+find . -name '*.weft' | entr just tangle
 ```
 
 ### Using just (with a watch recipe)

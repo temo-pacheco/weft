@@ -28,8 +28,13 @@ recompilation during development.
 @<Operating System Dependencies@>@}
 
 We'll need at least five of the standard system include files.
+We also require \verb|_POSIX_C_SOURCE| at level 200809L so that
+POSIX functions like \verb|strdup| are visible when compiling
+under strict C11 mode (\verb|-std=c11|).
 @d Include files
 @{
+#define _POSIX_C_SOURCE 200809L
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -54,7 +59,22 @@ code seems to work on all the local systems.
 #ifndef TRUE
 #define TRUE 1
 #endif
-@| FALSE TRUE @}
+
+#if defined(__GNUC__) && __GNUC__ >= 7
+#define FALLTHROUGH __attribute__((fallthrough))
+#elif defined(__clang__)
+#define FALLTHROUGH __attribute__((fallthrough))
+#else
+#define FALLTHROUGH ((void)0)
+#endif
+@| FALSE TRUE FALLTHROUGH @}
+
+The \verb|FALLTHROUGH| macro marks intentional switch case fall-throughs
+as a statement rather than a comment.  GCC~7+ and Clang recognise
+\verb|__attribute__((fallthrough))| and suppress
+\verb|-Wimplicit-fallthrough| warnings; other compilers see a harmless
+\verb|((void)0)|.  The prose surrounding each switch already explains
+why the fall-through is intended, so no inline comment is needed.
 
 Here we define the maximum length for names (of fragments etc).
 
