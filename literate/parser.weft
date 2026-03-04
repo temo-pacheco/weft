@@ -1,0 +1,668 @@
+\section{Pass One} \label{pass-one}
+
+During the first pass, we scan the file, recording the definitions of
+each fragment and file and accumulating all the scraps.
+
+@d Function pro...
+@{extern void pass1(char *file_name);
+@}
+
+
+The routine \verb|pass1| takes a single argument, the name of the
+source file. It opens the file, then initializes the scrap structures
+(see Section~\ref{scraps}) and the roots of the file-name tree, the
+fragment-name tree, and the tree of user-specified index entries (see
+Section~\ref{names}). After completing all the
+necessary preparation, we make a pass over the file, filling in all
+our data structures. Next, we seach all the scraps for references to
+the user-specified index entries. Finally, we must reverse all the
+cross-reference lists accumulated while scanning the scraps.
+@o pass1.c
+@{void pass1(char *file_name)
+{
+  if (verbose_flag)
+    fprintf(stderr, "reading %s\n", file_name);
+  source_open(file_name);
+  init_scraps();
+  macro_names = NULL;
+  file_names = NULL;
+  user_names = NULL;
+  @<Scan the source file, looking for at-sequences@>
+  if (tex_flag)
+    search();
+  @<Reverse cross-reference lists@>
+}
+@| pass1 @}
+
+The only thing we look for in the first pass are the command
+sequences.  All ordinary text is skipped entirely.
+
+@d Scan the source file, look...
+@{{
+  int c = source_get();
+  while (c != EOF) {
+    if (c == nw_char)
+      @<Scan at-sequence@>
+    c = source_get();
+  }
+}@}
+
+
+The \verb|@@l| command (lowercase) sets the language for the next
+\verb|@@o| or \verb|@@d| directive by storing the tag in
+\verb|pending_lang|.  It replaces the earlier mechanism of detecting
+Markdown fences (\verb|```lang|) and \LaTeX{} markers (\verb|%%%lang|)
+during pass1.  A typical usage is:
+\begin{verbatim}
+    @@l python
+    @@d Validate input
+    @@{import re
+    ...
+    @@}
+\end{verbatim}
+
+@d Collect language apply in pass1
+@{{
+  char lang[64];
+  char *lp = lang;
+  int lc = source_get();
+  /* skip optional whitespace */
+  while (lc == ' ' || lc == '\t')
+    lc = source_get();
+  /* read language tag */
+  while (lc != EOF && lc != '\n' && lc != ' ' && lc != '\t'
+         && (lp - lang) < 62) {
+    *lp++ = lc;
+    lc = source_get();
+  }
+  *lp = '\0';
+  if (lang[0] != '\0') {
+    strncpy(pending_lang, lang, 63);
+    pending_lang[63] = '\0';
+  }
+  /* consume rest of line */
+  while (lc != EOF && lc != '\n')
+    lc = source_get();
+}@}
+
+The \verb|@@L| command (Section~\ref{user-lang-def}) lets users
+register custom language mappings.  During pass1, the actual parsing
+and registration is handled by \verb|collect_lang_def()| in
+\verb|names.c|.  During the weave passes (\LaTeX{} and Markdown), we
+simply consume the rest of the line so that the arguments do not leak
+into the typeset output.
+
+@d Collect user language definition in pass1
+@{collect_lang_def();@}
+
+@d Collect weave format declaration in pass1
+@{collect_weave_format();@}
+
+@d Skip at-L language definition line
+@{{ int lc = source_get();
+  while (lc != '\n' && lc != EOF)
+    lc = source_get();
+}
+c = source_get();@}
+
+
+Six at-sequences are interesting during the first pass: \verb|@@o|
+and \verb|@@O| (file definitions), \verb|@@d|, \verb|@@D|, and
+\verb|@@q| (fragment definitions), \verb|@@c| (block comments),
+\verb|@@s|/\verb|@@S| (sectors), \verb|@@l| (language apply), and
+\verb|@@L| (language definitions).  We skip past all others
+immediately, warning if unexpected sequences are discovered.
+@d Scan at-sequence
+@{{
+  char quoted = 0;
+
+  c = source_get();
+  switch (c) {
+    case 'r':
+          c = source_get();
+          nw_char = c;
+          update_delimit_scrap();
+          break;
+    case 'O':
+    case 'o': @<Build output file definition@>
+              break;
+    case 'Q':
+    case 'q': quoted = 1;
+    case 'D':
+    case 'd': @<Build fragment definition@>
+              break;
+    case 's':
+              @<Step to next sector@>
+              break;
+    case 'S':
+              @<Close the current sector@>
+              break;
+    case '<':
+    case '(':
+    case '[':
+    case '{': @<Skip over an in-text scrap@>
+              break;
+    case 'c': @<Collect a block comment@>
+              break;
+    case 'l': @<Collect language apply in pass1@>
+              break;
+    case 'L': @<Collect user language definition in pass1@>
+              break;
+    case 'W': @<Collect weave format declaration in pass1@>
+              break;
+    case 'x':
+    case 'v':
+    case 'u':
+    case 'm':
+    case 'f': /* ignore during this pass */
+              break;
+    default:  if (c==nw_char) /* ignore during this pass */
+                break;
+              fprintf(stderr,
+                      "%s: unexpected %c sequence ignored (%s, line %d)\n",
+                      command_name, nw_char, source_name, source_line);
+              break;
+  }
+}@}
+
+@d Step to next sector
+@{
+prev_sector += 1;
+current_sector = prev_sector;
+c = source_get();
+@}
+
+@d Close the current sector
+@{current_sector = 1;
+c = source_get();
+@}
+
+@d Global variable declar...
+@{extern unsigned char current_sector;
+extern unsigned char prev_sector;
+@| current_sector prev_sector @}
+
+@d Global variable def...
+@{unsigned char current_sector = 1;
+unsigned char prev_sector = 1;
+@}
+
+\subsection{Accumulating Definitions}
+
+There are three steps required to handle a definition:
+\begin{enumerate}
+  \item Build an entry for the name so we can look it up later.
+  \item Collect the scrap and save it in the table of scraps.
+  \item Attach the scrap to the name.
+\end{enumerate}
+We go through the same steps for both file names and fragment names.
+@d Build output file definition
+@{{
+  Name *name = collect_file_name(); /* returns a pointer to the name entry */
+  int scrap = collect_scrap();      /* returns an index to the scrap */
+  @<Add \verb|scrap| to...@>
+}@}
+
+
+@d Build fragment definition
+@{{
+  Name *name = collect_macro_name();
+  int scrap = collect_scrap();
+  @<Add \verb|scrap| to...@>
+}@}
+
+
+Since a file or fragment may be defined by many scraps, we maintain them
+in a simple linked list. The list is actually built in reverse order,
+with each new definition being added to the head of the list.
+@d Add \verb|scrap| to \verb|name|'s definition list
+@{{
+  Scrap_Node *def = (Scrap_Node *) arena_getmem(sizeof(Scrap_Node));
+  def->scrap = scrap;
+  def->quoted = quoted;
+  def->next = name->defs;
+  name->defs = def;
+}@}
+
+@d Skip over an in-text scrap
+@{
+{
+   int c;
+   int depth = 1;
+   while ((c = source_get()) != EOF) {
+      if (c == nw_char)
+         @<Skip over at-sign or go to skipped@>
+   }
+   fprintf(stderr, "%s: unexpected EOF in text at (%s, %d)\n",
+                    command_name, source_name, source_line);
+   exit(-1);
+
+skipped:  ;
+}
+@}
+
+@d Skip over at-sign or go to skipped
+@{
+{
+   c = source_get();
+   switch (c) {
+     case '{': case '[': case '(': case '<':
+        depth += 1;
+        break;
+     case '}': case ']': case ')': case '>':
+        if (--depth == 0)
+           goto skipped;
+     case 'x': case '|': case ',':
+     case '%': case '1': case '2':
+     case '3': case '4': case '5': case '6':
+     case '7': case '8': case '9': case '_':
+     case 'f': case '#': case '+': case '-':
+     case 'v': case '*': case 'c': case '\'':
+     case 's':
+        break;
+     default:
+        if (c != nw_char) {
+	   fprintf(stderr, "%s: unexpected %c%c in text at (%s, %d)\n",
+	                   command_name, nw_char, c, source_name, source_line);
+	   exit(-1);
+	}
+        break;
+   }
+}
+@}
+\subsection{Block Comments}
+
+@d Collect a block comment
+@{{
+   char * p = blockBuff;
+   char * e = blockBuff + (sizeof(blockBuff)/sizeof(blockBuff[0])) - 1;
+
+   @<Skip whitespace@>
+   while (p < e)
+   {
+      @<Add one char to the block buffer@>
+   }
+   if (p == e)
+   {
+      @<Skip to the next nw-char@>
+   }
+   *p = '\000';
+}
+@}
+
+@d Skip whitespace
+@{while (source_peek == ' '
+       || source_peek == '\t'
+       || source_peek == '\n')
+   (void)source_get();
+@}
+
+@d Add one char to the block buffer
+@{int c = source_get();
+
+if (c == nw_char)
+{
+   @<Add an at character to the block or break@>
+}
+else if (c == EOF)
+{
+   source_ungetc(&c);
+   break;
+}
+else
+{
+   @<Add any other character to the block@>
+}
+@}
+
+@d Add an at character to the block or break
+@{int cc = source_peek;
+
+if (cc == 'c')
+{
+   do
+      c = source_get();
+   while (c <= ' ');
+
+   break;
+}
+else if (cc == 'd'
+         || cc == 'D'
+         || cc == 'q'
+         || cc == 'Q'
+         || cc == 'o'
+         || cc == 'O'
+         || cc == EOF)
+{
+   source_ungetc(&c);
+   break;
+}
+else
+{
+   *p++ = c;
+   *p++ = source_get();
+}
+@}
+
+@d Add any other character to the block
+@{
+   @<Perhaps skip white-space@>
+   *p++ = c;
+@}
+
+@d Perhaps skip white-space
+@{if (c == ' ')
+{
+   while (source_peek == ' ')
+      c = source_get();
+}
+if (c == '\n')
+{
+   if (source_peek == '\n')
+   {
+      do
+         c = source_get();
+      while (source_peek == '\n');
+   }
+   else
+      c = ' ';
+}
+@}
+
+@d Skip to the next nw-char
+@{int c;
+
+while ((c = source_get()), c != nw_char && c != EOF)/* Skip */
+source_ungetc(&c);@}
+
+@d Global variable declar...
+@{extern char blockBuff[6400];
+@| blockBuff @}
+
+@d Global variable def...
+@{char blockBuff[6400];
+@}
+
+We don't show block comments inside scraps in the \TeX\ file,
+but we do show where they go.
+
+@d Show presence of a block comment
+@{{
+  fputs(delimit_scrap[scrap_type][1],file);
+  fprintf(file, "\\hbox{\\sffamily\\slshape (Comment)}");
+  fputs(delimit_scrap[scrap_type][0], file);
+}
+@}
+
+The block comment is presently in the block buffer. Here we
+copy it into the scrap whence we shall copy it into the output
+file.
+
+@d Include block comment in a scrap
+@{{
+   char * p = blockBuff;
+
+   push(nw_char, &writer);
+   do
+   {
+      push(c, &writer);
+      c = *p++;
+   } while (c != '\0');
+}@}
+
+@d Copy block comment from scrap
+@{{
+   int bgn = indent + global_indent;
+   int posn = bgn + strlen(comment_begin[comment_flag]);
+   int i;
+
+   @<Perhaps put a delayed indent@>
+   c = pop(&reader);
+   fputs(comment_begin[comment_flag], file);
+   while (c != '\0')
+   {
+      @<Move a word to the file@>
+      @<If we break the line at this word@>
+      {
+         putc('\n', file);
+         for (i = 0; i < bgn ; i++)
+            putc(' ', file);
+         c = pop(&reader);
+         if (c != '\0')
+         {
+            posn = bgn + strlen(comment_mid[comment_flag]);
+            fputs(comment_mid[comment_flag], file);
+         }
+      }
+   }
+   fputs(comment_end[comment_flag], file);
+}
+@}
+
+@d Move a word to the file
+@{do
+{
+   putc(c, file);
+   posn += 1;
+   c = pop(&reader);
+} while (c > ' ');
+@}
+
+@d If we break the line at this word
+@{if (c == '\n' || (c == ' ' && posn > 60))@}
+
+@d Skip over a block comment
+@{if (last == nw_char && c == 'c')
+   while ((c = pop(reader.m)) != '\0')
+      /* Skip */;
+@}
+
+@d Begin or end a block comment
+@{if (inBlock)
+{
+   @<End block@>
+}
+else
+{
+   @<Start block@>
+}@}
+
+
+\subsection{Fixing the Cross References}
+
+Since the definition and reference lists for each name are accumulated
+in reverse order, we take the time at the end of \verb|pass1| to
+reverse them all so they'll be simpler to print out prettily.
+The code for \verb|reverse_lists| appears in Section~\ref{names}.
+@d Reverse cross-reference lists
+@{{
+  reverse_lists(file_names);
+  reverse_lists(macro_names);
+  reverse_lists(user_names);
+}@}
+
+\subsection{Dealing with fragment parameters}
+
+Fragment parameters were added on later in nuweb's development.
+There still is not, for example, an index of fragment parameters.
+We need a data type to keep track of fragment parameters.
+
+@d Type dec...
+@{typedef int *Parameters;
+@| Parameters @}
+
+
+When we are copying a scrap to the output, we check for an embedded
+parameter. If we find it we copy it. Otherwise it's an old-style
+parameter and we can then pull
+the $n$th string from the \verb|Parameters| list when we
+see an \verb|@@1| \verb|@@2|, etc.
+
+@D Handle macro parameter substitution @{
+case '1': case '2': case '3':
+case '4': case '5': case '6':
+case '7': case '8': case '9':
+  {
+    Arglist * args;
+    Name * name;
+
+    lookup(c - '1', inArgs, inParams, &name, &args);
+
+    if (name == (Name *)1) {
+      Embed_Node * q = (Embed_Node *)args;
+      indent = write_scraps(file, spelling, q->defs,
+                            global_indent + indent,
+                            indent_chars, debug_flag,
+                            tab_flag, indent_flag,
+                            0, 0,
+                            q->args, inParams,
+                            local_parameters, "");
+    }
+    else if (name != NULL) {
+       int i, narg;
+       char * p = name->spelling;
+       Arglist *q = args;
+
+       @<Perhaps comment...@>
+       indent = write_scraps(file, spelling, name->defs,
+                             global_indent + indent,
+                             indent_chars, debug_flag,
+                             tab_flag, indent_flag,
+                             comment_flag, location_flag,
+                             args, name->arg,
+                             local_parameters, p);
+    }
+    else if (args != NULL) {
+       if (delayed_indent) {
+         @<Put out the indent@>
+       }
+       fputs((char *)args, file);
+    }
+    else if ( parameters && parameters[c - '1'] ) {
+      Scrap_Node param_defs;
+      param_defs.scrap = parameters[c - '1'];
+      param_defs.next = 0;
+      write_scraps(file, spelling, &param_defs,
+                   global_indent + indent,
+                   indent_chars, debug_flag,
+                   tab_flag, indent_flag,
+                   comment_flag, location_flag,
+                   NULL, NULL, 0, "");
+    } else if (delayed_indent) {
+      @<Put out the indent@>
+    }
+  }
+@}
+Now onto actually parsing fragment parameters from a call.
+We start off checking for fragment parameters, an \verb|@@(| sequence
+followed by parameters separated by \verb|@@,| sequences, and
+terminated by a \verb|@@)| sequence.
+
+We collect separate scraps for each parameter, and write the
+scrap numbers down in the text. For example, if the file has:
+\begin{verbatim}
+   @@<foo @@( param1 @@, param2 @@)@@>
+\end{verbatim}
+we actually make new scraps, say 10 and 11, for param1 and param2,
+and write in the collected scrap:
+\begin{verbatim}
+   @@<foo @@(10@@,11@@)@@>
+\end{verbatim}
+
+@d Save macro parameters
+@{{
+  int param_scrap;
+  char param_buf[10];
+
+  push(nw_char, &writer);
+  push('(', &writer);
+  do {
+     param_scrap = collect_scrap();
+     sprintf(param_buf, "%d", param_scrap);
+     pushs(param_buf, &writer);
+     push(nw_char, &writer);
+     push(scrap_ended_with, &writer);
+     add_to_use(name, current_scrap);
+  } while( scrap_ended_with == ',' );
+  do
+    c = source_get();
+  while( ' ' == c );
+  if (c == nw_char) {
+    c = source_get();
+  }
+  if (c != '>') {
+    /* ZZZ print error */;
+  }
+}@}
+
+If we get inside, we have at least one parameter, which will be at
+the beginning of the parms buffer, and we prime the pump with the
+first character.
+
+@d Check for macro parameters
+@{
+  if (c == '(') {
+    Parameters res = arena_getmem(10 * sizeof(int));
+    int *p2 = res;
+    int count = 0;
+    int scrapnum;
+
+    while( c && c != ')' ) {
+      scrapnum = 0;
+      c = pop(manager);
+      while( '0' <= c && c <= '9' ) {
+        scrapnum = scrapnum  * 10 + c - '0';
+        c = pop(manager);
+      }
+      if ( c == nw_char ) {
+        c = pop(manager);
+      }
+      *p2++ = scrapnum;
+    }
+    while (count < 10) {
+      *p2++ = 0;
+      count++;
+    }
+    while( c && c != nw_char ) {
+        c = pop(manager);
+    }
+    if ( c == nw_char ) {
+      c = pop(manager);
+    }
+    *parameters = res;
+  }
+@}
+
+These are used in \verb|write_tex| to output the
+argument list for a fragment.
+
+@d Format macro parameters
+@{
+   char sep;
+
+   sep = '(';
+   do {
+     fputc(sep,file);
+
+     fputs("{\\footnotesize ", file);
+     write_single_scrap_ref(file, scraps + 1);
+     fprintf(file, "\\label{scrap%d}\n", scraps + 1);
+     fputs(" }", file);
+
+     source_last = '{';
+     copy_scrap(file, TRUE, NULL);
+
+     ++scraps;
+
+     sep = ',';
+   } while ( source_last != ')' && source_last != EOF );
+   fputs(" ) ",file);
+   do
+     c = source_get();
+   while(c != nw_char && c != EOF);
+   if (c == nw_char) {
+     c = source_get();
+   }
+@}
+
+

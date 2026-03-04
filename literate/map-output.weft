@@ -1,0 +1,274 @@
+\section{Map and Extract Output} \label{map-extract}
+
+Two modes support AI-assisted navigation of weft projects:
+
+\begin{description}
+\item[\tt -m] (map) emits a JSON object to stdout describing every
+  output file and every fragment, their definition locations, usage
+  relationships, and transitive dependencies.
+\item[\tt -e {\it name}] (extract) emits the scrap code and
+  dependency information for a single fragment (matched by prefix)
+  as Markdown to stdout.
+\end{description}
+
+Both modes run after \verb|pass1| has built the name trees and
+do \emph{not} invoke the weave or tangle phases.
+
+\subsection{JSON Map Output}
+
+The \verb|write_map| function performs an in-order traversal of the
+\verb|file_names| and \verb|macro_names| binary search trees, emitting
+a JSON object with two arrays: \verb|"files"| and \verb|"fragments"|.
+
+For each \verb|Name| node, it records:
+\begin{itemize}
+\item The spelling (name of the file or fragment).
+\item The sector number.
+\item The language tag (if any).
+\item Each definition scrap with its source file and line.
+\item Each usage scrap (scraps that reference this name).
+\item For definition scraps, the list of fragments referenced
+  inside (via \verb|get_scrap_uses|).
+\end{itemize}
+
+A helper function escapes strings for JSON output.
+
+@o output.c
+@{static void json_puts(FILE *f, const char *s)
+{
+  fputc('"', f);
+  while (*s) {
+    switch (*s) {
+      case '"':  fputs("\\\"", f); break;
+      case '\\': fputs("\\\\", f); break;
+      case '\n': fputs("\\n", f);  break;
+      case '\r': fputs("\\r", f);  break;
+      case '\t': fputs("\\t", f);  break;
+      default:
+        if ((unsigned char)*s < 0x20)
+          fprintf(f, "\\u%04x", (unsigned char)*s);
+        else
+          fputc(*s, f);
+    }
+    s++;
+  }
+  fputc('"', f);
+}
+@| json_puts @}
+
+The \verb|emit_name_json| helper emits a single name entry as a JSON
+object.  The \verb|is_file| flag distinguishes file names (which use
+\verb|"uses_fragments"| for fragments referenced inside their
+definition scraps) from macro fragments (which use \verb|"used_by"|
+for the scraps that invoke them, and \verb|"uses"| for fragments
+they invoke).
+
+@o output.c
+@{static void emit_name_json(FILE *f, Name *name, int is_file, int *first)
+{
+  Scrap_Node *sn;
+  int first_inner;
+
+  if (!name) return;
+  emit_name_json(f, name->llink, is_file, first);
+
+  if (!*first) fputs(",\n", f);
+  *first = 0;
+
+  fputs("    {\n", f);
+  fputs("      \"name\": ", f); json_puts(f, name->spelling);
+  if (name->lang[0]) {
+    fputs(",\n      \"lang\": ", f); json_puts(f, name->lang);
+  }
+  fprintf(f, ",\n      \"sector\": %d", name->sector);
+
+  /* defs array */
+  fputs(",\n      \"defs\": [", f);
+  first_inner = 1;
+  for (sn = name->defs; sn; sn = sn->next) {
+    if (!first_inner) fputs(", ", f);
+    first_inner = 0;
+    fprintf(f, "{\"scrap\": %d, \"file\": ", sn->scrap);
+    json_puts(f, scrap_file_name(sn->scrap));
+    fprintf(f, ", \"line\": %d}", scrap_file_line(sn->scrap));
+  }
+  fputs("]", f);
+
+  if (is_file) {
+    /* uses_fragments: fragments referenced inside this file's scraps */
+    fputs(",\n      \"uses_fragments\": [", f);
+    first_inner = 1;
+    for (sn = name->defs; sn; sn = sn->next) {
+      Uses *u;
+      for (u = get_scrap_uses(sn->scrap); u; u = u->next) {
+        if (!first_inner) fputs(", ", f);
+        first_inner = 0;
+        json_puts(f, u->defn->spelling);
+      }
+    }
+    fputs("]", f);
+  } else {
+    /* used_by: scraps that invoke this fragment */
+    fputs(",\n      \"used_by\": [", f);
+    first_inner = 1;
+    for (sn = name->uses; sn; sn = sn->next) {
+      if (!first_inner) fputs(", ", f);
+      first_inner = 0;
+      fprintf(f, "{\"scrap\": %d, \"file\": ", sn->scrap);
+      json_puts(f, scrap_file_name(sn->scrap));
+      fprintf(f, ", \"line\": %d}", scrap_file_line(sn->scrap));
+    }
+    fputs("]", f);
+
+    /* uses: fragments referenced inside this fragment's def scraps */
+    fputs(",\n      \"uses\": [", f);
+    first_inner = 1;
+    for (sn = name->defs; sn; sn = sn->next) {
+      Uses *u;
+      for (u = get_scrap_uses(sn->scrap); u; u = u->next) {
+        if (!first_inner) fputs(", ", f);
+        first_inner = 0;
+        json_puts(f, u->defn->spelling);
+      }
+    }
+    fputs("]", f);
+  }
+
+  fputs("\n    }", f);
+
+  emit_name_json(f, name->rlink, is_file, first);
+}
+@| emit_name_json @}
+
+@o output.c
+@{void write_map(Name *files, Name *macros)
+{
+  int first;
+
+  fputs("{\n  \"files\": [\n", stdout);
+  first = 1;
+  emit_name_json(stdout, files, 1, &first);
+  fputs("\n  ],\n  \"fragments\": [\n", stdout);
+  first = 1;
+  emit_name_json(stdout, macros, 0, &first);
+  fputs("\n  ]\n}\n", stdout);
+}
+@| write_map @}
+
+
+\subsection{Fragment Extraction}
+
+The \verb|write_extract| function finds a fragment by name (using
+prefix matching, like \verb|@@<name...@@>| in the source), then emits
+the scrap code and dependency information as Markdown.  It recurses
+into referenced fragments to provide the full transitive closure of
+the requested fragment.
+
+To find a name in the BST without creating a new entry, we use a
+read-only search function:
+
+@o output.c
+@{static Name *find_name(Name *node, const char *spelling)
+{
+  Name *found;
+  if (!node) return NULL;
+  if (robs_strcmp(node->spelling, (char *)spelling) == 0)
+    return node;
+  found = find_name(node->llink, spelling);
+  if (found) return found;
+  return find_name(node->rlink, spelling);
+}
+@| find_name @}
+
+A recursive helper emits one fragment and all its transitive
+dependencies.  A visited array (indexed by Name pointer cast to
+a simple mark) prevents infinite recursion on cyclic references.
+
+@o output.c
+@{static void extract_fragment(FILE *f, Name *name, Name *files, Name *macros)
+{
+  Scrap_Node *sn;
+
+  if (!name || name->mark) return;
+  name->mark = TRUE;
+
+  for (sn = name->defs; sn; sn = sn->next) {
+    fprintf(f, "\n## \"%s\" --- %s:%d\n\n",
+            name->spelling,
+            scrap_file_name(sn->scrap),
+            scrap_file_line(sn->scrap));
+    if (name->lang[0])
+      fprintf(f, "```%s\n", name->lang);
+    else
+      fputs("```\n", f);
+    dump_scrap_text(f, sn->scrap);
+    fputs("\n```\n", f);
+
+    /* Show dependencies */
+    {
+      Uses *u = get_scrap_uses(sn->scrap);
+      if (u) {
+        fputs("\n### Uses\n", f);
+        for (; u; u = u->next)
+          fprintf(f, "- %s\n", u->defn->spelling);
+      }
+    }
+  }
+
+  /* Show used_by */
+  if (name->uses) {
+    Scrap_Node *usn;
+    fputs("\n### Used by\n", f);
+    for (usn = name->uses; usn; usn = usn->next) {
+      fprintf(f, "- scrap %d (%s:%d)\n",
+              usn->scrap,
+              scrap_file_name(usn->scrap),
+              scrap_file_line(usn->scrap));
+    }
+  }
+
+  /* Recurse into dependencies */
+  for (sn = name->defs; sn; sn = sn->next) {
+    Uses *u;
+    for (u = get_scrap_uses(sn->scrap); u; u = u->next) {
+      extract_fragment(f, u->defn, files, macros);
+    }
+  }
+}
+@| extract_fragment @}
+
+Clear marks after extraction so the name trees remain usable:
+
+@o output.c
+@{static void clear_marks(Name *node)
+{
+  if (!node) return;
+  clear_marks(node->llink);
+  node->mark = FALSE;
+  clear_marks(node->rlink);
+}
+@| clear_marks @}
+
+@o output.c
+@{void write_extract(char *name, Name *files, Name *macros)
+{
+  Name *found = NULL;
+
+  /* Search in macro_names first, then file_names */
+  found = find_name(macros, name);
+  if (!found)
+    found = find_name(files, name);
+
+  if (!found) {
+    fprintf(stderr, "%s: fragment \"%s\" not found\n", command_name, name);
+    exit(1);
+  }
+
+  fprintf(stdout, "# Extract: \"%s\"\n", found->spelling);
+  extract_fragment(stdout, found, files, macros);
+
+  /* Clean up marks */
+  clear_marks(files);
+  clear_marks(macros);
+}
+@| write_extract @}

@@ -1,0 +1,1377 @@
+\chapter{Introduction}
+\pagenumbering{arabic}
+
+In 1984, Knuth introduced the idea of {\em literate programming\/} and
+described a pair of tools to support the practise~\cite{Knuth:CJ-27-2-97}.
+His approach was to combine Pascal code with \TeX\ documentation to
+produce a new language, \verb|WEB|, that offered programmers a superior
+approach to programming. He wrote several programs in \verb|WEB|,
+including \verb|weave| and \verb|tangle|, the programs used to support
+literate programming.
+The idea was that a programmer wrote one document, the web file, that
+combined documentation (written in \TeX~\cite{Knuth:ct-a}) with code
+(written in Pascal).
+
+Running \verb|tangle| on the web file would produce a complete
+Pascal program, ready for compilation by an ordinary Pascal compiler.
+The primary function of \verb|tangle| is to allow the programmer to
+present elements of the program in any desired order, regardless of
+the restrictions imposed by the programming language. Thus, the
+programmer is free to present his program in a top-down fashion,
+bottom-up fashion, or whatever seems best in terms of promoting
+understanding and maintenance.
+
+Running \verb|weave| on the web file would produce a \TeX\ file, ready
+to be processed by \TeX\@@. The resulting document included a variety of
+automatically generated indices and cross-references that made it much
+easier to navigate the code. Additionally, all of the code sections
+were automatically prettyprinted, resulting in a quite impressive
+document.
+
+Knuth also wrote the programs for \TeX\ and {\small\sf METAFONT}
+entirely in \verb|WEB|, eventually publishing them in book
+form~\cite{Knuth:ct-b,Knuth:ct-d}. These are probably the
+largest programs ever published in a readable form.
+
+Inspired by Knuth's example, many people have experimented with
+\verb|WEB|\@@. Some people have even built web-like tools for their
+own favorite combinations of programming language and typesetting
+language. For example, \verb|CWEB|, Knuth's current system of choice,
+works with a combination of C (or C++) and \TeX~\cite{Levy:TB8-1-12}.
+Another system, FunnelWeb, is independent of any programming language
+and only mildly dependent on \TeX~\cite{Williams:FUM92}. Inspired by the
+versatility of FunnelWeb and by the daunting size of its
+documentation, Preston Briggs decided to write his own, very simple, tool for
+literate programming.%
+\footnote{There is another system similar to
+nuweb, written by Norman Ramsey, called {\em noweb}~\cite{Ramsey:LPT92}. It
+perhaps suffers from being overly Unix-dependent and requiring several
+programs to use. On the other hand, its command syntax is very nice.
+In any case, nuweb certainly owes its name and a number of features to
+his inspiration.}
+
+weft is a fork of nuweb. The original nuweb code, written by Preston
+Briggs and maintained over the years by several contributors, provided
+an excellent foundation: a simple, language-independent literate
+programming tool. weft builds on that foundation with a modernized
+codebase, a modular source structure organized by concept, the removal
+of the unmaintained HTML output path, and the addition of a Markdown 
+weave output format. The goal is to continue evolving the tool while
+preserving the simplicity and philosophy that made nuweb valuable
+in the first place.
+
+\section{weft}
+
+weft works with any programming language and produces documentation in
+\LaTeX~\cite{Lamport:LDP85} or Markdown format. \LaTeX\ was the
+original choice because it supports a multi-level sectioning scheme
+and has facilities for drawing figures. Markdown support was added to
+allow literate programs to produce lightweight documentation that
+renders well on platforms like GitHub, GitLab, and any Markdown viewer,
+without requiring a \TeX\ installation.
+
+Support for arbitrary programming languages was a design goal because
+programmers work in many languages (and sometimes combinations of
+several languages), {\em e.g.,} C, Fortran, C++, yacc, lex, Scheme,
+assembly, Postscript, and so forth. The need to support arbitrary
+programming languages has many consequences:
+\begin{description}
+\item[No prettyprinting] Both \verb|WEB| and \verb|CWEB| are able to
+  prettyprint the code sections of their documents because they
+  understand the language well enough to parse it. Since weft aims to support
+  {\em any\/} language, this feature must be abandoned.
+  However, weft does allow particular individual formulas or fragments
+  of \LaTeX\ code to be formatted and still be parts of output files.
+  Also, keywords in scraps can be surrounded by \verb|@@_| to
+  have them be bold in the output.
+\item[No index of identifiers] Because \verb|WEB| knows about Pascal,
+  it is able to construct an index of all the identifiers occurring in
+  the code sections (filtering out keywords and the standard type
+  identifiers). Unfortunately, this isn't as easy for a language-independent
+  tool. weft doesn't know what an identifier looks like in each language and
+  certainly doesn't know all the keywords. (On the other hand, see the end of
+  Section~\ref{minorcommands})
+\end{description}
+Of course, there must be some compensation for these losses or the
+whole idea would be a waste. Here are the advantages:
+\begin{description}
+\item[Simplicity] The majority of the commands in \verb|WEB| are
+  concerned with control of the automatic prettyprinting. Since weft
+  doesn't prettyprint, many commands are eliminated. A further set of
+  commands is subsumed by \LaTeX\  and may also be eliminated. As a
+  result, the set of commands is reduced to only four members (explained
+  in the next section). This simplicity is also reflected in
+  the size of this tool, which is quite a bit smaller than the tools
+  used with other approaches.
+\item[No prettyprinting] Everyone disagrees about how their code
+  should look, so automatic formatting annoys many people. One approach
+  is to provide ways to control the formatting. weft's approach is
+  simpler---it performs no automatic formatting and therefore allows the
+  programmer complete control of code layout.
+  weft does allow individual scraps to be presented in either verbatim,
+  math, or paragraph mode in the \TeX\ output.
+\item[Control] weft also offers the programmer complete control of the
+  layout of his output files (the files generated during tangling). Of
+  course, this is essential for languages that are sensitive to layout;
+  but it is also important in many practical situations, {\em e.g.,}
+  debugging.
+\item[Speed] Since weft doesn't do too much, the weft tool runs
+  quickly. By default it performs only tangling; weaving is activated
+  with \verb|-w|. When weaving is requested, both operations execute
+  in a single pass.
+\item[Page numbers] Inspired by the example of noweb, weft refers to
+  all scraps by page number to simplify navigation. If there are
+  multiple scraps on a page (say, page~17), they are distinguished by
+  lower-case letters ({\em e.g.,} 17a, 17b, and so forth).
+\item[Multiple file output] The programmer may specify more than one
+  output file in a single weft file. This is required when constructing
+  programs in a combination of languages (say, Fortran and C)\@@. It's also
+  an advantage when constructing very large programs that would require
+  a lot of compile time.
+\end{description}
+This last point is very important. By allowing the creation of
+multiple output files, the need for monolithic programs is avoided.
+This supports the creation of very large programs by groups of
+people.
+
+A further reduction in compilation time is achieved by first
+writing each output file to a temporary location, then comparing the
+temporary file with the old version of the file. If there is no
+difference, the temporary file can be deleted. If the files differ,
+the old version is deleted and the temporary file renamed. This
+approach works well in combination with \verb|make| (or similar tools),
+since \verb|make| will avoid recompiling untouched output files.
+
+\section{Writing weft}
+
+The bulk of a weft file will be ordinary \LaTeX\ (or Markdown, when
+using the \verb|-w md| flag). In fact, any \LaTeX\ file can serve as
+input to weft and will be simply copied through, unchanged, to the
+documentation file---unless a weft command is discovered.  Similarly,
+any Markdown file can be processed with \verb|-w md| and will be
+copied through to the \verb|.md| output. All weft commands begin with
+an ``at-sign'' (\verb|@@|).  Therefore, a file without at-signs will
+be copied unchanged. weft commands are used to specify {\em output
+files,} define {\em fragments,} and delimit {\em scraps}. These are
+the basic features of interest to the weft tool---all else is simply
+text to be copied to the documentation file.
+
+\subsection{Source File Extension: \texttt{.weft}}
+
+weft source files use the \verb|.weft| extension. This single,
+format-agnostic extension replaces the earlier \verb|.w| and
+\verb|.wmd| conventions.  The prose surrounding scraps may be
+written in \LaTeX\ or Markdown; the at-sign commands (\verb|@@o|,
+\verb|@@d|, \verb|@@<|, etc.) are the same in both cases.
+
+The weave output format is specified in one of two ways:
+\begin{description}
+\item[In the source file] The \verb|@@W| directive declares the
+  intended format: \verb|@@W tex| for \LaTeX, \verb|@@W md| for
+  Markdown. This should appear in the preamble, before any
+  \verb|@@o| or \verb|@@d| directives.
+\item[On the command line] \verb|-w md| or \verb|-w tex| overrides
+  the \verb|@@W| directive. Using \verb|-w| alone (without a format
+  token) reads the format from \verb|@@W|.
+\end{description}
+If no extension is given on the command line, weft appends
+\verb|.weft| automatically.
+
+\subsubsection{Default Behavior: Tangle Only}
+
+By default, \verb|weft myfile.weft| performs only tangling (producing
+the output files). No documentation is generated unless \verb|-w| is
+given:
+\begin{quote}
+\begin{verbatim}
+weft programa.weft             tangle only (default)
+weft -w programa.weft          weave per @@W (error if missing)
+weft -w md programa.weft       weave Markdown (override)
+weft -w tex programa.weft      weave LaTeX (override)
+\end{verbatim}
+\end{quote}
+The \verb|-t| flag suppresses weaving even if \verb|-w| is given.
+The \verb|-o| flag suppresses tangling.
+
+\subsubsection{Cosmetic Fences}
+\label{cosmetic-fences}
+
+When writing \verb|.weft| files with Markdown prose, it is often
+convenient to surround scrap definitions with Markdown fenced code
+blocks (triple backticks) so that the source file renders nicely in
+Markdown previewers such as GitHub or VS~Code. For example:
+\begin{quote}
+\begin{verbatim}
+Some prose in Markdown.
+
+```c
+@@d My fragment
+@@{code here
+@@}
+```
+
+More prose.
+\end{verbatim}
+\end{quote}
+weft silently strips these fence lines (lines that consist of three or
+more backticks, optionally followed by a language identifier) during
+Markdown weaving. They do not appear in the generated \verb|.md| file
+and do not affect tangling. This is purely a cosmetic convenience for
+making the source file readable in any Markdown viewer.
+
+Note that fences are only stripped in Markdown mode (\verb|-w md|).
+In \LaTeX\ mode, backtick lines are treated as ordinary text.
+
+\subsection{The Major Commands}
+
+Files and fragments are defined with the following commands:
+\begin{description}
+\item[{\tt @@o} {\em file-name flags scrap\/}] Output a file. The file
+  name is terminated by whitespace.
+\item[{\tt @@d} {\em fragment-name scrap\/}] Define a fragment. The
+  fragment name is terminated by a return or the beginning of a scrap.
+\item[{\tt @@q} {\em fragment-name scrap\/}] Define a fragment. The
+  fragment name is terminated by a return or the beginning of a scrap.
+  This a quoted fragment.
+\end{description}
+A specific file may be specified several times, with each definition
+being written out, one after the other, in the order they appear.
+The definitions of fragments may be similarly specified piecemeal.
+
+\subsubsection{Fragment Names with Embedded Parameters}
+
+Fragment names can carry \emph{parameters}---placeholder values
+embedded directly in the name using the \verb|@@'value@@'| syntax.
+Inside the fragment body, \verb|@@1|, \verb|@@2|, \ldots\verb|@@9|
+refer to the first, second, \ldots ninth parameter in order of
+appearance.
+
+For example, a reusable validation fragment:
+\begin{verbatim}
+  @@d Validate field @@'name@@' type @@'string@@'
+  @@{if (!data.@@1) throw new Error("Missing @@1");
+  if (typeof data.@@1 !== '@@2')
+    throw new TypeError("@@1 must be @@2");
+  @@}
+\end{verbatim}
+
+\noindent Each invocation supplies its own arguments:
+\begin{verbatim}
+  @@<Validate field @@'email@@' type @@'string@@'@@>
+  @@<Validate field @@'age@@'   type @@'number@@'@@>
+\end{verbatim}
+
+\noindent The first invocation expands to:
+\begin{verbatim}
+  if (!data.email) throw new Error("Missing email");
+  if (typeof data.email !== 'string')
+    throw new TypeError("email must be string");
+\end{verbatim}
+
+\noindent Note three key points:
+\begin{itemize}
+\item The values in the \emph{definition} (\verb|@@'name@@'|,
+      \verb|@@'string@@'|) serve as default arguments and as
+      documentation---they make the fragment name readable.
+\item At each \emph{invocation}, different values can be substituted
+      (\verb|@@'email@@'| replaces~\verb|@@1|,
+      \verb|@@'string@@'| replaces~\verb|@@2|).
+\item If a fragment name is abbreviated with~\verb|...|, any
+      missing arguments fall back to the defaults given in the
+      definition.
+\end{itemize}
+
+The difference between a quoted fragment (\texttt{@@q}) and an
+ordinary one (\texttt{@@d}) is that inside a quoted fragment fragments
+are not expanded on output. Rather, they are formatted as uses of
+fragments so that the output file can itself be \texttt{weft}
+source. This allows you to create files containing fragments which can
+undergo further processing before the fragments are expanded, while
+also describing and documenting them in one place.
+
+You can have both quoted and unquoted fragments with the same
+name. They are written out in order as usual, with those introduced by
+\texttt{@@q} being quoted and those with \texttt{@@d} expanded as
+normal.
+
+In quoted fragments, the \texttt{@@f} filename is quoted as well, so that
+when it is expanded it refers to the finally produced file, not
+any of the intermediate ones.
+
+\subsubsection{Scraps}
+
+Scraps have specific begin markers and end markers to allow precise
+control over the contents and layout. Note that any amount of
+whitespace (including carriage returns) may appear between a name and
+the beginning of a scrap. Scraps may also appear in the running text
+where they are formatted (almost) identically to their use in definitions,
+but don't appear in any code output.
+\begin{description}
+\item[\tt @@\{{\em anything\/}@@\}] where the scrap body includes every
+  character in {\em anything\/}---all the blanks, all the tabs, all the
+  carriage returns.  This scrap will be typeset in verbatim mode. Using
+  the \texttt{-l} option will cause the program to typeset the scrap with
+  the help of \LaTeX's \texttt{listings} package.
+\item[\tt @@[{\em anything\/}@@]] where the scrap body includes every
+  character in {\em anything\/}---all the blanks, all the tabs, all the
+  carriage returns.  This scrap will be typeset in paragraph mode, allowing
+  sections of \TeX\ documents to be scraps, but still  be prettyprinted
+  in the document.
+\item[\tt @@({\em anything\/}@@)] where the scrap body includes every
+  character in {\em anything\/}---all the blanks, all the tabs, all the
+  carriage returns.  This scrap will be typeset in math mode.  This allows
+  this scrap to contain a formula which will be typeset nicely.
+\end{description}
+Inside a scrap, several special sequences are recognized.
+
+\paragraph{Fragment invocation.}
+\begin{description}
+\item[\tt @@<{\em fragment-name\/}@@>]
+  Expands the named fragment inline. It is an error to specify
+  recursive invocations.  If the fragment name contains embedded
+  parameters, the invocation supplies arguments at the same
+  positions (see above).
+\end{description}
+
+\paragraph{Argument substitution.}
+\begin{description}
+\item[\tt @@1, @@2, ..., @@9] Inside a fragment body, substitutes
+  the $n$th argument. If the argument was not supplied, the empty
+  string is used.
+\end{description}
+
+\noindent At each argument position in an invocation, four forms are
+accepted:
+\begin{description}
+\item[\tt @@'string@@'] A literal string, copied verbatim (only
+  \verb|@@@@| is interpreted, producing a single~\verb|@@|).
+  This is the most common form.
+\item[\tt @@<{\em fragment-name\/}@@>] The fragment is expanded and
+  its output becomes the argument value.
+\item[\tt @@\{text@@\}] The text is expanded as an anonymous
+  fragment (inheriting the caller's arguments) and the result is
+  passed as the argument.  Useful for combining text and
+  arguments into a single value.
+\item[\tt @@1, @@2, ..., @@9] Forwards an argument from the
+  calling fragment to the called one.
+\end{description}
+
+\paragraph{Other in-scrap commands.}
+\begin{description}
+\item[\tt @@x{\em label}@@x] Marks a place inside a scrap and
+associates it to the label (which can be any text not containing
+a @@). Expands to the reference number of the scrap followed by a
+numeric value. Outside scraps it expands to the same value. It is
+used so that text outside scraps can refer to particular places
+within scraps.
+\item[\tt @@f] Inside a scrap this is replaced by the name of the
+current output file.
+\item[\tt @@t] Inside a scrap this is replaced by the title of the
+fragment as it is at the point it is used, with all parameters
+replaced by actual arguments.
+\item[\tt @@\#] At the beginning of a line in a scrap this will
+suppress the normal indentation for that line. Use this, for
+example, when you have a \verb|#ifdef| inside a nested scrap.
+Writing \verb|@@##ifdef| will cause it to be lined up on the left
+rather than indented with the rest of its code.
+\item[\tt @@s] Inside a scrap supresses indentation for the following
+fragment expansion.
+\end{description}
+Note that fragment names may be abbreviated, either during invocation or
+definition. For example, it would be very tedious to have to
+type, repeatedly, the fragment name
+\begin{quote}
+\verb|@@d Check for terminating at-sequence and return name if found|
+\end{quote}
+Therefore, weft provides a mechanism (borrowed from Knuth) of indicating
+abbreviated names.
+\begin{quote}
+\verb|@@d Check for terminating...|
+\end{quote}
+Basically, the programmer need only type enough characters to
+identify the fragment name uniquely, followed by three periods. An abbreviation
+may even occur before the full version; weft simply preserves the
+longest version of a fragment name. Note also that blanks and tabs are
+insignificant within a fragment name; each string of them is replaced by a
+single blank.
+
+Sometimes, for instance during program testing, it is convenient to comment
+out a few lines of code. In C or Fortran placing \verb|/* ... */| around the relevant
+code is not a robust solution, as the code itself may contain
+comments. weft provides the command
+\begin{quote}
+\verb|@@%|
+\end{quote}only to be used inside scraps. It behaves exactly the same
+as \verb|%| in the normal {\LaTeX} text body.
+
+When scraps are written to a program file or a documentation file, tabs are
+expanded into spaces by default. Currently, weft assumes tab stops are set
+every eight characters. Furthermore, when a fragment is expanded in a scrap,
+the body of the fragment is indented to match the indentation of the
+fragment invocation. Therefore, care must be taken with languages
+({\em e.g.,} Fortran) that are sensitive to indentation.
+These default behaviors may be changed for each output file (see
+below).
+
+\subsubsection{Flags}
+
+When defining an output file, the programmer has the option of using
+flags to control output of a particular file. The flags are intended
+to make life a little easier for programmers using certain languages.
+They introduce little language dependences; however, they do so only
+for a particular file. Thus it is still easy to mix languages within a
+single document. There are five ``per-file'' flags:
+\begin{description}
+\item[\tt -d] Forces the creation of \verb|#line| directives in the
+  output file. These are useful with C (and sometimes C++ and Fortran) on
+  many Unix systems since they cause the compiler's error messages to
+  refer to the web file rather than to the output file. Similarly, they
+  allow source debugging in terms of the web file.
+\item[\tt -i] Suppresses the indentation of fragments. That is, when a
+  fragment is expanded within a scrap, it will {\em not\/} be indented to
+  match the indentation of the fragment invocation. This flag would seem
+  most useful for Fortran programmers.
+\item[\tt -t] Suppresses expansion of tabs in the output file. This
+  feature seems important when generating \verb|make| files.
+\item[\tt -c{\it x}] Puts comments in generated code documenting the
+fragment that generated that code. The {\it x} selects the comment style
+for the language in use: \verb|c| for C~(\verb|/* */|),
+\verb|+| for C++~(\verb|//|), and \verb|p| for shell/Perl~(\verb|#|).
+If the global \verb|-x| cross-reference flag is
+set the comment includes the page reference for the first scrap that
+generated the code.
+\item[\tt -s] Suppresses section markers and \verb|#line| directives
+  in the tangled output for this file. The language is still detected
+  (from the extension or a preceding \verb|@@l|), so the Markdown weaver
+  can emit syntax-highlighting classes, but the tangled code is emitted
+  without any tangle annotations. This is useful for bootstrap source
+  files or generated output that should remain clean.
+
+These flags are still available for explicit control, but in most
+cases the automatic language detection described in
+Section~\ref{section-markers}
+is more convenient.
+\end{description}
+
+\subsection{The Minor Commands\label{minorcommands}}
+
+There are some very low-level utility commands that may appear anywhere
+in the web file.
+\begin{description}
+\item[\tt @@@@] Causes a single ``at sign'' to be copied into the output.
+\item[\tt @@\_] Causes the text between it and the next {\tt @@\_}
+      to be made bold (for keywords, etc.)
+\item[\tt @@i {\em file-name\/}] Includes a file. Includes may be
+  nested, though there is currently a limit of 10~levels. The file name
+  should be complete (no extension will be appended) and should be
+  terminated by a carriage return. Normally the current directory is
+  searched for the file to be included, but this can be varied using
+  the \verb|-I| flag on the command line. Each such flag adds one
+  directory to the search path and they are searched in the order
+  given.
+\item[{\tt @@r}$x$] Changes the escape character `@@' to `$x$'.
+  This must appear before any scrap definitions.
+\item[\tt @@v] Always replaced by the string established by
+the \texttt{-V} flag, or a default string if the flag isn't
+given. This is intended to mark versions of the generated
+files.
+\item[{\tt @@l} {\em tag\/}] Sets the language for the next
+  \verb|@@o| or \verb|@@d| directive.  The tag is looked up in the
+  language table (Section~\ref{section-markers}) to determine the
+  comment style for section markers and the \verb|class| attribute for
+  Markdown syntax highlighting.  Placed on the line before the
+  directive it applies to.
+\item[{\tt @@L} {\em name style\/} {\tt [+d]}] Defines a custom
+  language mapping for the section marker system (see
+  Section~\ref{section-markers}). This must appear in the document
+  preamble, before any \verb|@@o| or \verb|@@d| directives that
+  depend on it.
+\item[{\tt @@W} {\em format\/}] Declares the weave output format
+  for this source file.  Valid formats are \verb|md| (Markdown) and
+  \verb|tex| (\LaTeX).  Used by \verb|-w| when no explicit format
+  is given on the command line.  A CLI format (\verb|-w md| or
+  \verb|-w tex|) overrides this directive.  Should appear in the
+  document preamble.
+\end{description}
+
+In the text of the document, that is outside scraps, you may include
+scrap-like material.
+
+\begin{description}
+\item[\tt @@\{\textit{Anything}@@\}]
+The included material, the \textit{Anything},
+is typeset as if it appeared inside a scrap. This is useful for
+referring to fragments in the text and for
+describing the literate programming process itself.
+\item[\tt @@<\textit{Fragment name}@@>]
+The fragment named is expanded in place in the text.
+The expansion is presented verbatim, it is not interpreted for
+typesetting, so any special environment must be set up before and
+after this is used.
+\item[\tt @@c] Outside of a scrap this is used to define a block
+comment using all the text until the next command. Inside a scrap
+the last block comment is expanded using the current indentation
+and breaking lines between words if 60 characters are exceeded.
+\end{description}
+
+Finally, there are three commands used to create indices to the
+fragment
+names, file definitions, and user-specified identifiers.
+\begin{description}
+\item[\tt @@f] Create an index of file names.
+\item[\tt @@m] Create an index of fragment names.
+\item[\tt @@u] Create an index of user-specified identifiers.
+\end{description}
+These are usually placed in their own section
+in the \LaTeX\ document; for example, see Chapter~\ref{indices}.
+
+Identifiers must be explicitly specified for inclusion in the
+\verb|@@u| index. By convention, each identifier is marked at the
+point of its definition; all references to each identifier (inside
+scraps) will be discovered automatically. To ``mark'' an identifier
+for inclusion in the index, it must be mentioned at the end of a scrap.
+For example,
+\begin{quote}
+\begin{verbatim}
+@@d a scrap @@{
+Suppose the variables FOO and BAR are being declared
+inside this scrap.
+@@| FOO BAR @@}
+\end{verbatim}
+\end{quote}
+Alphabetic identifiers have been used in this example, but any string of
+characters (not including whitespace or \verb|@@| characters) will do.
+Therefore, it's possible to add index entries for things like
+\verb|<<=| if desired. An identifier may be declared in more than one
+scrap.
+
+In the generated index, each identifier appears with a list of all the
+scraps using and defining it, where the defining scraps are
+distinguished by underlining. Note that the identifier doesn't
+actually have to appear in the defining scrap; it just has to be in
+the list of definitions at the end of a scrap.
+
+\section{Sectioning commands}
+For larger documents the indexes and usage lists get rather
+unwieldy and problems arise in naming things so that different
+things in different parts of the document don't get confused. weft
+has a sectioning command which keeps the fragment names and user
+identifiers separate. Thus, you can give a fragment in one section
+the same name as a fragment in another and the two won't be confused
+or connected in any way. Nor will user identifiers
+defined in one section be referenced in another. Except for the
+fact that scraps in successive sections can go into the same
+output file, this is the same as if the sections came from
+separate input files.
+
+However, occasionally you may really want fragments from one section
+to be used in another. More often, you will want to identify a
+user identifier in one section with the same identifier in
+another (as, for example, a header file defined in one section is
+included in code in another). Extra commands allow a fragment
+defined in one section to be accessible from all other sections.
+Similarly, you can have scraps which define user identifiers and
+export them so that they can be used in other sections.
+
+\begin{description}
+\item[{\tt @@s}] Start a new section.
+\item[{\tt @@S}] Close the current section and don't start another.
+\item[{\tt @@d+} fragment-name scrap] Define a fragment which is
+accessible in all sections, a global fragment.
+\item[{\tt @@D+}] Likewise
+\item[{\tt @@q+}] Likewise
+\item[{\tt @@Q+}] Likewise
+\item[{\tt @@m+}] Create an index of all such fragments.
+\item[{\tt @@u+}] Create an index of globally accessible
+user identifiers.
+\end{description}
+
+There are two kinds of section, the base section which is where
+normally everything goes, and local sections which are introduced with
+the {\tt @@s} command. A local section comprises everything from the
+command which starts it to the one which ends it. A {\tt @@s} command
+will start a new local section. A {\tt @@S} command closes the current
+local section, but doesn't open another, so what follows goes into the
+base section. Note that fragments defined in the base section aren't
+global; they are accessible only in the base section, but they are
+accessible regardless of any local sections between their definition
+and their use.
+
+Within a scrap:
+\begin{description}
+\item[\tt @@<+{\em fragment-name\/}@@>]
+Expand the globally accessible fragment with that name, rather than
+any local fragment.
+\item[{\tt @@+}] Like \verb"@@|" except that the identifiers
+defined are exported to the global realm and are not directly
+referenced in any scrap in any section (not even the one where
+they are defined).
+\item[{\tt @@-}] Like \verb"@@|" except that the identifiers
+are imported to the local realm. The cross-references show where
+the global variables are defined and defines the same names as
+locally accesible. Uses of the names within the section will
+point to this scrap.
+\end{description}
+
+Note that the \verb"+" signs above are part of the commands. They
+are not part of the fragment names. If you want a fragment whose name
+begins with a plus sign, leave a space between the command and the
+name.
+
+\section{Running weft}
+
+weft is invoked using the following command:
+\begin{quote}
+{\tt weft} {\em flags file-name}\ldots
+\end{quote}
+One or more files may be processed at a time. If a file name has no
+extension, \verb|.weft| will be appended.
+While a file name may specify a file in another directory,
+the resulting documentation file will always be created in the current
+directory. For example,
+\begin{quote}
+{\tt weft /foo/bar/quux}
+\end{quote}
+will take as input the file \verb|/foo/bar/quux.weft| and will produce
+the tangled output files only. To also generate documentation, use
+\verb|-w| (see below).
+
+By default, weft performs only tangling---it generates the output
+files defined by \verb|@@o| directives and nothing else.
+Documentation (weaving) is produced only when the \verb|-w| flag is
+given. When \verb|-w| is present, both tangling and weaving execute
+in a single pass. Three flags control what weft produces:
+\begin{description}
+\item[\tt -t] Suppress weaving (useful to override \verb|-w| in scripts).
+\item[\tt -o] Suppress generation of the output files (weave only).
+\item[\tt -c] Avoid testing output files for change before updating them.
+\end{description}
+Thus, the command
+\begin{quote}
+\verb|weft -to /foo/bar/quux|
+\end{quote}
+would simply scan the input and produce no output at all.
+
+There are several additional command-line flags:
+\begin{description}
+\item[\tt -v] For ``verbose'', causes weft to write information about
+  its progress to \verb|stderr|.
+\item[\tt -n] Forces scraps to be numbered sequentially from~1
+  (instead of using page numbers). This form is perhaps more desirable
+  for small webs.
+\item[\tt -s] Doesn't print list of scraps making up each file
+  following each scrap.
+\item[\tt -d] Print ``dangling'' identifiers -- user identifiers which
+  are never referenced, in indices, etc.
+\item[\tt -p {\it path}] Prepend \textit{path} to the filenames for
+all the output files.
+\item[\tt -w {\it [format]}] Activate weaving (documentation
+generation). Without \verb|-w|, no documentation file is produced.
+The optional {\it format\/} argument selects the output format:
+\begin{itemize}
+\item \verb|-w md| --- force Markdown output (\verb|.md| file).
+\item \verb|-w tex| --- force \LaTeX\ output (\verb|.tex| file).
+\item \verb|-w| alone --- read the format from the \verb|@@W| directive
+  in the source file. If \verb|@@W| is absent, weft reports an error.
+\end{itemize}
+A format given on the command line overrides any \verb|@@W| directive.
+When Markdown output is selected, sequential numbering (\verb|-n|) is
+forced automatically, since Markdown has no concept of page numbers.
+The Markdown output uses HTML anchors (\verb|<a id="...">|) for
+cross-references and \verb|<pre><code>| blocks for scraps, allowing
+clickable navigation between definitions and references. Cosmetic
+fence lines (triple backticks) in the source are silently stripped.
+\item[\tt -x] Include cross-reference numbers in scrap comments.
+\item[\tt -h {\it options}] Provide options for the hyperref
+package.
+\item[\tt -r] Turn on hyperlinks. You must include the |usepackage|
+options in the text.
+\item[\tt -l] \label{sec:pretty-print} Use the \texttt{listings}
+package for formatting scraps. Use this if you want to have a
+pretty-printer for your scraps. In order to e.g. have pretty Perl
+scraps, include the following \LaTeX\ commands in your document:
+\lstset{language=[LaTeX]TeX}
+
+\begin{lstlisting}{language={[LaTeX]TeX}}
+\usepackage{listings}
+...
+\lstset{extendedchars=true,keepspaces=true,language=perl}
+\end{lstlisting}
+
+See the \texttt{listings} documentation for a list of formatting
+options. Be sure to include a \texttt{\char92
+usepackage\{listings\}}
+in your document.
+
+\item[\tt -V {\it string}] Provide \textit{string} as the
+replacement for the @@v operation.
+\item[\tt -m] Emit a JSON map of the project to stdout and exit.
+The map describes every output file and every fragment, their
+definition locations, usage relationships, and transitive
+dependencies.  Neither weaving nor tangling is performed.
+See Section~\ref{map-extract} for details.
+\item[\tt -e {\it name}] Extract a single fragment by name and emit
+its code and dependency information as Markdown to stdout.
+The match uses the same prefix logic as \verb|@@<name...@@>|.
+Neither weaving nor tangling is performed.
+See Section~\ref{map-extract} for details.
+\end{description}
+
+\section{Markdown Output}
+
+When invoked with \verb|-w md|, weft generates a Markdown file
+(\verb|.md|) instead of a \LaTeX\ file (\verb|.tex|). This allows
+literate programs to be read on any platform that renders Markdown,
+including GitHub, GitLab, and local editors like VS~Code.
+
+The Markdown output preserves all the essential features of the
+\LaTeX\ output---scrap definitions, cross-references, and
+indices---but uses a different set of formatting conventions:
+\begin{description}
+\item[Scrap headers] File definitions appear as
+  \verb|**"filename"** **N** =| and fragment definitions as
+  \verb|**<*Name* N>** =|, where {\em N\/} is the sequential scrap
+  number.
+\item[Scrap bodies] Code is wrapped in \verb|<pre><code>|
+  HTML blocks (not fenced code blocks). This allows fragment
+  references within scraps to be rendered as clickable HTML links
+  with italic and bold formatting, which would not be possible inside
+  Markdown fenced blocks.
+\item[HTML escaping] Characters \verb|<|, \verb|>|, and \verb|&|
+  inside scraps are escaped as \verb|&lt;|, \verb|&gt;|, and
+  \verb|&amp;| respectively.
+\item[Cross-references] Each scrap has an HTML anchor
+  (\verb|<a id="weftN">|) and cross-reference links use
+  \verb|<a href="#weftN">|. Footer notes (``defined by'',
+  ``referenced in'') appear as Markdown blockquotes.
+\item[Indices] The \verb|@@f|, \verb|@@m|, and \verb|@@u| commands
+  produce Markdown lists with links. In the user identifier index,
+  defining scraps appear in bold.
+\item[Sequential numbering] The \verb|-n| flag is forced
+  automatically, since Markdown has no page numbers. Scraps are
+  numbered 1, 2, 3, \ldots\ without letter suffixes.
+\item[Prose] Text outside scraps passes through unmodified. The
+  author writes Markdown prose directly in the \verb|.weft| source
+  file; weft does not interpret or transform it.
+\item[Syntax highlighting] When the language of a scrap can be
+  determined---from a preceding \verb|@@l| tag, the \verb|@@L|
+  command, or the file extension of an \verb|@@o| name---weft emits
+  \verb|<code class="language-X">| on the opening tag.  This allows
+  client-side highlighters (highlight.js, Prism) and platforms like
+  GitHub to apply syntax colouring automatically.
+\end{description}
+
+Tangling (output file generation) works identically regardless of
+the weave format. When \verb|-w| is given, a single invocation
+produces both the documentation and the tangled output files in one
+pass.
+
+\section{Section Markers and Language Auto-Detection}
+\label{section-markers}
+
+When debugging tangled code, it is useful to correlate lines in the
+generated file back to the original web source.  weft can
+auto-detect the programming language and generate {\em section
+markers\/}---comments that delimit the opening and closing of each
+scrap in the tangled output, including the source file name and line
+number.  For C and~C++, it also generates \verb|#line| directives
+automatically.
+
+The key idea is simple:
+
+\begin{quote}
+\textbf{file extension $\longrightarrow$ language $\longrightarrow$
+comment style $\longrightarrow$ section markers in tangled output}
+\end{quote}
+
+\noindent
+For example, \verb|@@o server.js| has the extension \verb|.js|.
+weft looks up \verb|js| in its language table, finds that JavaScript
+uses \verb|//| comments, and wraps each scrap in the tangled
+\verb|server.js| with \verb|//| markers:
+\begin{verbatim}
+    // {1: web.weft:12}
+    console.log("hello");
+    // {:1}
+\end{verbatim}
+Similarly, \verb|@@o main.c| matches \verb|c|, which uses
+\verb|/* */| comments and also enables \verb|#line| directives:
+\begin{verbatim}
+    #line 5 "core.weft"
+    /* {1: core.weft:5} */
+    #include <stdio.h>
+    /* {:1} */
+\end{verbatim}
+And \verb|@@o config.py| matches \verb|py|, using \verb|#| comments:
+\begin{verbatim}
+    # {3: settings.weft:40}
+    DATABASE_URL = "postgres://localhost/app"
+    # {:3}
+\end{verbatim}
+This happens automatically---no flags are needed.  The extension
+alone is enough.
+
+\subsection{Overriding the Language with \texttt{@@l}}
+
+Sometimes the file extension is not enough, or you want a different
+behaviour.  The \verb|@@l| command (lowercase) placed on the line
+before an \verb|@@o| or \verb|@@d| directive overrides the extension:
+
+\begin{verbatim}
+    @@l sql
+    @@o queries.txt
+    @@{SELECT * FROM users;
+    @@}
+\end{verbatim}
+Here the file is \verb|queries.txt|, whose extension \verb|.txt| has
+no comment style.  But \verb|@@l sql| tells weft to use
+\verb|--| comments, so the tangled output gets:
+\begin{verbatim}
+    -- {1: db.weft:5}
+    SELECT * FROM users;
+    -- {:1}
+\end{verbatim}
+
+\medskip\noindent
+\verb|@@l| also works on \verb|@@d| (fragment) definitions.
+This is useful for fragments that will be included in files of a
+specific language:
+\begin{verbatim}
+    @@l python
+    @@d Validate email
+    @@{import re
+    def validate(email):
+        return bool(re.match(r'^[^@@]+@@[^@@]+$', email))
+    @@}
+\end{verbatim}
+The language tag is stored on the fragment and used both for section
+markers in the tangled output and for syntax highlighting in the
+Markdown weave output.
+
+\medskip\noindent
+\verb|@@l| is format-agnostic: it works identically in \LaTeX\ and
+Markdown source files.  Unlike the earlier approach of encoding the
+language in Markdown fences (\verb|```python|) or \LaTeX\ markers
+(\verb|%%%python|), \verb|@@l| uses the same at-sign syntax as every
+other weft command.
+
+Note that cosmetic fences (\verb|```|) may still be used around
+\verb|@@o|/\verb|@@d| definitions for readability in Markdown
+previewers---they are silently stripped during Markdown weaving (see
+Section~\ref{cosmetic-fences}).  But fences no longer set the
+language; use \verb|@@l| for that.
+
+\medskip\noindent
+\textbf{Priority rules.}  When multiple sources of language
+information are available, weft resolves them in this order:
+\begin{enumerate}
+\item \textbf{Explicit per-file flags} (\verb|-d|, \verb|-s|,
+      \verb|-c|{\it x}, etc.)
+      on the \verb|@@o| line always win for tangle behaviour.
+\item \textbf{\texttt{@@l} tag} immediately before the
+      directive---overrides the extension.
+\item \textbf{File extension} of the \verb|@@o| name---the default
+      when no \verb|@@l| is present.
+\end{enumerate}
+
+\subsection{The \texttt{@@L} Command: Defining New Languages}
+\label{at-L-intro}
+
+The built-in table covers over 250~entries, but it cannot anticipate
+every language or every project's preferences.  The \verb|@@L| command
+defines new language mappings---or overrides existing ones---directly
+in the document preamble.
+
+\begin{quote}
+{\tt @@L} {\em name\/} {\em style\/} [{\tt +d}]
+\end{quote}
+
+\begin{itemize}
+\item {\em name\/} is the tag that will be recognised in \verb|@@l|
+      commands and file extensions (\verb|@@o file.name|).
+\item {\em style\/} is the comment syntax: \verb|//|, \verb|#|,
+      \verb|--|, \verb|/*|, or \verb|<!--|.
+\item \verb|+d| (optional) enables \verb|#line| directive generation.
+\end{itemize}
+
+\noindent
+\textbf{Examples:}
+\begin{verbatim}
+    @@L wgsl //           % WebGPU shading language: // comments
+    @@L cedar //          % Cedar policy language
+    @@L c //              % override built-in: use // instead of /* */
+\end{verbatim}
+
+\noindent
+\textbf{How @@L interacts with the rest of the system.}  User-defined
+entries are searched {\em before\/} the built-in table, so
+\verb|@@L c //| effectively changes the comment style for all
+subsequent \verb|@@o main.c| directives (and for any \verb|@@l c|
+tag) from \verb|/* */| to \verb|//|.  Up to 32~user-defined
+languages may be registered.
+
+\verb|@@L| should appear in the document preamble, before any
+\verb|@@o| or \verb|@@d| that depends on it.  It is processed during
+pass~1 and silently skipped during weaving.
+
+\subsection{The Language Table}
+
+weft includes a built-in table of over 250~entries (languages, file
+extensions, and common aliases), organised by comment style.  Each
+entry maps a tag to a comment style and optionally enables
+\verb|#line| directives.  The tag is matched against \verb|@@l| tags
+and file extensions alike---there is no distinction between them.
+
+\begin{center}
+\small
+\begin{tabular}{lp{10cm}}
+\hline
+Comment style & Tags (representative) \\
+\hline
+\verb|/* */| + \verb|#line|
+  & c, h, cpp, cc, cxx, hpp, hxx, objc, objcpp, m, mm,
+    ino, pde, cu, cuh, cilk \\[2pt]
+\verb|/* */|
+  & css, scss, sass, less, stylus, cl~(OpenCL) \\[2pt]
+\verb|//|
+  & js, ts, jsx, tsx, mjs, cjs, mts, svelte, vue,
+    java, scala, kotlin, kt, groovy, gradle, clj,
+    cs, fs, fsx, vb,
+    go, rust, rs, zig, swift, dart, odin, mojo, carbon,
+    php, graphql, prisma,
+    glsl, hlsl, wgsl, metal, vert, frag,
+    proto, thrift, fbs, capnp, sol,
+    reason, res, ml, sml, fut,
+    apex, bicep, jsonnet, qml, p4 \\[2pt]
+\verb|#|
+  & python, py, pyx, pyi,
+    sh, bash, zsh, fish, ksh, nu,
+    perl, pl, ruby, rb, r, tcl, awk, sed, coffee,
+    makefile, mk, cmake, just, meson, bazel, bzl,
+    julia, jl, nim, crystal, cr, elixir, ex,
+    yaml, yml, toml, dockerfile, terraform, tf, hcl, nix,
+    conf, ini, env, editorconfig, gitignore,
+    powershell, ps1, xdc, sdc \\[2pt]
+\verb|--|
+  & lua, luau, sql, psql, plsql, plpgsql, mysql, sqlite, hive,
+    haskell, hs, elm, purescript, purs,
+    ada, adb, ads, vhdl, vhd,
+    lean, lean4, agda, idris, idr, erlang \\[2pt]
+\verb|<!-- -->|
+  & html, htm, xml, svg, xhtml, xsl, xsd, dtd, rss,
+    xaml, csproj, jsp, aspx, cshtml, erb, ejs, hbs,
+    njk, twig, blade, pug, liquid, mustache,
+    md, mdx, rst, tex, latex \\[2pt]
+(none)
+  & json, csv, tsv, txt, diff, patch \\
+\hline
+\end{tabular}
+\end{center}
+
+\noindent
+For the full list, see the \verb|lang_table| array in
+Section~\ref{lang-table}.  If a tag is not found in either the
+user-defined (\verb|@@L|) or built-in table, weft defaults to
+\verb|//| comments with no \verb|#line| directives.  Tags mapped to
+style~0 (e.g.\ \verb|json|, \verb|txt|) produce no markers at all.
+
+\subsection{Syntax Highlighting in Markdown Output}
+
+When weaving to Markdown (\verb|-w md|), weft emits the language tag
+on the \verb|<code>| element:
+\begin{verbatim}
+    <pre><code class="language-python">def hello():
+        print("hello")
+    </code></pre>
+\end{verbatim}
+This allows client-side highlighters (highlight.js, Prism) and
+platforms like GitHub to apply syntax colouring automatically.  The
+language tag comes from the same chain described above: \verb|@@l|
+tag or file extension.
+
+For \verb|@@d| fragments, the tag comes from a preceding \verb|@@l|
+command (there is no file extension to infer from).  If no language is
+known, weft emits a plain \verb|<pre><code>| without a class.
+
+\subsection{Output Format of Section Markers}
+
+Each scrap in the tangled file is wrapped with an opening marker at
+the top and a closing marker at the bottom, using the comment syntax
+of the detected language.  The opening marker includes the scrap
+number and the source location (file name and line number).
+When fragments are nested, each expansion gets its own pair of
+markers, producing a clear hierarchy in the output.
+
+\subsection{Debugging Tangled Code}
+\label{debugging-tangled}
+
+When you work with literate programming, the code you execute is
+{\em tangled output\/}---generated files assembled from scraps
+scattered across \verb|.w| files.  An error at \verb|server.js:47|
+does not correspond to line~47 of any file you wrote; it is line~47
+of a file that weft assembled from fragments defined in
+\verb|server.w|, \verb|routes.w|, and \verb|database.w|.
+Without markers, debugging means mentally reconstructing which scrap
+produced which line.  With markers, the tangled file tells you
+directly.
+
+\paragraph{Reading the markers.}
+Each marker encodes three pieces of information:
+\begin{center}
+\small
+\begin{tabular}{ll}
+\hline
+Part & Meaning \\
+\hline
+\verb|{| or \verb|{:| & Opening or closing delimiter \\
+Number & Scrap ID---unique across the entire document \\
+\verb|file:line| & Source \verb|.w| file and line number (opening only) \\
+\hline
+\end{tabular}
+\end{center}
+
+\paragraph{Examples by language.}
+
+\noindent\textbf{JavaScript} (\verb|//| comments):
+\begin{verbatim}
+    // {3: routes.w:42}
+    app.get("/api/users", async (req, res) => {
+      // {7: database.w:18}
+      const users = await db.query("SELECT * FROM users");
+      // {:7}
+      res.json(users);
+    });
+    // {:3}
+\end{verbatim}
+
+\noindent\textbf{Python} (\verb|#| comments):
+\begin{verbatim}
+    # {5: models.w:31}
+    class User:
+        def __init__(self, name, email):
+            self.name = name
+            self.email = email
+    # {:5}
+\end{verbatim}
+
+\noindent\textbf{C} (\verb|/* */| comments with \verb|#line| directives):
+\begin{verbatim}
+    #line 12 "memory.w"
+    /* {2: memory.w:12} */
+    void *safe_malloc(size_t size) {
+        void *ptr = malloc(size);
+        if (!ptr) {
+            /* {4: errors.w:8} */
+            fprintf(stderr, "out of memory\n");
+            exit(1);
+            /* {:4} */
+        }
+        return ptr;
+    }
+    /* {:2} */
+\end{verbatim}
+
+\noindent\textbf{Lua} (\verb|--| comments):
+\begin{verbatim}
+    -- {9: config.w:55}
+    local defaults = {
+      port = 8080,
+      host = "localhost",
+    }
+    -- {:9}
+\end{verbatim}
+
+\noindent\textbf{HTML} (\verb|<!-- -->| comments):
+\begin{verbatim}
+    <!-- {6: layout.w:20} -->
+    <nav class="sidebar">
+      <!-- {11: navigation.w:7} -->
+      <ul>
+        <li><a href="/">Home</a></li>
+      </ul>
+      <!-- {:11} -->
+    </nav>
+    <!-- {:6} -->
+\end{verbatim}
+
+\paragraph{Debugging workflow.}
+The following four-step procedure traces any error in tangled output
+back to the literate source.
+
+\medskip\noindent\textbf{Step~1: Locate the error in tangled output.}
+You receive an error such as:
+\begin{verbatim}
+    TypeError: Cannot read property 'id' of undefined
+        at Object.<anonymous> (server.js:47)
+\end{verbatim}
+Open \verb|server.js| and go to line~47.
+
+\medskip\noindent\textbf{Step~2: Read the nearest opening marker.}
+Scan {\em upward\/} from the error line until you find an opening
+marker:
+\begin{verbatim}
+    // {3: routes.w:42}
+\end{verbatim}
+This tells you: scrap~3 generated this code, defined in
+\verb|routes.w| starting at line~42.
+
+\medskip\noindent\textbf{Step~3: Go to the literate source.}
+Open \verb|routes.w| at line~42.  You will find the scrap with the
+bug, surrounded by prose that explains its intent:
+\begin{verbatim}
+    We fetch the user by ID from the database. If the user
+    doesn't exist, we should return a 404, but currently we
+    assume the user always exists --- this is the bug.
+
+    @@d Handle user fetch
+    @@{const user = await getUser(req.params.id);
+    res.json(user.id);
+    @@}
+\end{verbatim}
+The prose makes the bug obvious: there is no null check.  Fix it in
+the \verb|.w| file, re-tangle, and the error is gone.
+
+\medskip\noindent\textbf{Step~4: Nested markers = nested fragments.}
+When fragments invoke other fragments, markers nest:
+\begin{verbatim}
+    // {3: routes.w:42}
+    app.get("/api/users/:id", async (req, res) => {
+      // {7: database.w:18}
+      const user = await db.query(
+        "SELECT * FROM users WHERE id=$1",
+        [req.params.id]);
+      // {:7}
+      if (!user) return res.status(404).json({error: "not found"});
+      res.json(user);
+    });
+    // {:3}
+\end{verbatim}
+If the bug is inside the \verb|{7:...{:7}| block, go to
+\verb|database.w:18|, not \verb|routes.w:42|.  The {\em innermost
+enclosing markers\/} point to the most specific source location.
+Always look at the tightest pair around the error line.
+
+\paragraph{Interpreting nested hierarchies.}
+Complex tangled output can have several nesting levels.  Read them
+like parentheses---each opening matches its corresponding close:
+\begin{verbatim}
+    /* {1: main.w:10} */          outermost: main file structure
+    #include <stdio.h>
+    /* {2: io.w:25} */            middle: I/O subsystem
+    void print_report() {
+        /* {5: format.w:8} */     innermost: formatting detail
+        printf("Report v%d\n", VERSION);
+        /* {:5} */
+    }
+    /* {:2} */
+    int main() {
+        /* {3: init.w:14} */
+        init_subsystems();
+        /* {:3} */
+        print_report();
+        return 0;
+    }
+    /* {:1} */
+\end{verbatim}
+Scrap numbers are {\em document-global\/}---scrap~1 is the first
+\verb|@@{...@@}| in the entire woven document, scrap~5 is the
+fifth.  They are stable as long as you do not reorder scraps.
+
+\paragraph{C/C++: {\tt\#line} directives.}
+For C-family languages, weft also generates \verb|#line| directives
+{\em above\/} the opening marker.  These make the C~compiler itself
+report errors against the \verb|.w| source file:
+\begin{verbatim}
+    #line 12 "memory.w"
+    /* {2: memory.w:12} */
+    void *safe_malloc(size_t size) { ... }
+    /* {:2} */
+\end{verbatim}
+Now \verb|gcc| will say:
+\begin{verbatim}
+    memory.w:14: error: implicit declaration of function 'malloc'
+\end{verbatim}
+instead of:
+\begin{verbatim}
+    memory.c:47: error: implicit declaration of function 'malloc'
+\end{verbatim}
+The \verb|#line| directive and the section marker are complementary:
+\verb|#line| makes the compiler report errors against the \verb|.w|
+file directly; the \verb|{N: file:line}| markers are human-readable
+when browsing the tangled output.
+
+\paragraph{Common debugging scenarios.}
+
+\noindent\textbf{Runtime error with stack trace.}
+\begin{verbatim}
+    Error: ENOENT: no such file or directory, open '/data/config.json'
+        at readConfig (server.js:123)
+\end{verbatim}
+Open \verb|server.js:123|, find the nearest marker
+\verb|// {12: config.w:35}|, open \verb|config.w:35|---the scrap
+that reads the config---and fix the path or add an existence check
+in the \verb|.w| file.
+
+\medskip\noindent\textbf{Compiler error in~C.}  With \verb|#line|
+directives active, the compiler already reports:
+\begin{verbatim}
+    parser.w:84: error: 'token_type' undeclared
+\end{verbatim}
+Go directly to \verb|parser.w:84|.  The prose around the scrap
+explains what \verb|token_type| should be and where it is defined.
+
+\medskip\noindent\textbf{Wrong output, no error.}
+The program runs but produces wrong results.  Open the tangled file
+and search for the relevant code.  The markers tell you which
+\verb|.w| file and scrap to examine:
+\begin{verbatim}
+    # {15: transform.w:67}
+    result = [x * 2 for x in data]    # should be x * 3?
+    # {:15}
+\end{verbatim}
+Go to \verb|transform.w:67|.  The prose says ``triple each value''
+but the code says \verb|* 2|.  Bug found.
+
+\medskip\noindent\textbf{Identifying which fragment owns a line.}
+Sometimes you know the line of code but not which \verb|@@d|
+definition produced it (multiple fragments with the same name
+accumulate).  The scrap number is unique:
+\begin{verbatim}
+    // {14: handlers.w:89}
+    validateInput(data);
+    // {:14}
+    // {22: handlers.w:112}
+    validatePermissions(user);
+    // {:22}
+\end{verbatim}
+Scraps~14 and~22 are two different definitions (or continuations)
+of the same fragment.  The line numbers point to each one
+independently.
+
+\paragraph{Tips.}
+\begin{itemize}
+\item {\em Never edit tangled files.\/}  The markers remind you
+  these are generated.  Always trace back to the \verb|.w| source
+  and edit there.
+\item {\em Scrap numbers are stable\/} as long as you do not add or
+  remove \verb|@@{...@@}| blocks before them.  If numbering shifts
+  after edits, re-tangle and the markers update automatically.
+\item {\em Use {\tt grep} on markers\/} to find all scraps from a
+  specific file:\newline
+  \verb|    grep -n '{[0-9]*: database.w:' server.js|
+\item {\em Closing markers as verification.\/}  If you see
+  \verb|{:7}| but no \verb|{7:| above it in your viewport, scroll
+  up---the scrap is larger than your screen.  If you see \verb|{7:|
+  but no \verb|{:7}|, the scrap extends below.
+\item {\em Markers in test output.\/}  If your test framework shows
+  code snippets on failure, the markers point straight to the
+  literate source.
+\item {\em Disable markers selectively.\/}  Use explicit flags on
+  \verb|@@o| (e.g.\ \verb|@@o file -t|) with no comment flags to
+  suppress markers for a specific output file when comments would
+  interfere---for example, binary formats, data files, or files
+  where comments are not valid syntax.
+\end{itemize}
+
+\section{Restrictions}
+
+Because weft is intended to be a simple tool, a few
+restrictions have been established. Over time, some of these may be
+eliminated; others seem fundamental.
+\begin{itemize}
+\item The handling of errors is not completely ideal. In some cases, weft
+  simply warns of a problem and continues; in other cases it halts
+  immediately. This behavior should be regularized.
+\item weft warns about references to fragments that haven't been defined, but
+  doesn't halt. The name of the fragment is included in the output file
+  surrounded by \verb|<>| signs.
+  This seems most convenient for development, but may change
+  in the future.
+\item File names and index entries should not contain any \verb|@@|
+  signs.
+\item Fragment names may be (almost) any well-formed \TeX\ string.
+  It makes sense to change fonts or use math mode; however, care should
+  be taken to ensure matching braces, brackets, and dollar signs.
+\item Anything is allowed in the body of a scrap; however, very
+  long scraps (horizontally or vertically) may not typeset well.
+\item Temporary files (created for comparison to the eventual
+  output files) are placed in the current directory. Since they may be
+  renamed to an output file name, all the output files should be on the
+  same file system as the current directory. Alternatively, you can
+  use the \verb|-p| flag to specify where the files go.
+\item Because page numbers cannot be determined until the document has
+  been typeset, weft must be rerun after \LaTeX\ to obtain a clean
+  version of the document (very similar to the way it is sometimes necessary
+  to rerun \LaTeX\ to obtain an up-to-date table of contents after
+  significant edits).  weft will warn (in most cases) when this needs
+  to be done; in the remaining cases, \LaTeX\ will warn that labels
+  may have changed. This restriction does not apply to Markdown output
+  (\verb|-w md|), which uses sequential numbering and requires no
+  additional processing passes.
+\end{itemize}
+Very long scraps may be allowed to break across a page if declared
+with \verb|@@O| or \verb|@@D| (instead of \verb|@@o| and \verb|@@d|).
+This doesn't work very well as a default, since far too many short
+scraps will be broken across pages; however, as a user-controlled
+option, it seems very useful.
+
+\section{Project Introspection}
+\label{map-extract}
+
+The \verb|-m| and \verb|-e| flags support machine-readable
+introspection of a weft project.  They run after pass~1 has built
+the name trees and do \emph{not} invoke the weave or tangle phases.
+
+\subsection{Map (\texttt{-m})}
+
+The command
+\begin{quote}
+\verb|weft -m project.weft|
+\end{quote}
+writes a JSON object to stdout with two arrays, \verb|"files"| and
+\verb|"fragments"|.  For each entry the map records the name, language
+tag, definition scraps (with source file and line), and dependency
+relationships.  File entries list the fragments they use; fragment
+entries list the scraps that invoke them and the fragments they
+reference in turn.
+
+This gives an AI assistant or any external tool a complete dependency
+graph of the project in a single invocation, without having to parse
+the weft source files.
+
+\subsection{Extract (\texttt{-e})}
+
+The command
+\begin{quote}
+\verb|weft -e "fragment name" project.weft|
+\end{quote}
+finds the named fragment (using prefix matching), then emits its
+scrap code and dependency information as Markdown to stdout.
+Referenced fragments are followed transitively, so the output
+contains the full closure of the requested fragment.
+
+This allows an AI assistant to retrieve exactly the code it needs
+to understand or modify a specific fragment, together with all its
+dependencies, in one step.
+
+\section{Acknowledgements}
+
+Several people have contributed their time, ideas, and debugging
+skills. In particular, the contributions of the following people are
+gratefully acknowledged:
+Osman Buyukisik, Manuel Carriba, Adrian Clarke, Tim Harvey, Michael
+Lewis, Walter Ravenek, Rob Shillingsburg, Kayvan Sylvan, Dominique
+de~Waleffe, and Scott Warren.  Of course, most of these people would
+never have heard of nuweb (the original tool) without the efforts of
+George Greenwade.
+
+Since maintenance has been taken over by Marc Mengel, Simon Wright and
+Keith Harwood online contributions have been made by:
+\begin{itemize}
+\item Walter Brown \verb|<wb@@fnal.gov>|
+\item Nicky van Foreest \verb|<n.d.vanforeest@@math.utwente.nl>|
+\item Javier Goizueta \verb|<jgoizueta@@jazzfree.com>|
+\item Alan Karp \verb|<karp@@hp.com>|
+\end{itemize}
+
+\ifshowcode

@@ -1,0 +1,244 @@
+\chapter{The Support Routines}
+
+\section{Source Files} \label{source-files}
+
+\subsection{Global Declarations}
+
+We need two routines to handle reading the source files.
+@d Function pro...
+@{extern void source_open(char *name); /* pass in the name of the source file */
+extern int source_get(void);   /* no args; returns the next char or EOF */
+extern int source_last;   /* what last source_get() returned. */
+extern int source_peek;   /* The next character to get */
+@}
+
+
+There are also two global variables maintained for use in error
+messages and such.
+@d Global variable dec...
+@{extern char *source_name;  /* name of the current file */
+extern int source_line;    /* current line in the source file */
+@| source_name source_line @}
+
+@d Global variable def...
+@{char *source_name = NULL;
+int source_line = 0;
+@}
+
+\subsection{Local Declarations}
+
+
+@o input.c
+@{static FILE *source_file;  /* the current input file */
+static int double_at;
+static int include_depth;
+@| source_file double_at include_depth @}
+
+
+@o input.c
+@{static struct {
+  FILE *file;
+  char *name;
+  int line;
+} stack[10];
+@| stack @}
+
+
+\subsection{Reading a File}
+
+The routine \verb|source_get| returns the next character from the
+current source file. It notices newlines and keeps the line counter
+\verb|source_line| up to date. It also catches \verb|EOF| and watches
+for \verb|@@|~characters. All other characters are immediately returned.
+We define \verb|source_last| to let us tell which type of scrap we
+are defining.
+@o input.c
+@{
+int source_peek;
+int source_last;
+int source_get(void)
+{
+  int c;
+  source_last = c = source_peek;
+  switch (c) {
+    case EOF:  @<Handle \verb|EOF|@>
+               return c;
+    case '\n': source_line++;
+    default:
+           if (c==nw_char)
+             {
+               @<Handle an ``at'' character@>
+               return c;
+             }
+           source_peek = getc(source_file);
+               return c;
+  }
+}
+@| source_peek source_get source_last @}
+
+\verb|source_ungetc| pushes a read character back to the \verb|source_file|.
+
+@d Function prototypes
+@{extern void source_ungetc(int*);
+@}
+
+
+@o input.c
+@{void source_ungetc(int *c)
+{
+  ungetc(source_peek, source_file);
+  if(*c == '\n')
+    source_line--;
+  source_peek=*c;
+}
+@|source_ungetc @}
+
+This whole \verb|@@|~character handling mess is pretty annoying.
+I want to recognize \verb|@@i| so I can handle include files correctly.
+At the same time, it makes sense to recognize illegal \verb|@@|~sequences
+and complain; this avoids ever having to check anywhere else.
+Unfortunately, I need to avoid tripping over the \verb|@@@@|~sequence;
+hence this whole unsatisfactory \verb|double_at| business.
+@d Handle an ``at''...
+@{{
+  c = getc(source_file);
+  if (double_at) {
+    source_peek = c;
+    double_at = FALSE;
+    c = nw_char;
+  }
+  else
+    switch (c) {
+      case 'i': @<Open an include file@>
+                break;
+      case '#': case 'f': case 'm': case 'u': case 'v':
+      case 'd': case 'o': case 'D': case 'O': case 's':
+      case 'q': case 'Q': case 'S': case 'l': case 'L': case 't':
+      case 'W':
+      case '+':
+      case '-':
+      case '*':
+      case '\'':
+      case '{': case '}': case '<': case '>': case '|':
+      case '(': case ')': case '[': case ']':
+      case '%': case '_':
+      case ':': case ',': case 'x': case 'c':
+      case '1': case '2': case '3': case '4': case '5':
+      case '6': case '7': case '8': case '9':
+      case 'r':
+                source_peek = c;
+                c = nw_char;
+                break;
+      default:
+            if (c==nw_char)
+              {
+                source_peek = c;
+                double_at = TRUE;
+                break;
+              }
+             fprintf(stderr, "%s: bad %c sequence %c[%d] (%s, line %d)\n",
+                     command_name, nw_char, c, c, source_name, source_line);
+             exit(-1);
+    }
+}@}
+
+@d Open an include file
+@{{
+  char name[FILENAME_MAX];
+  char fullname[FILENAME_MAX];
+  struct incl * p = include_list;
+
+  if (include_depth >= 10) {
+    fprintf(stderr, "%s: include nesting too deep (%s, %d)\n",
+            command_name, source_name, source_line);
+    exit(-1);
+  }
+  @<Collect include-file name@>
+  stack[include_depth].file = source_file;
+  fullname[0] = '\0';
+  for (;;) {
+     strcat(fullname, name);
+     source_file = fopen(fullname, "r");
+     if (source_file || !p)
+        break;
+     strcpy(fullname, p->name);
+     strcat(fullname, "/");
+     p = p->next;
+  }
+  if (!source_file) {
+    fprintf(stderr, "%s: can't open include file %s\n",
+            command_name, name);
+    source_file = stack[include_depth].file;
+  }
+  else
+  {
+     stack[include_depth].name = source_name;
+     stack[include_depth].line = source_line + 1;
+     include_depth++;
+     source_line = 1;
+     source_name = save_string(fullname);
+  }
+  source_peek = getc(source_file);
+  c = source_get();
+}@}
+
+@d Collect include-file name
+@{{
+    char *p = name;
+    do
+      c = getc(source_file);
+    while (c == ' ' || c == '\t');
+    while (isgraph(c)) {
+      *p++ = c;
+      c = getc(source_file);
+    }
+    *p = '\0';
+    if (c != '\n') {
+      fprintf(stderr, "%s: unexpected characters after file name (%s, %d)\n",
+              command_name, source_name, source_line);
+      exit(-1);
+    }
+}@}
+
+If an \verb|EOF| is discovered, the current file must be closed and
+input from the next stacked file must be resumed. If no more files are
+on the stack, the \verb|EOF| is returned.
+@d Handle \verb|EOF|
+@{{
+  fclose(source_file);
+  if (include_depth) {
+    include_depth--;
+    source_file = stack[include_depth].file;
+    source_line = stack[include_depth].line;
+    source_name = stack[include_depth].name;
+    source_peek = getc(source_file);
+    c = source_get();
+  }
+}@}
+
+
+\subsection{Opening a File}
+
+The routine \verb|source_open| takes a file name and tries to open the
+file. If unsuccessful, it complains and halts. Otherwise, it sets
+\verb|source_name|, \verb|source_line|, and \verb|double_at|.
+@o input.c
+@{void source_open(char *name)
+{
+  source_file = fopen(name, "r");
+  if (!source_file) {
+    fprintf(stderr, "%s: couldn't open %s\n", command_name, name);
+    exit(-1);
+  }
+  nw_char = '@@';
+  source_name = name;
+  source_line = 1;
+  source_peek = getc(source_file);
+  double_at = FALSE;
+  include_depth = 0;
+}
+@| source_open @}
+
+
+
+

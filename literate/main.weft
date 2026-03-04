@@ -1,0 +1,556 @@
+\section{The Main Routine} \label{main-routine}
+
+The main routine is quite simple in structure.
+It wades through the optional command-line arguments,
+then handles any files listed on the command line.
+@o main.c
+@{
+#include <stdlib.h>
+int main(int argc, char **argv)
+{
+  int arg = 1;
+  @<Interpret command-line arguments@>
+  @<Set locale information@>
+  initialise_delimit_scrap_array();
+  @<Process the remaining arguments (file names)@>
+  exit(0);
+}
+@| main @}
+
+We only have two major operating system dependencies; the separators for
+file names, and how to set environment variables.
+For now we assume the latter can be accomplished
+via \verb|putenv()| in \verb|stdlib.h|.
+@d Operating System Dependencies @{
+#if defined(VMS)
+#define PATH_SEP(c) (c==']'||c==':')
+#define PATH_SEP_CHAR ""
+#define DEFAULT_PATH ""
+#elif defined(MSDOS)
+#define PATH_SEP(c) (c=='\\')
+#define PATH_SEP_CHAR "\\"
+#define DEFAULT_PATH "."
+#else
+#define PATH_SEP(c) (c=='/')
+#define PATH_SEP_CHAR "/"
+#define DEFAULT_PATH "."
+#endif
+@}
+\subsection{Command-Line Arguments}
+
+There are numerous possible command-line arguments:
+\begin{description}
+\item[\tt -t] Suppresses generation of the {\tt .tex} file.
+\item[\tt -o] Suppresses generation of the output files.
+\item[\tt -d] list dangling identifier references in indexes.
+\item[\tt -c] Forces output files to overwrite old files of the same
+  name without comparing for equality first.
+\item[\tt -v] The verbose flag. Forces output of progress reports.
+\item[\tt -n] Forces sequential numbering of scraps (instead of page
+  numbers).
+\item[\tt -s] Doesn't print list of scraps making up file at end of
+  each scrap.
+\item[\tt -x] Include cross-reference numbers in scrap comments.
+\item[\tt -p {\it path}] Prepend \textit{path} to the filenames for
+all the output files.
+\item[\tt -h {\it options}] Provide options for the hyperref
+package.
+\item[\tt -r] Turn on hyperlinks. You must include the |usepackage|
+options in the text.
+\item[\tt -l] Use the \texttt{listings} package for formatting scraps.
+\end{description}
+
+There are two ways to get hyper-links into your documentation. With
+one, the \texttt{-r} flag simply arranges for fragment
+cross-references to be hyperlinks. You have to provide all the rest of
+the \texttt{hyperref} material yourself. The \texttt{-h} flag does
+more work, but requires you provide the \texttt{hyperref} options on
+the command line. You would use the first if you know you will use the
+same tools all the time. You would use the second if you have to
+distribute the weft file and use the build system to provide the
+\texttt{hyperref} options.
+
+The \texttt{-h}\ option is used as follows. If you want
+hyperlinks in your document give a string to this option which is
+a valid option for the \texttt{hyperref} package. For example,
+\verb|"dvips,colorlinks=true"| sets it to use the
+\texttt{dvips} driver and mark the links in colour. For more
+information about these options, see the \texttt{hyperref}\
+documentation.
+
+Then in your document you put the command \verb|\NWuseHyperlinks|
+immediately after your \verb|usepackage| commands. If you do both
+of these you will get hyperlinks. If you miss out either then
+nothing interesting happens.
+
+\noindent
+Global flags are declared for each of the arguments.
+@d Global variable dec...
+@{extern int tex_flag;      /* if FALSE, don't emit the documentation file */
+extern int output_flag;   /* if FALSE, don't emit the output files */
+extern int compare_flag;  /* if FALSE, overwrite without comparison */
+extern int verbose_flag;  /* if TRUE, write progress information */
+extern int number_flag;   /* if TRUE, use a sequential numbering scheme */
+extern int scrap_flag;    /* if FALSE, don't print list of scraps */
+extern int dangling_flag;    /* if FALSE, don't print dangling identifiers */
+extern int xref_flag; /* If TRUE, print cross-references in scrap comments */
+extern int prepend_flag;  /* If TRUE, prepend a path to the output file names */
+extern char * dirpath;    /* The prepended directory path */
+extern char * path_sep;   /* How to join path to filename */
+extern int listings_flag;   /* if TRUE, use listings package for scrap formatting */
+extern int version_info_flag; /* If TRUE, set up version string */
+extern char *  version_string; /* What to print for @@v */
+extern int hyperref_flag; /* Are we preparing for hyperref
+                             package. */
+extern int hyperopt_flag; /* Are we preparing for hyperref options */
+extern char * hyperoptions; /* The options to pass to the
+                               hyperref package */
+extern int includepath_flag; /* Do we have an include path? */
+extern struct incl{char * name; struct incl * next;} * include_list;
+                       /* The list of include paths */
+extern int markdown_flag; /* if TRUE, generate Markdown instead of LaTeX */
+extern int weave_flag;          /* if TRUE, weave was requested via -w */
+extern int weave_format;        /* 0=none, 1=tex, 2=md */
+extern int weave_format_from_cli; /* if TRUE, CLI override of @@W */
+extern int map_flag;       /* if TRUE, emit JSON map to stdout */
+extern int extract_flag;   /* if TRUE, next arg is extract name */
+extern char *extract_name; /* fragment name to extract */
+@| tex_flag output_flag compare_flag verbose_flag number_flag
+scrap_flag dangling_flag xref_flag version_info_flag
+version_string hyperref_flag hyperopt_flag hyperoptions includepath_flag
+incl markdown_flag weave_flag weave_format weave_format_from_cli
+map_flag extract_flag extract_name @}
+
+The flags are all initialized for correct default behavior.
+
+@d Global variable def...
+@{int tex_flag = TRUE;
+int output_flag = TRUE;
+int compare_flag = TRUE;
+int verbose_flag = FALSE;
+int number_flag = FALSE;
+int scrap_flag = TRUE;
+int dangling_flag = FALSE;
+int xref_flag = FALSE;
+int prepend_flag = FALSE;
+char * dirpath = DEFAULT_PATH; /* Default directory path */
+char * path_sep = PATH_SEP_CHAR;
+int listings_flag = FALSE;
+int version_info_flag = FALSE;
+char default_version_string[] = "no version";
+char *  version_string = default_version_string;
+int hyperref_flag = FALSE;
+int hyperopt_flag = FALSE;
+char * hyperoptions = "";
+int includepath_flag = FALSE; /* Do we have an include path? */
+struct incl * include_list = NULL;
+                       /* The list of include paths */
+int markdown_flag = FALSE;
+int weave_flag = FALSE;
+int weave_format = 0;
+int weave_format_from_cli = FALSE;
+int map_flag = FALSE;
+int extract_flag = FALSE;
+char *extract_name = NULL;
+@}
+
+A global variable \verb|nw_char| will be used for the weft
+meta-character, which by default will be @@.
+@d Global variable dec...
+@{extern int nw_char;
+@| nw_char @}
+@d Global variable def...
+@{int nw_char='@@';
+@| nw_char @}
+
+
+We save the invocation name of the command in a global variable
+\verb|command_name| for use in error messages.
+@d Global variable dec...
+@{extern char *command_name;
+@| command_name @}
+
+@d Global variable def...
+@{char *command_name = NULL;
+@}
+
+The invocation name is conventionally passed in \verb|argv[0]|.
+@d Interpret com...
+@{command_name = argv[0];
+@}
+
+We need to examine the remaining entries in \verb|argv|, looking for
+command-line arguments.
+@d Interpret com...
+@{while (arg < argc) {
+  char *s = argv[arg];
+  if (*s++ == '-') {
+    @<Interpret the argument string \verb|s|@>
+    arg++;
+    @<Perhaps get the prepend path@>
+    @<Perhaps get the version info string@>
+    @<Perhaps get the hyperref options@>
+    @<Perhaps add an include path@>
+    @<Perhaps get the extract name@>
+  }
+  else break;
+}@}
+
+Several flags can be stacked behind a single minus sign; therefore,
+we've got to loop through the string, handling them all.
+If this flag requires an argument we skip to getting its argument
+straight away. This allows arguments to butt up to their flags
+and also avoids ambiguity about which value goes with which flag.
+
+@d Interpret the...
+@{{
+  char c = *s++;
+  while (c) {
+    switch (c) {
+      case 'c': compare_flag = FALSE;
+                break;
+      case 'd': dangling_flag = TRUE;
+                break;
+      case 'h': hyperopt_flag = TRUE;
+                goto HasValue;
+      case 'I': includepath_flag = TRUE;
+                goto HasValue;
+      case 'l': listings_flag = TRUE;
+                break;
+      case 'n': number_flag = TRUE;
+                break;
+      case 'o': output_flag = FALSE;
+                break;
+      case 'p': prepend_flag = TRUE;
+                goto HasValue;
+      case 'r': hyperref_flag = TRUE;
+                break;
+      case 's': scrap_flag = FALSE;
+                break;
+      case 't': tex_flag = FALSE;
+                break;
+      case 'e': extract_flag = TRUE;
+                goto HasValue;
+      case 'm': map_flag = TRUE;
+                break;
+      case 'v': verbose_flag = TRUE;
+                break;
+      case 'V': version_info_flag = TRUE;
+                goto HasValue;
+      case 'w': goto HasWeaveFormat;
+      case 'x': xref_flag = TRUE;
+                break;
+      default:  fprintf(stderr, "%s: unexpected argument ignored.  ",
+                        command_name);
+                fprintf(stderr, "Usage is: %s [-cdmnostvx] "
+                      "[-e name] [-I path] [-V version] "
+                      "[-w [format]] [-h options] [-p path] file...\n",
+                        command_name);
+                break;
+    }
+    c = *s++;
+  }
+  goto HasValue;
+@#HasWeaveFormat:
+  {
+    char *fmt = NULL;
+    weave_flag = TRUE;
+    if (*s != '\0')
+      fmt = s;
+    else if (arg + 1 < argc && argv[arg + 1][0] != '-') {
+      /* Peek: only consume next arg if it looks like a format token */
+      char *candidate = argv[arg + 1];
+      if (strcmp(candidate, "md") == 0 || strcmp(candidate, "tex") == 0) {
+        fmt = candidate;
+        ++arg;
+      }
+    }
+    if (fmt != NULL) {
+      if (strcmp(fmt, "md") == 0) {
+        weave_format = 2;
+        markdown_flag = TRUE;
+        weave_format_from_cli = TRUE;
+      } else if (strcmp(fmt, "tex") == 0) {
+        weave_format = 1;
+        weave_format_from_cli = TRUE;
+      } else {
+        fprintf(stderr, "%s: unknown weave format '%s'. Use 'md' or 'tex'.\n",
+                command_name, fmt);
+      }
+    }
+    /* If fmt is NULL, -w alone: format will come from @@W */
+    s = "";
+  }
+@#HasValue:;
+}@}
+
+
+@d Perhaps get the prepend path
+@{if (prepend_flag)
+{
+  if (*s == '\0')
+    s = argv[arg++];
+  dirpath = s;
+  prepend_flag = FALSE;
+}
+@}
+
+@d Perhaps add an include path
+@{if (includepath_flag)
+{
+   struct incl * le
+      = (struct incl *)arena_getmem(sizeof(struct incl));
+   struct incl ** p = &include_list;
+
+   if (*s == '\0')
+     s = argv[arg++];
+   le->name = save_string(s);
+   le->next = NULL;
+   while (*p != NULL)
+      p = &((*p)->next);
+   *p = le;
+   includepath_flag = FALSE;
+}
+@}
+
+@d Perhaps get the version info string
+@{if (version_info_flag)
+{
+   if (*s == '\0')
+     s = argv[arg++];
+   version_string = s;
+   version_info_flag = FALSE;
+}
+@}
+
+@d Perhaps get the hyperref options
+@{if (hyperopt_flag)
+{
+  if (*s == '\0')
+    s = argv[arg++];
+  hyperoptions = s;
+  hyperopt_flag = FALSE;
+  hyperref_flag = TRUE;
+}
+@}
+
+@d Perhaps get the extract name
+@{if (extract_flag) {
+  extract_name = (*s != '\0') ? s : argv[arg++];
+  extract_flag = FALSE;
+}@}
+
+In order to be able to process files in foreign languages we
+set the locale information. \texttt{isgraph()} and friends need
+this (see Section~\ref{names}).
+Try to read \texttt{LC\_CTYPE} from the environment. Use \texttt{LC\_ALL}
+if that fails. Don't set the locale if reading \texttt{LC\_ALL} fails, too.
+Print a warning if setting the program's locale fails.
+@d Set locale information @{
+{
+  /* try to get locale information */
+  char *s=getenv("LC_CTYPE");
+  if (s==NULL) s=getenv("LC_ALL");
+
+  /* set it */
+  if (s!=NULL)
+    if(setlocale(LC_CTYPE, s)==NULL)
+      fprintf(stderr, "Setting locale failed\n");
+}
+@}
+
+\subsection{File Names}
+
+We expect at least one file name. While a missing file name might be
+ignored without causing any problems, we take the opportunity to report
+the usage convention.
+@d Process the remaining...
+@{{
+  if (arg >= argc) {
+    fprintf(stderr, "%s: expected a file name.  ", command_name);
+    fprintf(stderr, "Usage is: %s [-cdmnostvx] [-e name] [-w [format]] [-p path] file-name...\n", command_name);
+    exit(-1);
+  }
+  do {
+    @<Handle the file name in \verb|argv[arg]|@>
+    arg++;
+  } while (arg < argc);
+}@}
+
+\newpage
+\noindent
+The code to handle a particular file name is rather more tedious than
+the actual processing of the file. A file name may be an arbitrarily
+complicated path name, with an optional extension. If no extension is
+present, we add \verb|.w| as a default. The extended path name will be
+kept in a local variable \verb|source_name|. The resulting documentation
+file will be written in the current directory; its name will be kept
+in the variable \verb|tex_name|.
+@d Handle the file...
+@{{
+  char source_name[FILENAME_MAX];
+  char tex_name[FILENAME_MAX];
+  char aux_name[FILENAME_MAX];
+  char *trim;
+  char *dot;
+  @<Build \verb|source_name| and \verb|tex_name|@>
+  @<Process a file@>
+}@}
+
+
+I bump the pointer \verb|p| through all the characters in \verb|argv[arg]|,
+copying all the characters into \verb|source_name| (via the pointer
+\verb|q|).
+
+At each slash, I update \verb|trim| to point just past the
+slash in \verb|source_name|. The effect is that \verb|trim| will point
+at the file name without any leading directory specifications.
+
+The pointer \verb|dot| is made to point at the file name extension, if
+present. If there is no extension, we add \verb|.weft| to the source name.
+The \verb|tex_name| (weave output name) is computed later in
+``Process a file'' once the weave format is known.
+@d Build \verb|sou...
+@{{
+  char *p = argv[arg];
+  char *q = source_name;
+  char c;
+  trim = q;
+  dot = NULL;
+  c = *p++;
+  while (c) {
+    *q++ = c;
+    if (PATH_SEP(c)) {
+      trim = q;
+      dot = NULL;
+    }
+    else if (c == '.')
+      dot = q - 1;
+    c = *p++;
+  }
+  @<Add the source path to the include path list@>
+  *q = '\0';
+  if (!dot) {
+    *q++ = '.';
+    *q++ = 'w';
+    *q++ = 'e';
+    *q++ = 'f';
+    *q++ = 't';
+    *q = '\0';
+  }
+  /* Find trim again for tex_name computation later */
+  {
+    char *t = source_name;
+    trim = t;
+    dot = NULL;
+    while (*t) {
+      if (PATH_SEP(*t)) { trim = t + 1; dot = NULL; }
+      else if (*t == '.') dot = t;
+      t++;
+    }
+  }
+}@}
+
+If the source file has a directory part we add that directory to the
+end of the search path so that the path of last resort is the same as
+the source path, not, as one person put it, something irrelevant like
+the directory weft was invoked from.
+
+@d Add the source path to the include path list
+@{if (trim != source_name) {
+   struct incl * le
+      = (struct incl *)arena_getmem(sizeof(struct incl));
+   struct incl ** p = &include_list;
+   char sv = *trim;
+
+   *trim = '\0';
+   le->name = save_string(source_name);
+   le->next = NULL;
+   while (*p != NULL)
+      p = &((*p)->next);
+   *p = le;
+   *trim = sv;
+}
+@}
+
+Now that we're finally ready to process a file, it's not really too
+complex.  We bundle most of the work into three routines \verb|pass1|
+(see Section~\ref{pass-one}), \verb|write_tex| (see
+Section~\ref{latex-file}), and \verb|write_files| (see
+Section~\ref{output-files}). After we're finished with a
+particular file, we must remember to release its storage (see
+Section~\ref{memory-management}).
+
+The default behavior is to tangle only.  Weaving happens only when
+\verb|-w| is given.  The weave format is determined by (in priority
+order): a CLI argument (\verb|-w md| or \verb|-w tex|), or the
+\verb|@@W| directive in the source file.  If \verb|-w| is given
+without a format and no \verb|@@W| is present, weft reports an
+error and exits.  The \verb|-t| flag suppresses weaving even if
+\verb|-w| was given.
+@d Process a file
+@{{
+  int do_weave = FALSE;
+  int effective_format = 0;
+
+  /* Reset weave_format for this file unless CLI locked it */
+  if (!weave_format_from_cli)
+    weave_format = 0;
+
+  pass1(source_name);
+  current_sector = 1;
+  prev_sector = 1;
+
+  if (map_flag) {
+    write_map(file_names, macro_names);
+    /* skip weave and tangle */
+  } else if (extract_name) {
+    write_extract(extract_name, file_names, macro_names);
+    /* skip weave and tangle */
+  } else {
+    /* Determine whether to weave and with which format */
+    if (weave_flag && !tex_flag) {
+      /* -t suppresses weave: tex_flag==FALSE means user passed -t */
+    } else if (weave_flag) {
+      effective_format = weave_format;
+      if (effective_format == 0) {
+        fprintf(stderr, "%s: -w requires a weave format.\n"
+                "  Use -w md, -w tex, or add %cW md/%cW tex to the source file.\n",
+                command_name, nw_char, nw_char);
+        exit(-1);
+      }
+      do_weave = TRUE;
+    }
+
+    if (do_weave) {
+      /* Compute weave output name now that format is known */
+      const char *weave_ext = (effective_format == 2) ? ".md" : ".tex";
+      if (dot) {
+        *dot = '\0';
+        sprintf(tex_name, "%s%s%s%s", dirpath, path_sep, trim, weave_ext);
+        sprintf(aux_name, "%s%s%s.aux", dirpath, path_sep, trim);
+        *dot = '.';
+      } else {
+        sprintf(tex_name, "%s%s%s%s", dirpath, path_sep, trim, weave_ext);
+        sprintf(aux_name, "%s%s%s.aux", dirpath, path_sep, trim);
+      }
+
+      if (effective_format == 2) {
+        markdown_flag = TRUE;
+        number_flag = TRUE;
+        collect_numbers(aux_name);
+        write_md(source_name, tex_name, 0);
+      } else {
+        collect_numbers(aux_name);
+        write_tex(source_name, tex_name, 0);
+      }
+    }
+
+    if (output_flag)
+      write_files(file_names);
+  }
+  arena_free();
+}@}
+
+
+\newpage

@@ -1,0 +1,30 @@
+\chapter{Indices} \label{indices}
+
+Three sets of indices can be created automatically: an index of file
+names, an index of fragment names, and an index of user-specified
+identifiers. An index entry includes the name of the entry, where it
+was defined, and where it was referenced.
+
+\section{Files}
+
+@f
+
+\section{Fragments}
+
+@m
+
+\section{Identifiers}
+
+Knuth prints his index of identifiers in a two-column format.
+I could force this automatically by emitting the \verb|\twocolumn|
+command; but this has the side effect of forcing a new page.
+Therefore, it seems better to leave it this up to the user.
+
+@u
+
+\fi
+
+\bibliographystyle{amsplain}
+\bibliography{litprog,master,misc}
+
+\end{document}

@@ -1,0 +1,144 @@
+\chapter{The Overall Structure}
+
+Processing a web requires three major steps:
+\begin{enumerate}
+  \item Read the source, accumulating file names, fragment names, scraps,
+    and lists of cross-references.
+  \item Reread the source, copying out to the documentation file, with
+    protection and cross-reference information for all the scraps.
+  \item Traverse the list of files names. For each file name:
+  \begin{enumerate}
+    \item Dump all the defining scraps into a temporary file.
+    \item If the file already exists and is unchanged, delete the
+      temporary file; otherwise, rename the temporary file.
+  \end{enumerate}
+\end{enumerate}
+
+
+\section{Files}
+
+I have divided the program into several files for quicker
+recompilation during development.
+@o global.h
+@{@<Include files@>
+@<Type declarations@>
+@<Limits@>
+@<Global variable declarations@>
+@<Function prototypes@>
+@<Operating System Dependencies@>@}
+
+We'll need at least five of the standard system include files.
+@d Include files
+@{
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <signal.h>
+#include <locale.h>
+@| FILE stderr exit fprintf fputs fopen fclose getc putc strlen
+toupper isupper islower isgraph isspace remove malloc size_t
+setlocale getenv @}
+
+
+\newpage
+\noindent
+I like to use \verb|TRUE| and \verb|FALSE| in my code.
+I'd use an \verb|enum| here, except that some systems seem to provide
+definitions of \verb|TRUE| and \verb|FALSE| by default.  The following
+code seems to work on all the local systems.
+@d Type dec...
+@{#ifndef FALSE
+#define FALSE 0
+#endif
+#ifndef TRUE
+#define TRUE 1
+#endif
+@| FALSE TRUE @}
+
+Here we define the maximum length for names (of fragments etc).
+
+@d Limits @{@%
+#ifndef MAX_NAME_LEN
+#define MAX_NAME_LEN 1024
+#endif
+@| MAX_NAME_LEN @}
+
+
+\subsection{The Main Files}
+
+The code is divided into four main files (introduced here) and five
+support files (introduced in the next section).
+The file \verb|main.c| will contain the driver for the whole program
+(see Section~\ref{main-routine}).
+@o main.c
+@{#include "global.h"
+@}
+
+The first pass over the source file is contained in \verb|pass1.c|.
+It handles collection of all the file names, fragments names, and scraps
+(see Section~\ref{pass-one}).
+@o pass1.c
+@{#include "global.h"
+@}
+
+The \verb|.tex| file is created during a second pass over the source
+file. The file \verb|latex.c| contains the code controlling the
+construction of the \verb|.tex| file
+(see Section~\ref{latex-file}).
+@o latex.c
+@{#include "global.h"
+static int scraps = 1;
+@}
+
+The Markdown output is created by the code in \verb|markdown.c|
+(see Section~\ref{markdown-file}).
+@o markdown.c
+@{#include "global.h"
+static int scraps = 1;
+@}
+
+The code controlling the creation of the output files is in \verb|output.c|
+(see Section~\ref{output-files}).
+@o output.c
+@{#include "global.h"
+@}
+
+\newpage
+\subsection{Support Files}
+
+The support files contain a variety of support routines used to define
+and manipulate the major data abstractions.
+The file \verb|input.c| holds all the routines used for referring to
+source files (see Section~\ref{source-files}).
+@o input.c
+@{#include "global.h"
+@}
+
+Creation and lookup of scraps is handled by routines in \verb|scraps.c|
+(see Section~\ref{scraps}).
+@o scraps.c
+@{#include "global.h"
+@}
+
+
+The handling of file names and fragment names is detailed in \verb|names.c|
+(see Section~\ref{names}).
+@o names.c
+@{#include "global.h"
+@}
+
+Memory allocation and deallocation is handled by routines in \verb|arena.c|
+(see Section~\ref{memory-management}).
+@o arena.c
+@{#include "global.h"
+@}
+
+Finally, for best portability, I seem to need a file containing
+(useless!) definitions of all the global variables.
+@o global.c
+@{#include "global.h"
+@<Operating System Dependencies@>
+@<Global variable definitions@>
+@}
+

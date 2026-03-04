@@ -1,0 +1,61 @@
+\documentclass[a4paper]{report}
+\newif\ifshowcode
+\showcodetrue
+\usepackage{latexsym}
+\usepackage{listings}
+\usepackage{color}
+\definecolor{linkcolor}{rgb}{0, 0, 0.7}
+\usepackage[colorlinks,linkcolor={linkcolor},citecolor={linkcolor},urlcolor={linkcolor}]{hyperref}
+\setlength{\oddsidemargin}{0in}
+\setlength{\evensidemargin}{0in}
+\setlength{\topmargin}{0in}
+\addtolength{\topmargin}{-\headheight}
+\addtolength{\topmargin}{-\headsep}
+\setlength{\textheight}{8.9in}
+\setlength{\textwidth}{6.5in}
+\setlength{\marginparwidth}{0.5in}
+\renewcommand{\chaptername}{\textsf{Chapter}}
+\makeatletter
+\renewcommand{\@@makechapterhead}[1]{%
+  \vspace*{50\p@@}%
+  {\parindent \z@@ \raggedright \normalfont
+    \ifnum \c@@secnumdepth >\m@@ne
+      \huge\bfseries\sffamily \@@chapapp\space \thechapter
+      \par\nobreak
+      \vskip 20\p@@
+    \fi
+    \interlinepenalty\@@M
+    \Huge \bfseries \sffamily #1\par\nobreak
+    \vskip 40\p@@
+  }}
+\renewcommand{\@@makeschapterhead}[1]{%
+  \vspace*{50\p@@}%
+  {\parindent \z@@ \raggedright
+    \normalfont
+    \interlinepenalty\@@M
+    \Huge \bfseries \sffamily #1\par\nobreak
+    \vskip 40\p@@
+  }}
+\renewcommand{\section}{\@@startsection{section}{1}{\z@@}%
+  {-3.5ex \@@plus -1ex \@@minus -.2ex}%
+  {2.3ex \@@plus.2ex}%
+  {\normalfont\Large\bfseries\sffamily}}
+\renewcommand{\subsection}{\@@startsection{subsection}{2}{\z@@}%
+  {-3.25ex\@@plus -1ex \@@minus -.2ex}%
+  {1.5ex \@@plus .2ex}%
+  {\normalfont\large\bfseries\sffamily}}
+\renewcommand{\subsubsection}{\@@startsection{subsubsection}{3}{\z@@}%
+  {-3.25ex\@@plus -1ex \@@minus -.2ex}%
+  {1.5ex \@@plus .2ex}%
+  {\normalfont\normalsize\bfseries\sffamily}}
+\makeatother
+\title{\sffamily\bfseries {\fontsize{40}{48}\selectfont weft 1.0}\\[6pt] A Modern Literate Programming Tool\\[4pt] \Large User Guide}
+\author{\sffamily Cuauhtemoc Pacheco}
+\date{\sffamily\today}
+\begin{document}
+\maketitle
+\tableofcontents
+@i literate/introduction.weft
+\bibliographystyle{amsplain}
+\bibliography{litprog,master,misc}
+\end{document}

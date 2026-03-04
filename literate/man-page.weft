@@ -1,0 +1,235 @@
+\chapter{Man page}
+
+Here is the UNIX man page for weft:
+
+@O weft.1 @{.TH WEFT 1 "March 2026"
+.SH NAME
+weft, a literate programming tool
+.SH SYNOPSIS
+.B weft
+.br
+\fBweft\fP [options] [file] ...
+.SH DESCRIPTION
+.I weft
+is a literate programming tool like Knuth's
+.I WEB,
+only simpler.
+A
+.I weft
+file contains program source code interleaved with documentation.
+When
+.I weft
+is given a
+.I weft
+file, it writes the program file(s).
+By default only tangling is performed. Weaving (documentation
+generation) is requested with \fB-w\fP.
+.SH COMMAND LINE OPTIONS
+.br
+\fB-t\fP Suppresses weave output (even if \fB-w\fP is given).
+.br
+\fB-o\fP Suppresses generation of the output files.
+.br
+\fB-d\fP List dangling identifier references in indexes.
+.br
+\fB-c\fP Forces output files to overwrite old files of the same
+  name without comparing for equality first.
+.br
+\fB-v\fP The verbose flag. Forces output of progress reports.
+.br
+\fB-n\fP Forces sequential numbering of scraps (instead of page
+  numbers).
+.br
+\fB-s\fP Doesn't print list of scraps making up file at end of
+  each scrap.
+\fB-p path\fP Prepend path to the filenames for all the output files.
+\fB-V string\fP Provide the string for replacement of the @@v
+operation. This is intended as a means for including version
+information in generated output.
+\fB-x\fP Include cross-references in comments in output files.
+\fB-h options\fP Turn on hyperlinks using the hyperref package of
+LaTeX and provide the options to the package.
+\fB-r\fP Turn on hyperlinks using the hyperref package of
+LaTeX, with the package options being in the text.
+\fB-I path\fP Provide a directory to search for included files. This
+may appear several times.
+.br
+\fB-m\fP Emit a JSON map of all output files, fragments, their definitions,
+and dependency relationships to stdout. No weave or tangle is performed.
+Useful for AI tooling and project navigation.
+.br
+\fB-e name\fP Extract the named fragment and all its transitive
+dependencies as Markdown to stdout. Fragment names support prefix
+matching. No weave or tangle is performed.
+.br
+\fB-w [format]\fP Request weave output. Without a format token,
+the format is taken from the \fB@@W\fP directive in the source file.
+With \fBmd\fP, a \fB.md\fP file is generated; with \fBtex\fP,
+a \fB.tex\fP file is generated. A CLI format overrides \fB@@W\fP.
+If \fB-w\fP is given without a format and no \fB@@W\fP exists,
+weft exits with an error.
+
+.SH FORMAT OF WEFT FILES
+A
+.I weft
+file contains mostly ordinary
+.I LaTeX.
+The file is read and copied to output (.tex file) unless a
+.I weft
+command is encountered. All
+.I weft
+commands start with an ``at-sign'' (@@).
+Files and fragments are defined with the following commands:
+.PP
+@@o \fIfile-name flags  scrap\fP  where scrap is smaller than one page.
+.br
+@@O \fIfile-name flags  scrap\fP  where scrap is bigger than one page.
+.br
+@@d \fIfragment-name scrap\fP. Where scrap is smaller than one page.
+.br
+@@D \fIfragment-name scrap\fP. Where scrap is bigger than one page.
+.PP
+@@q \fIfragment-name scrap\fP. Where scrap is smaller than one page.
+The scrap is not expanded in the output, allowing you to construct
+output files which can, perhaps after further processing, be input to
+.I weft.
+.br
+@@Q \fIfragment-name scrap\fP. Where scrap is bigger than one page.
+Likewise.
+.PP
+Scraps have specific begin and end
+markers;
+which begin and end marker you use determines how the scrap will be
+typeset in the .tex file:
+.br
+\fB@@{\fP...\fB@@}\fP for verbatim "terminal style" formatting or,
+with the -l flag, LaTeX listing package.
+.br
+\fB@@[\fP...\fB@@]\fP for LaTeX paragraph mode formatting, and
+.br
+\fB@@(\fP...\fB@@)\fP for LaTeX math mode formatting.
+.br
+Any amount of whitespace
+(including carriage returns) may appear between a name and the
+beginning of a scrap.
+.PP
+Several code/file scraps may have the same name;
+.I weft
+concatenates their definitions to produce a single scrap.
+Code scrap definitions are like macro definitions;
+.I weft
+extracts a program by expanding one scrap.
+The definition of that scrap contains references to other scraps, which are
+themselves expanded, and so on.
+\fIweft\fP's output is readable; it preserves the indentation of expanded
+scraps with respect to the scraps in which they appear.
+.PP
+.SH PER FILE OPTIONS
+When defining an output file, the programmer has the option of using flags
+to control the output.
+.PP
+\fB-d\fR option,
+.I weft
+will emit line number indications at scrap boundaries.
+.br
+\fB-i\fR option,
+.I weft
+supresses the indentation of fragments (useful for \fBFortran\fR).
+.br
+\fB-t\fP option makes \fIweft\fP
+copy tabs untouched from input to output.
+.br
+\fB-c\fIx\fP Include comments in the output file.
+\fIx\fP may be \fBc\fP for C-style comments, \fB+\fP for C++ and
+\fBp\fP for perl and similar.
+.br
+\fB-s\fP Suppress section markers and \fB#line\fP directives in the
+tangled output for this file.  Language auto-detection still sets
+the comment style and the \fBlang\fP tag (used for Markdown syntax
+highlighting), but no markers appear in the output.
+.PP
+.SH MINOR COMMANDS
+.br
+@@@@    Causes a single ``at-sign'' to be copied into the output.
+.br
+@@\_    Causes the text between it and the next {\tt @@\_} to be made bold
+        (for keywords, etc.) in the formatted document
+.br
+@@%     Comments out a line so that it doesn't appear in the output.
+.br
+@@i     \fBfilename\fR causes the file named to be included.
+.br
+@@f     Creates an index of output files.
+.br
+@@m     Creates an index of fragments.
+.br
+@@u     Creates an index of user-specified identifiers.
+.br
+@@W \fIformat\fP Declares the weave output format (\fBmd\fP or \fBtex\fP).
+Used by \fB-w\fP when no explicit format is given on the command line.
+.br
+@@l \fItag\fP Sets the language for the next @@o or @@d directive.
+The tag is looked up in the language table to determine the comment
+style for section markers and the \fBclass\fP attribute for Markdown
+syntax highlighting.  Place it on the line before the directive it
+applies to.
+.br
+@@L \fIname style\fP [+d] Defines a custom language mapping.
+\fIname\fP is the tag (e.g. \fBnim\fP, \fBglsl\fP),
+\fIstyle\fP is one of \fB//\fP, \fB#\fP, \fB--\fP, \fB/*\fP, or \fB<!--\fP.
+The optional \fB+d\fP flag enables \fB#line\fP directive generation.
+User-defined languages override built-in entries.  Must appear in the
+document preamble before any @@o or @@d that depends on it.
+.PP
+.SH SECTION MARKERS
+By default, when a language is detected (via @@l, @@L, or file extension
+of @@o), weft wraps each scrap in the tangled output with opening and
+closing section markers using the appropriate comment syntax.  For example,
+C output includes:
+.nf
+
+  /* {1: source.w:10} */
+  int main() { return 0; }
+  /* {:1} */
+
+.fi
+The opening marker shows the scrap number and source location; the closing
+marker shows only the scrap number.  Nested fragment expansions produce
+nested markers.
+.PP
+Languages with \fB#line\fP support (C, C++, Objective-C, etc.) also
+emit \fB#line\fP directives at scrap boundaries.
+.PP
+The \fB-s\fP per-file flag suppresses both section markers and \fB#line\fP
+directives.
+.PP
+.SH LANGUAGE INFERENCE
+When no @@l tag precedes an @@o directive, weft infers the language
+from the output file's extension.  For example, \fB@@o app.js\fP
+automatically detects JavaScript (// comments, no #line).  The inferred
+language is used for section markers in the tangle and for the
+\fBclass="language-X"\fP attribute in the Markdown weave.
+.PP
+Over 250 file extensions are recognised, covering C, C++, Python,
+JavaScript, Go, Rust, Ruby, Lua, SQL, HTML, and many more.
+Extensions not in the table produce no markers.
+.PP
+To mark an identifier for inclusion in the index, it must be mentioned
+at the end of the scrap it was defined in. The line starts
+with @@| and ends with the \fBend of scrap\fP mark \fB@@}\fP.
+.PP
+.SH ERROR MESSAGES
+.PP
+.SH BUGS
+.PP
+.SH AUTHOR
+Preston Briggs.
+Internet address \fBpreston@@cs.rice.edu\fP.
+.SH MAINTAINER
+Simon Wright
+Internet address \fBsimon@@pushface.org\fP
+.br
+Keith Harwood
+Internet address \fBKeith.Harwood@@vitalmis.com\fP
+@}
+

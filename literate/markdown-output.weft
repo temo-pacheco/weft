@@ -1,0 +1,1012 @@
+\section{Writing the Markdown File} \label{markdown-file}
+
+This section implements the Markdown weave output, activated by the
+\verb|-w md| command-line flag. It is structurally parallel to the
+\LaTeX\ output in Section~\ref{latex-file}, but emits Markdown with
+embedded HTML for scraps (using \verb|<pre><code>| blocks so that
+fragment references inside code can be clickable links).
+
+@d Function...
+@{extern void write_md(char *file_name, char *md_name, unsigned char sector);
+@}
+
+We need a few local function declarations before we get into the body
+of \verb|write_md|.
+
+@o markdown.c
+@{static void md_copy_scrap(FILE *file, int prefix, Name *name);
+static void md_print_scrap_numbers(FILE *md_file, Scrap_Node *scraps);
+static void md_format_entry(Name *name, FILE *md_file, unsigned char sector);
+static void md_format_file_entry(Name *name, FILE *md_file);
+static void md_format_user_entry(Name *name, FILE *md_file, unsigned char sector);
+static void md_write_arg(FILE *md_file, char *p);
+static void md_write_literal(FILE *md_file, char *p);
+static void md_write_ArglistElement(FILE *file, Arglist *args, char **params);
+static void md_format_uses_refs(FILE *md_file, int scrap);
+static void md_format_defs_refs(FILE *md_file, int scrap);
+@}
+
+
+The routine \verb|write_md| takes two file names as parameters: the
+name of the web source file and the name of the \verb|.md| output file.
+@o markdown.c
+@{void write_md(char *file_name, char *md_name, unsigned char sector)
+{
+  (void)sector;
+  FILE *md_file = fopen(md_name, "w");
+  if (md_file) {
+    if (verbose_flag)
+      fprintf(stderr, "writing %s\n", md_name);
+    source_open(file_name);
+    @<Copy \verb|source_file| into \verb|md_file|@>
+    fclose(md_file);
+  }
+  else
+    fprintf(stderr, "%s: can't open %s\n", command_name, md_name);
+}
+@| write_md @}
+
+
+We make our second pass through the source web, copying characters
+straight into the \verb|.md| file. We watch for \verb|@@| characters
+which signal a command sequence. We also detect and discard cosmetic
+fence lines (lines that are exactly \verb|```| optionally followed by
+a language tag).
+
+@d Copy \verb|source_file| into \verb|md_file|
+@{{
+  int c = source_get();
+  int at_line_start = TRUE;
+  while (c != EOF) {
+    if (c == nw_char)
+      {
+      @<Interpret md at-sequence@>
+      }
+    else if (c == '`' && at_line_start) {
+      @<Check for cosmetic fence line@>
+    }
+    else {
+      if (c == '\n') at_line_start = TRUE;
+      else at_line_start = FALSE;
+      putc(c, md_file);
+      c = source_get();
+    }
+  }
+}@}
+
+Cosmetic fence lines are lines that start with \verb|```|. We peek
+ahead to see if the line matches; if so, we skip to end of line.
+Otherwise we output what we already consumed and continue.
+
+@d Check for cosmetic fence line
+@{{
+  int c2 = source_get();
+  int c3 = (c2 == '`') ? source_get() : 0;
+  if (c2 == '`' && c3 == '`') {
+    /* Skip rest of fence line */
+    int fc = source_get();
+    while (fc != '\n' && fc != EOF)
+      fc = source_get();
+    c = source_get();
+    at_line_start = TRUE;
+  } else {
+    /* Not a fence, output what we consumed */
+    putc('`', md_file);
+    if (c2 == '`') {
+      putc('`', md_file);
+      c = c3;
+    } else {
+      c = c2;
+    }
+    at_line_start = FALSE;
+  }
+}@}
+
+@d Interpret md at-sequence
+@{{
+  int big_definition = FALSE;
+  c = source_get();
+  switch (c) {
+    case 'r':
+          c = source_get();
+          nw_char = c;
+          update_delimit_scrap();
+          break;
+    case 'O': big_definition = TRUE;
+    case 'o': @<Write md output file definition@>
+              break;
+    case 'Q':
+    case 'D': big_definition = TRUE;
+    case 'q':
+    case 'd': @<Write md macro definition@>
+              break;
+    case 's':
+              @<Step to next sector@>
+              break;
+    case 'S':
+              @<Close the current sector@>
+              break;
+    case '{':
+    case '[':
+    case '(': @<Write md in-text scrap@>
+              break;
+    case '<': @<Expand md macro into @'md_file@'@>
+              break;
+    case 'x': @<Copy label from source into@(md_file@)@>
+              c = source_get();
+              break;
+    case 'c': /* Block comments: no special handling in Markdown */
+              c = source_get();
+              break;
+    case 'f': @<Write md index of file names@>
+              break;
+    case 'm': @<Write md index of macro names@>
+              break;
+    case 'u': @<Write md index of user-specified names@>
+              break;
+    case 'v': @<Copy version info into md file@>
+              break;
+    case 'l':
+    case 'L': @<Skip at-L language definition line@>
+              break;
+    case 'W': @<Skip at-L language definition line@>
+              break;
+    default:
+          if (c==nw_char)
+            putc(c, md_file);
+          c = source_get();
+              break;
+  }
+}@}
+
+@d Copy version info into md file
+@{fputs(version_string, md_file);
+c = source_get();
+@}
+
+@d Expand md macro into @'file@'
+@{{
+   Parameters local_parameters = 0;
+   int changed;
+   char indent_chars[MAX_INDENT];
+   Arglist *a;
+   Name *name;
+   Arglist * args;
+   a = collect_scrap_name(0);
+   name = a->name;
+   args = instance(a->args, NULL, NULL, &changed);
+   name->mark = TRUE;
+   write_scraps(@1, md_name, name->defs, 0, indent_chars, 0, 0, 1, 0, 0,
+         args, name->arg, local_parameters, md_name);
+   name->mark = FALSE;
+   c = source_get();
+}
+@}
+
+\subsection{Formatting Definitions in Markdown}
+
+File and fragment definitions use HTML anchors and formatting.
+A file definition header looks like:
+\begin{verbatim}
+<a id="weft1"></a>
+**"filename"** **1** =
+<pre><code>...code...</code></pre>
+\end{verbatim}
+
+A fragment definition header looks like:
+\begin{verbatim}
+<a id="weft1"></a>
+**&lt;*Fragment Name* 1&gt;** =
+<pre><code>...code...</code></pre>
+\end{verbatim}
+
+@d Write md output file definition
+@{{
+  Name *name = collect_file_name();
+  (void)big_definition;
+  fputs("\n<a id=\"weft", md_file);
+  write_single_scrap_ref(md_file, scraps);
+  fputs("\"></a>\n", md_file);
+  fprintf(md_file, "**\"%s\"**", name->spelling);
+  fputs(" **", md_file);
+  write_single_scrap_ref(md_file, scraps);
+  fputs("** =\n", md_file);
+  @<Fill in the md scrap@>
+  @<Write md file cross-refs@>
+  @<Finish md scrap@>
+}@}
+
+
+@d Write md macro definition
+@{{
+  Name *name = collect_macro_name();
+  (void)big_definition;
+  fputs("\n<a id=\"weft", md_file);
+  write_single_scrap_ref(md_file, scraps);
+  fputs("\"></a>\n", md_file);
+  fputs("**&lt;*", md_file);
+  @<Write the md macro's name@>
+  fputs("* ", md_file);
+  write_single_scrap_ref(md_file, scraps);
+  fputs("&gt;** =\n", md_file);
+  @<Fill in the md scrap@>
+  @<Write md macro cross-refs@>
+  @<Finish md scrap@>
+}@}
+
+@d Write the md macro's name
+@{{
+  char * p = name->spelling;
+  int i = 0;
+
+  while (*p != '\000') {
+    if (*p == ARG_CHR) {
+      md_write_arg(md_file, name->arg[i++]);
+      p++;
+    }
+    else
+       fputc(*p++, md_file);
+  }
+}@}
+
+@o markdown.c
+@{static void md_write_arg(FILE * md_file, char * p)
+{
+   fputs("<i>", md_file);
+   while (*p)
+   {
+      switch (*p)
+      {
+      case '<':
+         fputs("&lt;", md_file);
+         break;
+      case '>':
+         fputs("&gt;", md_file);
+         break;
+      case '&':
+         fputs("&amp;", md_file);
+         break;
+      default:
+         fputc(*p, md_file);
+         break;
+      }
+      p++;
+   }
+   fputs("</i>", md_file);
+}
+@| md_write_arg @}
+
+
+@d Fill in the md scrap
+@{{
+  if (name->lang[0] != '\0')
+    fprintf(md_file, "<pre><code class=\"language-%s\">", name->lang);
+  else
+    fputs("<pre><code>", md_file);
+  extra_scraps = 0;
+  md_copy_scrap(md_file, TRUE, name);
+  fputs("</code></pre>\n", md_file);
+}@}
+
+
+@d Finish md scrap
+@{{
+  scraps += extra_scraps;
+  do
+    c = source_get();
+  while (isspace(c));
+  at_line_start = TRUE;
+}@}
+
+@d Write md in-text scrap
+@{md_copy_scrap(md_file, FALSE, NULL);
+c = source_get();
+@}
+
+\subsubsection{Cross References in Markdown}
+
+Cross-references appear as blockquotes after each scrap.
+
+@d Write md file cross-refs
+@{{
+  if ( scrap_flag ) {
+    @<Write md file defs@>
+  }
+  md_format_defs_refs(md_file, scraps);
+  md_format_uses_refs(md_file, scraps++);
+}@}
+
+@d Write md file defs
+@{{
+  if (name->defs) {
+    if (name->defs->next) {
+      fputs("> *File defined by* ", md_file);
+      md_print_scrap_numbers(md_file, name->defs);
+    }
+  } else {
+    fprintf(stderr,
+            "would have crashed in 'Write md file defs' for '%s'\n",
+             name->spelling);
+  }
+}@}
+
+@d Write md macro cross-refs
+@{{
+  @<Write md macro defs@>
+  @<Write md macro refs@>
+  md_format_defs_refs(md_file, scraps);
+  md_format_uses_refs(md_file, scraps++);
+}@}
+
+@d Write md macro defs
+@{{
+  if (name->defs->next) {
+    fputs("> *Fragment defined by* ", md_file);
+    md_print_scrap_numbers(md_file, name->defs);
+  }
+}@}
+
+@d Write md macro refs
+@{{
+  if (name->uses) {
+    if (name->uses->next) {
+      fputs("> *Fragment referenced in* ", md_file);
+      md_print_scrap_numbers(md_file, name->uses);
+    }
+    else {
+      fputs("> *Fragment referenced in* ", md_file);
+      fputs("<a href=\"#weft", md_file);
+      write_single_scrap_ref(md_file, name->uses->scrap);
+      fputs("\">", md_file);
+      write_single_scrap_ref(md_file, name->uses->scrap);
+      fputs("</a>", md_file);
+      fputs(".\n", md_file);
+    }
+  }
+  else {
+    fputs("> *Fragment never referenced*.\n", md_file);
+    fprintf(stderr, "%s: <%s> never referenced.\n",
+            command_name, name->spelling);
+  }
+}@}
+
+@o markdown.c
+@{static void md_print_scrap_numbers(FILE *md_file, Scrap_Node *scraps)
+{
+  int page;
+  fputs("<a href=\"#weft", md_file);
+  write_scrap_ref(md_file, scraps->scrap, -1, &page);
+  fputs("\">", md_file);
+  write_scrap_ref(md_file, scraps->scrap, TRUE, &page);
+  fputs("</a>", md_file);
+  scraps = scraps->next;
+  while (scraps) {
+    fputs("<a href=\"#weft", md_file);
+    write_scrap_ref(md_file, scraps->scrap, -1, &page);
+    fputs("\">", md_file);
+    write_scrap_ref(md_file, scraps->scrap, FALSE, &page);
+    fputs("</a>", md_file);
+    scraps = scraps->next;
+  }
+  fputs(".\n", md_file);
+}
+@| md_print_scrap_numbers @}
+
+\subsubsection{Formatting a Scrap in Markdown}
+
+Scraps are output inside \verb|<pre><code>| blocks. Characters
+\verb|<|, \verb|>|, and \verb|&| are HTML-escaped. At-sequences
+within scraps (macro references, keywords, parameters, etc.) emit
+HTML markup directly.
+
+@o markdown.c
+@{static int md_scrap_type = 0;
+
+static void md_copy_scrap(FILE *file, int prefix, Name *name)
+{
+  int indent = 0;
+  int c;
+  char ** params = name ? name->arg : NULL;
+  if (source_last == '{') md_scrap_type = 0;
+  if (source_last == '[') md_scrap_type = 1;
+  if (source_last == '(') md_scrap_type = 2;
+  c = source_get();
+  while (1) {
+    switch (c) {
+      case '\n': fputs("\n", file);
+                 indent = 0;
+                 break;
+      case '\t': @<Expand md tab into spaces@>
+                 break;
+      default:
+         if (c==nw_char)
+           {
+             @<Check md at-sequence for end-of-scrap@>
+             break;
+           }
+         if (md_scrap_type == 0 && prefix) {
+           @<HTML-escape character c@>
+         } else {
+           putc(c, file);
+         }
+                 indent++;
+                 break;
+    }
+    c = source_get();
+  }
+}
+@| md_copy_scrap md_scrap_type @}
+
+@d HTML-escape character c
+@{switch (c) {
+  case '<': fputs("&lt;", file); break;
+  case '>': fputs("&gt;", file); break;
+  case '&': fputs("&amp;", file); break;
+  default:  putc(c, file); break;
+}@}
+
+@d Expand md tab into spaces
+@{{
+  int delta = 8 - (indent % 8);
+  indent += delta;
+  while (delta > 0) {
+    putc(' ', file);
+    delta--;
+  }
+}@}
+
+@d Check md at-sequence for end-of-scrap
+@{{
+  c = source_get();
+  switch (c) {
+    case 'c': @<Show md presence of a block comment@>
+              break;
+    case 'x': @<Copy label from source into@(file@)@>
+              break;
+    case 'v': @<Copy version info into file@>
+    case 's':
+              break;
+    case '+':
+    case '-':
+    case '*':
+    case '|': @<Skip over index entries@>
+    case ',':
+    case ')':
+    case ']':
+    case '}': return;
+    case '<': @<Format md macro name@>
+              break;
+    case '%': @<Skip commented-out code@>
+              break;
+    case '_': @<Bold md Keyword@>
+              break;
+    case 't': @<Italic md "@'fragment title@'"@>
+              break;
+    case 'f': @<Italic md "@'file name@'"@>
+              break;
+    case '1': case '2': case '3':
+    case '4': case '5': case '6':
+    case '7': case '8': case '9':
+              if (name == NULL
+                  || name->arg[c - '1'] == NULL) {
+                if (md_scrap_type == 0 && prefix)
+                  fputs("&amp;", file);
+                else
+                  putc(nw_char, file);
+                fputc(c,   file);
+              }
+              else {
+                md_write_arg(file, name->arg[c - '1']);
+              }
+              break;
+    default:
+          if (c==nw_char)
+            {
+              if (md_scrap_type == 0 && prefix)
+                fputs("&amp;", file);
+              else
+                putc(nw_char, file);
+              break;
+            }
+          /* ignore these since pass1 will have warned about them */
+              break;
+  }
+}@}
+
+@d Show md presence of a block comment
+@{{
+  fputs("<i>(Comment)</i>", file);
+}
+@}
+
+@d Bold md Keyword
+@{{
+  fprintf(file, "<b>");
+  c = source_get();
+  do {
+      if (c == '<') fputs("&lt;", file);
+      else if (c == '>') fputs("&gt;", file);
+      else if (c == '&') fputs("&amp;", file);
+      else fputc(c, file);
+      c = source_get();
+  } while (c != nw_char);
+  c = source_get();
+  fprintf(file, "</b>");
+}@}
+
+@d Italic md "@'whatever@'"
+@{{
+  fprintf(file, "<i>@1</i>");
+}@}
+
+@d Format md macro name
+@{{
+  Arglist *args = collect_scrap_name(-1);
+  Name *name = args->name;
+  char * p = name->spelling;
+  Arglist *q = args->args;
+  int narg = 0;
+
+  fputs("&lt;<a href=\"#weft", file);
+  if (name->defs) {
+    write_single_scrap_ref(file, name->defs->scrap);
+  } else {
+    putc('?', file);
+  }
+  fputs("\"><i>", file);
+  while (*p != '\000') {
+    if (*p == ARG_CHR) {
+      if (q == NULL) {
+         md_write_literal(file, name->arg[narg]);
+      }
+      else {
+        md_write_ArglistElement(file, q, params);
+        q = q->next;
+      }
+      p++;
+      narg++;
+    }
+    else {
+      if (*p == '<') fputs("&lt;", file);
+      else if (*p == '>') fputs("&gt;", file);
+      else if (*p == '&') fputs("&amp;", file);
+      else fputc(*p, file);
+      p++;
+    }
+  }
+  fputs("</i> ", file);
+  if (name->defs) {
+    Scrap_Node *dp = name->defs;
+    write_single_scrap_ref(file, dp->scrap);
+    dp = dp->next;
+    if (dp)
+      fputs(", ...", file);
+  }
+  else {
+    putc('?', file);
+    fprintf(stderr, "%s: never defined <%s>\n",
+            command_name, name->spelling);
+  }
+  fputs("</a>&gt;", file);
+}@}
+
+
+@o markdown.c
+@{static void md_write_literal(FILE * md_file, char * p)
+{
+   while (*p!= '\000') {
+     if (*p == '<') fputs("&lt;", md_file);
+     else if (*p == '>') fputs("&gt;", md_file);
+     else if (*p == '&') fputs("&amp;", md_file);
+     else fputc(*p, md_file);
+     p++;
+   }
+}
+@| md_write_literal @}
+
+@o markdown.c
+@{static void
+md_write_ArglistElement(FILE * file, Arglist * args, char ** params)
+{
+  Name *name = args->name;
+  Arglist *q = args->args;
+
+  if (name == NULL) {
+    char * p = (char*)q;
+
+    if (p[0] == ARG_CHR) {
+       md_write_arg(file, params[p[1] - '1']);
+    } else {
+       md_write_literal(file, (char *)q);
+    }
+  } else if (name == (Name *)1) {
+    Scrap_Node * qq = (Scrap_Node *)q;
+    qq->quoted = TRUE;
+    write_scraps(file, "", qq,
+                 -1, "", 0, 0, 0, 0, 0,
+                 NULL, params, 0, "");
+    extra_scraps++;
+    qq->quoted = FALSE;
+  } else {
+    char * p = name->spelling;
+    fputs("&lt;<i>", file);
+    while (*p != '\000') {
+      if (*p == ARG_CHR) {
+        md_write_ArglistElement(file, q, params);
+        q = q->next;
+        p++;
+      }
+      else {
+        if (*p == '<') fputs("&lt;", file);
+        else if (*p == '>') fputs("&gt;", file);
+        else if (*p == '&') fputs("&amp;", file);
+        else fputc(*p, file);
+        p++;
+      }
+    }
+    fputs("</i> ", file);
+    if (name->defs) {
+      Scrap_Node *dp = name->defs;
+      write_single_scrap_ref(file, dp->scrap);
+      dp = dp->next;
+      if (dp)
+        fputs(", ...", file);
+    }
+    else {
+      putc('?', file);
+      fprintf(stderr, "%s: never defined <%s>\n",
+              command_name, name->spelling);
+    }
+    fputs("&gt;", file);
+  }
+}
+@| md_write_ArglistElement @}
+
+\subsection{Generating the Indices in Markdown}
+
+@d Write md index of file names
+@{{
+  if (file_names) {
+    fputs("\n", md_file);
+    md_format_file_entry(file_names, md_file);
+    fputs("\n", md_file);
+  }
+  c = source_get();
+}@}
+
+@o markdown.c
+@{static void md_format_file_entry(Name *name, FILE *md_file)
+{
+  while (name) {
+    md_format_file_entry(name->llink, md_file);
+    @<Format a md file index entry@>
+    name = name->rlink;
+  }
+}
+@| md_format_file_entry @}
+
+@d Format a md file index entry
+@{fputs("- ", md_file);
+fprintf(md_file, "`\"%s\"` ", name->spelling);
+@<Write md file's defining scrap numbers@>
+putc('\n', md_file);@}
+
+@d Write md file's defining scrap numbers
+@{{
+  Scrap_Node *p = name->defs;
+  fputs("*Defined by* ", md_file);
+  if (p->next) {
+    md_print_scrap_numbers(md_file, p);
+  }
+  else {
+    fputs("<a href=\"#weft", md_file);
+    write_single_scrap_ref(md_file, p->scrap);
+    fputs("\">", md_file);
+    write_single_scrap_ref(md_file, p->scrap);
+    fputs("</a>.", md_file);
+  }
+}@}
+
+@d Write md index of macro names
+@{{
+  unsigned char sector = current_sector;
+  int c = source_get();
+  if (c == '+')
+     sector = 0;
+  else
+     source_ungetc(&c);
+  if (has_sector(macro_names, sector)) {
+    fputs("\n", md_file);
+    md_format_entry(macro_names, md_file, sector);
+    fputs("\n", md_file);
+  } else {
+    fputs("None.\n", md_file);
+  }
+}
+c = source_get();
+@}
+
+@o markdown.c
+@{static int md_load_entry(Name * name, Name ** nms, int n)
+{
+   while (name) {
+      n = md_load_entry(name->llink, nms, n);
+      nms[n++] = name;
+      name = name->rlink;
+   }
+   return n;
+}
+@| md_load_entry @}
+
+@o markdown.c
+@{static void md_format_entry(Name *name, FILE *md_file, unsigned char sector)
+{
+  Name ** nms = malloc(num_scraps()*sizeof(Name *));
+  int n = md_load_entry(name, nms, 0);
+  int i;
+
+  @<Sort @'nms@' of size @'n@' for @<Rob's ordering@>@>
+  for (i = 0; i < n; i++)
+  {
+     Name * name = nms[i];
+
+     @<Format a md index entry@>
+  }
+  free(nms);
+}
+@| md_format_entry @}
+
+@d Format a md index entry
+@{if (name->sector == sector){
+  fputs("- ", md_file);
+  fputs("&lt;*", md_file);
+  @<Write the md macro's name@>
+  fputs("* ", md_file);
+  @<Write md defining scrap numbers@>
+  fputs("&gt; ", md_file);
+  @<Write md referencing scrap numbers@>
+  putc('\n', md_file);
+}@}
+
+@d Write md defining scrap numbers
+@{{
+  Scrap_Node *p = name->defs;
+  if (p) {
+    int page;
+    fputs("<a href=\"#weft", md_file);
+    write_scrap_ref(md_file, p->scrap, -1, &page);
+    fputs("\">", md_file);
+    write_scrap_ref(md_file, p->scrap, TRUE, &page);
+    fputs("</a>", md_file);
+    p = p->next;
+    while (p) {
+      fputs("<a href=\"#weft", md_file);
+      write_scrap_ref(md_file, p->scrap, -1, &page);
+      fputs("\">", md_file);
+      write_scrap_ref(md_file, p->scrap, FALSE, &page);
+      fputs("</a>", md_file);
+      p = p->next;
+    }
+  }
+  else
+    putc('?', md_file);
+}@}
+
+@d Write md referencing scrap numbers
+@{{
+  Scrap_Node *p = name->uses;
+  if (p) {
+    fputs("*Referenced in* ", md_file);
+    if (p->next) {
+      md_print_scrap_numbers(md_file, p);
+    }
+    else {
+      fputs("<a href=\"#weft", md_file);
+      write_single_scrap_ref(md_file, p->scrap);
+      fputs("\">", md_file);
+      write_single_scrap_ref(md_file, p->scrap);
+      fputs("</a>.", md_file);
+    }
+  }
+  else
+    fputs("*Not referenced*.", md_file);
+}@}
+
+
+@d Write md index of user-specified names
+@{{
+    unsigned char sector = current_sector;
+    c = source_get();
+    if (c == '+') {
+       sector = 0;
+       c = source_get();
+    }
+    if (has_sector(user_names, sector)) {
+      fputs("\n", md_file);
+      md_format_user_entry(user_names, md_file, sector);
+      fputs("\n", md_file);
+    }
+}@}
+
+
+@o markdown.c
+@{static void md_format_user_entry(Name *name, FILE *md_file, unsigned char sector)
+{
+  while (name) {
+    md_format_user_entry(name->llink, md_file, sector);
+    @<Format a md user index entry@>
+    name = name->rlink;
+  }
+}
+@| md_format_user_entry @}
+
+
+@D Format a md user index entry
+@{if (name->sector == sector){
+  Scrap_Node *uses = name->uses;
+  if ( uses || dangling_flag ) {
+    int page;
+    Scrap_Node *defs = name->defs;
+    fprintf(md_file, "- `%s`: ", name->spelling);
+    if (!uses) {
+        fputs("(**", md_file);
+        fputs("<a href=\"#weft", md_file);
+        write_single_scrap_ref(md_file, defs->scrap);
+        fputs("\">", md_file);
+        write_single_scrap_ref(md_file, defs->scrap);
+        fputs("</a>**)", md_file);
+        page = -2;
+        defs = defs->next;
+    }
+    else
+      if (!defs || uses->scrap < defs->scrap) {
+      fputs("<a href=\"#weft", md_file);
+      write_scrap_ref(md_file, uses->scrap, -1, &page);
+      fputs("\">", md_file);
+      write_scrap_ref(md_file, uses->scrap, TRUE, &page);
+      fputs("</a>", md_file);
+      uses = uses->next;
+    }
+    else {
+      if (defs->scrap == uses->scrap)
+        uses = uses->next;
+      fputs("**", md_file);
+
+      fputs("<a href=\"#weft", md_file);
+      write_single_scrap_ref(md_file, defs->scrap);
+      fputs("\">", md_file);
+      write_single_scrap_ref(md_file, defs->scrap);
+      fputs("</a>**", md_file);
+      page = -2;
+      defs = defs->next;
+    }
+    while (uses || defs) {
+      if (uses && (!defs || uses->scrap < defs->scrap)) {
+        fputs("<a href=\"#weft", md_file);
+        write_scrap_ref(md_file, uses->scrap, -1, &page);
+        fputs("\">", md_file);
+        write_scrap_ref(md_file, uses->scrap, FALSE, &page);
+        fputs("</a>", md_file);
+        uses = uses->next;
+      }
+      else {
+        if (uses && defs->scrap == uses->scrap)
+          uses = uses->next;
+        fputs(", **", md_file);
+
+        fputs("<a href=\"#weft", md_file);
+        write_single_scrap_ref(md_file, defs->scrap);
+        fputs("\">", md_file);
+        write_single_scrap_ref(md_file, defs->scrap);
+        fputs("</a>**", md_file);
+        page = -2;
+        defs = defs->next;
+      }
+    }
+    fputs(".\n", md_file);
+  }
+}@}
+
+\subsection{Identifier Cross-References in Markdown}
+
+These functions are the Markdown equivalents of \verb|format_uses_refs|
+and \verb|format_defs_refs| from \verb|scraps.c|, but emit Markdown
+blockquote format.
+
+@o markdown.c
+@{
+static void
+md_format_uses_refs(FILE * md_file, int scrap)
+{
+  Uses * p = get_scrap_uses(scrap);
+  if (p != NULL)
+    @<Write md uses references@>
+}
+@| md_format_uses_refs @}
+
+@d Write md uses references
+@{{
+  char join = ' ';
+  fputs("> *Uses:*", md_file);
+  do {
+    @<Write one md use reference@>
+    join = ',';
+    p = p->next;
+  }while (p != NULL);
+  fputs(".\n", md_file);
+}@}
+
+@d Write one md use reference
+@{Name * name = p->defn;
+Scrap_Node *defs = name->defs;
+int first = TRUE, page = -1;
+fprintf(md_file,
+        "%c `%s` ",
+        join, name->spelling);
+if (defs)
+{
+  do {
+    @<Write one md referenced scrap@>
+    first = FALSE;
+    defs = defs->next;
+  }while (defs!= NULL);
+}
+else
+{
+  fputs("*(not defined globally)*", md_file);
+}
+@}
+
+@d Write one md referenced scrap
+@{fputs("<a href=\"#weft", md_file);
+write_scrap_ref(md_file, defs->scrap, -1, &page);
+fputs("\">", md_file);
+write_scrap_ref(md_file, defs->scrap, first, &page);
+fputs("</a>", md_file);@}
+
+
+@o markdown.c
+@{
+static void
+md_format_defs_refs(FILE * md_file, int scrap)
+{
+  Uses * p = get_scrap_defs(scrap);
+  if (p != NULL)
+    @<Write md defs references@>
+}
+@| md_format_defs_refs @}
+
+@d Write md defs references
+@{{
+  char join = ' ';
+  fputs("> *Defines:*", md_file);
+  do {
+    @<Write one md def reference@>
+    join = ',';
+    p = p->next;
+  }while (p != NULL);
+  fputs(".\n", md_file);
+}@}
+
+@d Write one md def reference
+@{Name * name = p->defn;
+Scrap_Node *defs = name->uses;
+int first = TRUE, page = -1;
+fprintf(md_file,
+        "%c `%s` ",
+        join, name->spelling);
+if (defs == NULL
+    || (defs->scrap == scrap && defs->next == NULL)) {
+  fputs("*Never used*", md_file);
+}
+else {
+  do {
+    if (defs->scrap != scrap) {
+       @<Write one md referenced scrap@>
+       first = FALSE;
+    }
+    defs = defs->next;
+  }while (defs!= NULL);
+}
+@}
+

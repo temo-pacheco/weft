@@ -1,0 +1,129 @@
+@o global.c
+@{label_node * label_tab = NULL;
+@| label_tab@}
+
+@d Type declarations
+@{typedef struct l_node
+{
+   struct l_node * left, * right;
+   int scrap, seq;
+   char name[1];
+} label_node;
+@| label_node@}
+
+@d Global variable declarations
+@{extern label_node * label_tab;
+@}
+
+
+\section{Memory Management} \label{memory-management}
+
+I manage memory using a simple scheme inspired by Hanson's idea of
+{\em arenas\/}~\cite{hanson:90}.
+Basically, I allocate all the storage required when processing a
+source file (primarily for names and scraps) using calls to
+\verb|arena_getmem(n)|, where \verb|n| specifies the number of bytes to
+be allocated. When the storage is no longer required, the entire arena
+is freed with a single call to  \verb|arena_free()|. Both operations
+are quite fast.
+@d Function p...
+@{extern void *arena_getmem(size_t n);
+extern void arena_free(void);
+extern void arglist_reset(void);
+@}
+
+
+@o arena.c
+@{typedef struct chunk {
+  struct chunk *next;
+  char *limit;
+  char *avail;
+} Chunk;
+@| Chunk @}
+
+
+We define an empty chunk called \verb|first|. The variable \verb|arena| points
+at the current chunk of memory; it's initially pointed at \verb|first|.
+As soon as some storage is required, a ``real'' chunk of memory will
+be allocated and attached to \verb|first->next|; storage will be
+allocated from the new chunk (and later chunks if necessary).
+@o arena.c
+@{static Chunk first = { NULL, NULL, NULL };
+static Chunk *arena = &first;
+@| first arena @}
+
+
+\subsection{Allocating Memory}
+
+The routine \verb|arena_getmem(n)| returns a pointer to (at least)
+\verb|n| bytes of memory. Note that \verb|n| is rounded up to ensure
+that returned pointers are always aligned.  We align to the nearest
+8-byte segment, since that'll satisfy the more common 2-byte and
+4-byte alignment restrictions too.
+
+@o arena.c
+@{void *arena_getmem(size_t n)
+{
+  char *q;
+  char *p = arena->avail;
+  n = (n + 7) & ~7;             /* ensuring alignment to 8 bytes */
+  q = p + n;
+  if (q <= arena->limit) {
+    arena->avail = q;
+    return p;
+  }
+  @<Find a new chunk of memory@>
+}
+@| arena_getmem @}
+
+
+If the current chunk doesn't have adequate space (at least \verb|n|
+bytes) we examine the rest of the list of chunks (starting at
+\verb|arena->next|) looking for a chunk with adequate space. If \verb|n|
+is very large, we may not find it right away or we may not find a
+suitable chunk at all.
+@d Find a new chunk...
+@{{
+  Chunk *ap = arena;
+  Chunk *np = ap->next;
+  while (np) {
+    char *v = sizeof(Chunk) + (char *) np;
+    if (v + n <= np->limit) {
+      np->avail = v + n;
+      arena = np;
+      return v;
+    }
+    ap = np;
+    np = ap->next;
+  }
+  @<Allocate a new chunk of memory@>
+}@}
+
+
+If there isn't a suitable chunk of memory on the free list, then we
+need to allocate a new one.
+@d Allocate a new ch...
+@{{
+  size_t m = n + 10000;
+  np = (Chunk *) malloc(m);
+  np->limit = m + (char *) np;
+  np->avail = n + sizeof(Chunk) + (char *) np;
+  np->next = NULL;
+  ap->next = np;
+  arena = np;
+  return sizeof(Chunk) + (char *) np;
+}@}
+
+
+\subsection{Freeing Memory}
+
+To free all the memory in the arena, we need only point \verb|arena|
+back to the first empty chunk.
+@o arena.c
+@{void arena_free(void)
+{
+  arena = &first;
+  arglist_reset();
+}
+@| arena_free @}
+

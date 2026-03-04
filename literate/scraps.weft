@@ -1,0 +1,1090 @@
+\section{Scraps} \label{scraps}
+
+
+@o scraps.c
+@{#define SLAB_SIZE 1024
+
+typedef struct slab {
+  struct slab *next;
+  char chars[SLAB_SIZE];
+} Slab;
+@| Slab next SLAB_SIZE @}
+
+@o scraps.c
+@{typedef struct {
+  char *file_name;
+  Slab *slab;
+  struct uses *uses;
+  struct uses *defs;
+  int file_line;
+  int page;
+  char letter;
+  unsigned char sector;
+} ScrapEntry;
+@| file_name slab uses defs file_line page letter sector ScrapEntry @}
+
+There's some issue with reading the auxiliary file if it has more than 255 lines, so (as a workround only) increase the size of the array of \verb|ScrapEntry|s held in \verb|SCRAP[n]|.
+
+@o scraps.c
+@{
+#define SCRAP_BITS 10
+#define SCRAP_SIZE (1<<SCRAP_BITS)
+#define SCRAP_MASK (SCRAP_SIZE - 1)
+#define SCRAP_SHIFT SCRAP_BITS
+static ScrapEntry *SCRAP[SCRAP_SIZE];
+
+#define scrap_array(i) SCRAP[(i) >> SCRAP_SHIFT][(i) & SCRAP_MASK]
+
+static int scraps;
+int num_scraps(void)
+{
+   return scraps;
+}
+@<Forward declarations for scraps.c@>
+@| num_scraps scraps scrap_array SCRAP_BITS SCRAP_SIZE SCRAP_MASK SCRAP_SHIFT SCRAP @}
+
+
+@d Function pro...
+@{extern void init_scraps(void);
+extern int collect_scrap(void);
+extern int write_scraps(FILE *file, char *spelling, Scrap_Node *defs, int global_indent, char *indent_chars, char debug_flag, char tab_flag, char indent_flag, unsigned char comment_flag, char location_flag, Arglist *inArgs, char *inParams[9], Parameters parameters, char *title);
+extern void write_scrap_ref(FILE *file, int num, int first, int *page);
+extern void write_single_scrap_ref(FILE *file, int num);
+extern int num_scraps(void);
+extern Uses * get_scrap_uses(int scrap);
+extern Uses * get_scrap_defs(int scrap);
+@}
+
+
+@o scraps.c
+@{void init_scraps(void)
+{
+  scraps = 1;
+  SCRAP[0] = (ScrapEntry *) arena_getmem(SCRAP_SIZE * sizeof(ScrapEntry));
+}
+@| init_scraps @}
+
+@o scraps.c
+@{void write_scrap_ref(FILE *file, int num, int first, int *page)
+{
+  if (scrap_array(num).page >= 0) {
+    if (first!=0)
+      fprintf(file, "%d", scrap_array(num).page);
+    else if (scrap_array(num).page != *page)
+      fprintf(file, ", %d", scrap_array(num).page);
+    if (scrap_array(num).letter > 0)
+      fputc(scrap_array(num).letter, file);
+  }
+  else {
+    if (first!=0)
+      putc('?', file);
+    else
+      fputs(", ?", file);
+    @<Warn (only once) about needing to rerun after Latex@>
+  }
+  if (first>=0)
+  *page = scrap_array(num).page;
+}
+@| write_scrap_ref @}
+
+@o scraps.c
+@{void write_single_scrap_ref(FILE *file, int num)
+{
+  int page;
+  write_scrap_ref(file, num, TRUE, &page);
+}
+@| write_single_scrap_ref @}
+
+@o scraps.c
+@{Uses * get_scrap_uses(int scrap)
+{
+  return scrap_array(scrap).uses;
+}
+@| get_scrap_uses @}
+
+@o scraps.c
+@{Uses * get_scrap_defs(int scrap)
+{
+  return scrap_array(scrap).defs;
+}
+@| get_scrap_defs @}
+
+These accessors expose scrap metadata that is needed by the
+\verb|--map| and \verb|--extract| modes (Section~\ref{map-extract})
+without leaking the internal \verb|ScrapEntry| or \verb|Slab| types.
+
+@d Function pro...
+@{extern const char *scrap_file_name(int i);
+extern int scrap_file_line(int i);
+extern void dump_scrap_text(FILE *file, int scrap_idx);
+@}
+
+@o scraps.c
+@{const char *scrap_file_name(int i) { return scrap_array(i).file_name; }
+@| scrap_file_name @}
+
+@o scraps.c
+@{int scrap_file_line(int i) { return scrap_array(i).file_line; }
+@| scrap_file_line @}
+
+@d Warn (only once) about needing to...
+@{{
+  if (!already_warned) {
+    fprintf(stderr, "%s: you'll need to rerun weft after running latex\n",
+            command_name);
+    already_warned = TRUE;
+  }
+}@}
+
+@d Global variable dec...
+@{extern int already_warned;
+@| already_warned @}
+
+@d Global variable def...
+@{int already_warned = 0;
+@}
+
+@o scraps.c
+@{typedef struct {
+  Slab *scrap;
+  Slab *prev;
+  int index;
+} Manager;
+@| Manager @}
+
+
+
+@o scraps.c
+@{static void push(char c, Manager *manager)
+{
+  Slab *scrap = manager->scrap;
+  int index = manager->index;
+  scrap->chars[index++] = c;
+  if (index == SLAB_SIZE) {
+    Slab *new_slab = (Slab *) arena_getmem(sizeof(Slab));
+    scrap->next = new_slab;
+    manager->scrap = new_slab;
+    index = 0;
+  }
+  manager->index = index;
+}
+@| push @}
+
+@o scraps.c
+@{static void pushs(char *s, Manager *manager)
+{
+  while (*s)
+    push(*s++, manager);
+}
+@| pushs @}
+
+@o scraps.c
+@{int collect_scrap(void)
+{
+  int current_scrap, lblseq = 0;
+  int depth = 1;
+  Manager writer;
+  @<Create new scrap...@>
+  @<Accumulate scrap and return \verb|scraps++|@>
+}
+@| collect_scrap @}
+
+@d Create new scrap, managed by \verb|writer|
+@{{
+  Slab *scrap = (Slab *) arena_getmem(sizeof(Slab));
+  if ((scraps & SCRAP_MASK) == 0)
+    SCRAP[scraps >> SCRAP_SHIFT] = (ScrapEntry *) arena_getmem(SCRAP_SIZE * sizeof(ScrapEntry));
+  scrap_array(scraps).slab = scrap;
+  scrap_array(scraps).file_name = save_string(source_name);
+  scrap_array(scraps).file_line = source_line;
+  scrap_array(scraps).page = -1;
+  scrap_array(scraps).letter = 0;
+  scrap_array(scraps).uses = NULL;
+  scrap_array(scraps).defs = NULL;
+  scrap_array(scraps).sector = current_sector;
+  writer.scrap = scrap;
+  writer.index = 0;
+  current_scrap = scraps++;
+}@}
+
+
+@d Accumulate scrap...
+@{{
+  int c = source_get();
+  while (1) {
+    switch (c) {
+      case EOF: fprintf(stderr, "%s: unexpect EOF in (%s, %d)\n",
+                        command_name, scrap_array(current_scrap).file_name,
+                        scrap_array(current_scrap).file_line);
+                exit(-1);
+      default:
+        if (c==nw_char)
+          {
+            @<Handle at-sign during scrap accumulation@>
+                break;
+          }
+        push(c, &writer);
+                c = source_get();
+                break;
+    }
+  }
+}@}
+
+@d Handle at-sign during scrap accumulation
+@{{
+  c = source_get();
+  switch (c) {
+    case '(':
+    case '[':
+    case '{': depth++;
+              break;
+    case '+':
+    case '-':
+    case '*':
+    case '|': @<Collect user-specified index entries@>
+              /* Fall through */
+    case ')':
+    case ']':
+    case '}': if (--depth > 0)
+                break;
+	      /* else fall through */
+    case ',':
+              push('\0', &writer);
+              scrap_ended_with = c;
+              return current_scrap;
+    case '<': @<Handle macro invocation in scrap@>
+              break;
+    case '%': @<Skip commented-out code@>
+              /* emit line break to the output file to keep #line in sync. */
+              push('\n', &writer);
+              c = source_get();
+              break;
+    case 'x': @<Get label while collecting scrap@>
+              break;
+    case 'c': @<Include block comment in a scrap@>
+              break;
+    case '1': case '2': case '3':
+    case '4': case '5': case '6':
+    case '7': case '8': case '9':
+    case 'f': case '#': case 'v':
+    case 't': case 's':
+              push(nw_char, &writer);
+              break;
+    case '_': c = source_get();
+              break;
+    default :
+          if (c==nw_char)
+            {
+              push(nw_char, &writer);
+              push(nw_char, &writer);
+              c = source_get();
+              break;
+            }
+          fprintf(stderr, "%s: unexpected %c%c in scrap (%s, %d)\n",
+                      command_name, nw_char, c, source_name, source_line);
+              exit(-1);
+  }
+}@}
+
+@d Get label while collecting scrap
+@{{
+   @<Get label from@(source_get()@)@>
+   @<Save label to label store@>
+   push(nw_char, &writer);
+   push('x', &writer);
+   pushs(label_name, &writer);
+   push(nw_char, &writer);
+}@}
+
+
+@d Collect user-specified index entries
+@{{
+  do {
+    int type = c;
+    do {
+      char new_name[MAX_NAME_LEN];
+      char *p = new_name;
+      unsigned int sector = 0;
+      do
+        c = source_get();
+      while (isspace(c));
+      if (c != nw_char) {
+        Name *name;
+        do {
+          *p++ = c;
+          c = source_get();
+        } while (c != nw_char && !isspace(c));
+        *p = '\0';
+        switch (type) {
+        case '*':
+           sector = current_sector;
+           @<Add user identifier use@>
+           break;
+        case '-':
+           @<Add user identifier use@>
+           /* Fall through */
+        case '|':
+           sector = current_sector;
+           /* Fall through */
+        case '+':
+           @<Add user identifier definition@>
+           break;
+        }
+      }
+    } while (c != nw_char);
+    c = source_get();
+  }while (c == '|' || c == '*' || c == '-' || c == '+');
+  if (c != '}' && c != ']' && c != ')') {
+    fprintf(stderr, "%s: unexpected %c%c in index entry (%s, %d)\n",
+            command_name, nw_char, c, source_name, source_line);
+    exit(-1);
+  }
+}@}
+
+@d Add user identifier use
+@{name = name_add(&user_names, new_name, sector);
+if (!name->uses || name->uses->scrap != current_scrap) {
+  Scrap_Node *use = (Scrap_Node *) arena_getmem(sizeof(Scrap_Node));
+  use->scrap = current_scrap;
+  use->next = name->uses;
+  name->uses = use;
+  add_uses(&(scrap_array(current_scrap).uses), name);
+}@}
+
+@d Add user identifier definition
+@{name = name_add(&user_names, new_name, sector);
+if (!name->defs || name->defs->scrap != current_scrap) {
+  Scrap_Node *def = (Scrap_Node *) arena_getmem(sizeof(Scrap_Node));
+  def->scrap = current_scrap;
+  def->next = name->defs;
+  name->defs = def;
+  add_uses(&(scrap_array(current_scrap).defs), name);
+}@}
+
+@d Handle macro invocation in scrap
+@{{
+  Arglist * args = collect_scrap_name(current_scrap);
+  Name *name = args->name;
+  @<Save macro name@>
+  add_to_use(name, current_scrap);
+  if (scrap_name_has_parameters) {
+    @<Save macro parameters @>
+  }
+  push(nw_char, &writer);
+  push('>', &writer);
+  c = source_get();
+}@}
+
+
+@d Save macro name
+@{{
+  char buff[24];
+
+  push(nw_char, &writer);
+  push('<', &writer);
+  push(name->sector, &writer);
+  sprintf(buff, "%d", arglist_register(args));
+  pushs(buff, &writer);
+}@}
+
+@o scraps.c
+@{void
+add_to_use(Name * name, int current_scrap)
+{
+  if (!name->uses || name->uses->scrap != current_scrap) {
+    Scrap_Node *use = (Scrap_Node *) arena_getmem(sizeof(Scrap_Node));
+    use->scrap = current_scrap;
+    use->next = name->uses;
+    name->uses = use;
+  }
+}
+@| add_to_use @}
+
+@d Function...
+@{extern void add_to_use(Name * name, int current_scrap);
+@}
+@o scraps.c
+@{static char pop(Manager *manager)
+{
+  Slab *scrap = manager->scrap;
+  int index = manager->index;
+  char c = scrap->chars[index++];
+  if (index == SLAB_SIZE) {
+    manager->prev = scrap;
+    manager->scrap = scrap->next;
+    index = 0;
+  }
+  manager->index = index;
+  return c;
+}
+@| pop @}
+
+The function \verb|dump_scrap_text| walks the slab chain for a given
+scrap and writes every printable character (plus newlines and tabs) to
+the supplied file handle.  The internal meta-character sequences that
+encode fragment references are decoded back to their \verb|@@<name@@>|
+form; other control sequences are silently skipped.
+
+@o scraps.c
+@{void dump_scrap_text(FILE *file, int scrap_idx)
+{
+  Manager reader;
+  char c;
+  reader.scrap = scrap_array(scrap_idx).slab;
+  reader.prev = NULL;
+  reader.index = 0;
+  c = pop(&reader);
+  while (c) {
+    if (c == nw_char) {
+      /* handle internal control sequences */
+      c = pop(&reader);
+      if (c == '<') {
+        /* fragment reference encoded as: sector_byte + decimal_index
+           followed by nw_char + '>' */
+        char idx_buf[MAX_NAME_LEN];
+        char *p = idx_buf;
+        int idx;
+        (void)pop(&reader); /* sector byte, discard */
+        c = pop(&reader);
+        while (c != nw_char && c != '\0') {
+          *p++ = c;
+          c = pop(&reader);
+        }
+        *p = '\0';
+        if (sscanf(idx_buf, "%d", &idx) == 1) {
+          Arglist *a = arglist_lookup(idx);
+          if (a && a->name) {
+            fprintf(file, "%c<%s%c>", nw_char, a->name->spelling, nw_char);
+          }
+        }
+        /* skip past closing '>' marker */
+        if (c == nw_char)
+          c = pop(&reader);
+        /* skip optional parameter block */
+        if (c == '(') {
+          while (c && c != nw_char)
+            c = pop(&reader);
+          if (c == nw_char)
+            c = pop(&reader);
+        }
+      } else {
+        /* other control seq: skip */
+      }
+      c = pop(&reader);
+      continue;
+    }
+    fputc(c, file);
+    c = pop(&reader);
+  }
+}
+@| dump_scrap_text @}
+
+@o scraps.c
+@{static void backup(int n, Manager *manager)
+{
+  int index = manager->index;
+  if (n > index
+      && manager->prev != NULL)
+  {
+     manager->scrap = manager->prev;
+     manager->prev = NULL;
+     index += SLAB_SIZE;
+  }
+  manager->index = (n <= index ? index - n : 0);
+}
+@| backup @}
+
+@o scraps.c
+@{void
+lookup(int n, Arglist * par, char * arg[9], Name **name, Arglist ** args)
+{
+  int i;
+  Arglist * p = par;
+
+  for (i = 0; i < n && p != NULL; i++)
+    p = p->next;
+  if (p == NULL) {
+    char * a = arg[n];
+
+    *name = NULL;
+    *args = (Arglist *)a;
+  }
+  else {
+    *name = p->name;
+    *args = p->args;
+  }
+}
+@| lookup @}
+
+@o scraps.c
+@{Arglist * instance(Arglist * a, Arglist * par, char * arg[9], int * ch)
+{
+   if (a != NULL) {
+      int changed = 0;
+      Arglist *args, *next;
+      Name* name;
+      @<Set up name, args and next@>
+      if (changed){
+        @<Build a new arglist@>
+        *ch = 1;
+      }
+   }
+
+   return a;
+}
+@| instance @}
+
+@d Function prototypes
+@{Arglist *instance(Arglist *a, Arglist *par, char *arg[9], int *ch);
+@}
+
+@d Set up name, args and next
+@{next = instance(a->next, par, arg, &changed);
+name = a->name;
+if (name == (Name *)1) {
+   Embed_Node * q = (Embed_Node *)arena_getmem(sizeof(Embed_Node));
+   q->defs = (Scrap_Node *)a->args;
+   q->args = par;
+   args = (Arglist *)q;
+   changed = 1;
+} else if (name != NULL)
+  args = instance(a->args, par, arg, &changed);
+else {
+  char * p = (char *)a->args;
+   if (p[0] == ARG_CHR) {
+      lookup(p[1] - '1', par, arg, &name, &args);
+      changed = 1;
+   }
+   else {
+      args = a->args;
+   }
+}@}
+
+@d Build a new arglist
+@{a = (Arglist *)arena_getmem(sizeof(Arglist));
+a->name = name;
+a->args = args;
+a->next = next;@}
+
+@o scraps.c
+@{static Arglist *pop_scrap_name(Manager *manager, Parameters *parameters)
+{
+  char name[MAX_NAME_LEN];
+  char *p = name;
+  Arglist * args;
+  int c;
+  int idx;
+
+  (void)pop(manager); /* not sure why we have to pop twice */
+  c = pop(manager);
+
+  while (c != nw_char) {
+    *p++ = c;
+    c = pop(manager);
+  }
+  *p = '\000';
+  if (sscanf(name, "%d", &idx) != 1)
+  {
+    fprintf(stderr,  "%s: found an internal problem (2)\n", command_name);
+    exit(-1);
+  }
+  args = arglist_lookup(idx);
+  @<Check for end of scrap name@>
+  return args;
+}
+@| pop_scrap_name @}
+
+
+@d Check for end of scrap name
+@{{
+  c = pop(manager);
+  @<Check for macro parameters@>
+}@}
+
+@o scraps.c
+@{int write_scraps(FILE *file, char *spelling, Scrap_Node *defs,
+                   int global_indent, char *indent_chars,
+                   char debug_flag, char tab_flag, char indent_flag,
+                   unsigned char comment_flag, char location_flag,
+                   Arglist *inArgs,
+                   char *inParams[9], Parameters parameters, char *title)
+{
+  /* This is in file @f */
+  int indent = 0;
+  int newline = 1;
+  while (defs) {
+    @<Copy \verb|defs->scrap| to \verb|file|@>
+    defs = defs->next;
+  }
+  return indent + global_indent;
+}
+@| write_scraps @}
+
+@d Forward declarations for scraps.c
+@{int delayed_indent = 0;
+@| delayed_indent @}
+
+@d Forward declarations for scraps.c
+@{
+#define MAX_ARGLISTS 4096
+static Arglist *arglist_table[MAX_ARGLISTS];
+static int arglist_count = 0;
+
+void arglist_reset(void)
+{
+  arglist_count = 0;
+}
+
+static int arglist_register(Arglist *a)
+{
+  if (arglist_count >= MAX_ARGLISTS) {
+    fprintf(stderr, "%s: too many macro argument lists (max %d)\n",
+            command_name, MAX_ARGLISTS);
+    exit(EXIT_FAILURE);
+  }
+  arglist_table[arglist_count] = a;
+  return arglist_count++;
+}
+
+static Arglist *arglist_lookup(int idx)
+{
+  if (idx < 0 || idx >= arglist_count) {
+    fprintf(stderr, "%s: invalid arglist index %d\n", command_name, idx);
+    exit(EXIT_FAILURE);
+  }
+  return arglist_table[idx];
+}
+@| arglist_table arglist_count arglist_reset arglist_register arglist_lookup MAX_ARGLISTS @}
+
+@d Copy \verb|defs->scrap...
+@{{
+  char c;
+  Manager reader;
+  Parameters local_parameters = 0;
+  int line_number = scrap_array(defs->scrap).file_line;
+  reader.scrap = scrap_array(defs->scrap).slab;
+  reader.index = 0;
+  @<Insert debugging information if required@>
+  @<Insert section opening marker@>
+  if (delayed_indent)
+  {
+    @<Insert appropriate indentation@>
+  }
+  c = pop(&reader);
+  while (c) {
+    switch (c) {
+      case '\n':
+         if (global_indent >= 0) {
+           putc(c, file);
+           line_number++;
+           newline = 1;
+           delayed_indent = 0;
+           @<Insert appropriate indentation@>
+           break;
+         } else {
+           /* Don't show newlines in embedded fragmants */
+           fputs(". . .", file);
+           return 0;
+         }
+      case '\t': @<Handle tab...@>
+                 delayed_indent = 0;
+                 break;
+      default:
+         if (c==nw_char)
+           {
+             @<Check for macro invocation in scrap@>
+             break;
+           }
+         putc(c, file);
+         if (global_indent >= 0) {
+           @<Add more indentation @'' '@'@>
+         }
+         indent++;
+         if (c > ' ') newline = 0;
+         delayed_indent = 0;
+         break;
+    }
+    c = pop(&reader);
+  }
+  @<Insert section closing marker@>
+}@}
+
+We need to make sure that we don't overflow \verb|indent_chars[]|.
+If the line is longer than \verb|MAX_INDENT|, we simply stop recording;
+the \verb|Put out the indent| scrap will use spaces for any positions
+beyond the recorded range.
+@d Add more indentation @'char@'
+@{{
+  if (global_indent + indent < MAX_INDENT)
+    indent_chars[global_indent + indent] = @1;
+}@}
+
+
+@d Insert debugging information if required
+@{if (debug_flag) {
+  fprintf(file, "\n#line %d \"%s\"\n",
+          line_number, scrap_array(defs->scrap).file_name);
+  @<Insert appropr...@>
+}@}
+
+Section markers in the Knuth style delimit each scrap with
+opening and closing comments that include the scrap number and
+source location. For example, in C: \verb|/* {5: weft.w:28} */|
+and \verb|/* {:5} */|.
+
+@d Insert section opening marker
+@{if (location_flag && comment_flag) {
+  fprintf(file, "%s{%d: %s:%d}%s\n",
+          comment_begin[comment_flag],
+          defs->scrap,
+          scrap_array(defs->scrap).file_name,
+          line_number,
+          comment_end[comment_flag]);
+}@}
+
+@d Insert section closing marker
+@{if (location_flag && comment_flag) {
+  fprintf(file, "%s{:%d}%s\n",
+          comment_begin[comment_flag],
+          defs->scrap,
+          comment_end[comment_flag]);
+}@}
+
+
+@d Insert approp...
+@{{
+  char c1 = pop(&reader);
+  char c2 = pop(&reader);
+
+  if (indent_flag && !(@<Indent suppressed@>)) {
+    @<Put out the indent@>
+  }
+  indent = 0;
+  backup(2, &reader);
+}@}
+
+@d Put out the indent
+@{if (tab_flag)
+    for (indent=0; indent<global_indent; indent++)
+      putc(' ', file);
+  else
+    for (indent=0; indent<global_indent; indent++)
+      putc(indent < MAX_INDENT ? indent_chars[indent] : ' ', file);
+@}
+
+Indent will be suppressed if the next character is a newline or
+if the next two characters are \verb|@@#|. If the next two characters
+are \verb|@@<|, we suppress the indent for now but mark that it
+may be needed when the next fragment is started.
+
+@d Indent suppressed
+@{c1 == '\n'
+|| (c1 == nw_char && (c2 == '#' || (delayed_indent |= (c2 == '<'))))@}
+
+@d Handle tab characters on output
+@{{
+  if (tab_flag)
+    @<Expand tab...@>
+  else {
+    putc('\t', file);
+    if (global_indent >= 0) {
+      @<Add more indentation @''\t'@'@>
+    }
+    indent++;
+  }
+}@}
+
+
+@d Check for macro invocation...
+@{{
+  int oldin = indent;
+  char oldcf = comment_flag;
+  c = pop(&reader);
+  switch (c) {
+    case 't': @<Copy fragment title into file@>
+              break;
+    case 'c': @<Copy block comment from scrap@>
+              break;
+    case 'f': @<Copy file name into file@>
+              break;
+    case 'x': @<Copy label from scrap into file@>
+    case '_': break;
+    case 'v': @<Copy version info into file@>
+              break;
+    case 's': indent = -global_indent;
+              comment_flag = 0;
+              break;
+    case '<': @<Copy macro into \verb|file|@>
+              @<Insert debugging information if required@>
+              indent = oldin;
+              comment_flag = oldcf;
+              break;
+    @<Handle macro parameter substitution@>
+              indent = oldin;
+              break;
+    default:
+          if(c==nw_char)
+            {
+              putc(c, file);
+              if (global_indent >= 0) {
+                 @<Add more indentation @'' '@'@>
+              }
+              indent++;
+              break;
+            }
+          /* ignore, since we should already have a warning */
+              break;
+  }
+}@}
+
+@d Copy label from scrap into file
+@{{
+   @<Get label from@(pop(&reader)@)@>
+   write_label(label_name, file);
+}@}
+
+@d Copy file name into file
+@{if (defs->quoted)
+   fprintf(file, "%cf", nw_char);
+else
+   fputs(spelling, file);
+@}
+
+@d Copy macro into...
+@{{
+  Arglist *a = pop_scrap_name(&reader, &local_parameters);
+  Name *name = a->name;
+  int changed;
+  Arglist * args = instance(a->args, inArgs, inParams, &changed);
+  int i, narg;
+  char * p = name->spelling;
+  char * * inParams = name->arg;
+  Arglist *q = args;
+
+  if (name->mark) {
+    fprintf(stderr, "%s: recursive macro discovered involving <%s>\n",
+            command_name, name->spelling);
+    exit(-1);
+  }
+  if (name->defs && !defs->quoted) {
+    @<Perhaps comment this macro@>
+    name->mark = TRUE;
+    indent = write_scraps(file, spelling, name->defs, global_indent + indent,
+                          indent_chars, debug_flag, tab_flag, indent_flag,
+                          comment_flag, location_flag, args, name->arg,
+                          local_parameters, name->spelling);
+    indent -= global_indent;
+    name->mark = FALSE;
+  }
+  else
+  {
+    if (delayed_indent)
+    {
+      for (i = indent + global_indent; --i >= 0; )
+         putc(' ', file);
+    }
+
+    fprintf(file, "%c<",  nw_char);
+    if (name->sector == 0)
+       fputc('+', file);
+    @<Comment this macro use@>
+    fprintf(file, "%c>",  nw_char);
+    if (!defs->quoted && !tex_flag)
+      fprintf(stderr, "%s: macro never defined <%s>\n",
+            command_name, name->spelling);
+  }
+}@}
+
+@d Perhaps comment this macro
+@{if (comment_flag && newline) {
+   @<Perhaps put a delayed indent@>
+   fputs(comment_begin[comment_flag], file);
+   @<Comment this macro use@>
+   if (xref_flag) {
+      putc(' ', file);
+      write_single_scrap_ref(file, name->defs->scrap);
+   }
+   fputs(comment_end[comment_flag], file);
+   putc('\n', file);
+   if (!delayed_indent)
+      for (i = indent + global_indent; --i >= 0; )
+         putc(' ', file);
+}
+@}
+
+@d Perhaps put a delayed indent
+@{if (delayed_indent)
+   for (i = indent + global_indent; --i >= 0; )
+      putc(' ', file);
+@}
+
+@d Copy fragment title into file
+@{{
+   char * p = title;
+   Arglist *q = inArgs;
+   int narg;
+
+   @<Comment this macro use@>
+   if (xref_flag) {
+      putc(' ', file);
+      write_single_scrap_ref(file, defs->scrap);
+   }
+}@}
+
+@d Comment this macro use
+@{narg = 0;
+while (*p != '\000') {
+  if (*p == ARG_CHR) {
+    if (q == NULL) {
+       if (defs->quoted)
+          fprintf(file, "%c'%s%c'", nw_char, inParams[narg], nw_char);
+       else
+          fprintf(file, "'%s'", inParams[narg]);
+    }
+    else {
+      comment_ArglistElement(file, q, defs->quoted);
+      q = q->next;
+    }
+    p++;
+    narg++;
+  }
+  else
+     fputc(*p++, file);
+}@}
+
+@d Forward declarations for scraps.c
+@{static void
+comment_ArglistElement(FILE * file, Arglist * args, int quote)
+{
+  Name *name = args->name;
+  Arglist *q = args->args;
+
+  if (name == NULL) {
+    if (quote)
+       fprintf(file, "%c'%s%c'", nw_char, (char *)q, nw_char);
+    else
+       fprintf(file, "'%s'", (char *)q);
+  } else if (name == (Name *)1) {
+     @<Include an embedded scrap in comment@>
+  } else {
+     @<Include a fragment use in comment@>
+  }
+}
+@| comment_ArglistElement @}
+
+@d Include an embedded scrap in comment
+@{Embed_Node * e = (Embed_Node *)q;
+fputc('{', file);
+write_scraps(file, "", e->defs, -1, "", 0, 0, 0, 0, 0, e->args, NULL, NULL, "");
+fputc('}', file);@}
+
+@d Include a fragment use in comment
+@{char * p = name->spelling;
+if (quote)
+   fputc(nw_char, file);
+fputc('<', file);
+if (quote && name->sector == 0)
+   fputc('+', file);
+while (*p != '\000') {
+  if (*p == ARG_CHR) {
+    comment_ArglistElement(file, q, quote);
+    q = q->next;
+    p++;
+  }
+  else
+     fputc(*p++, file);
+}
+if (quote)
+   fputc(nw_char, file);
+fputc('>', file);@}
+
+\subsection{Collecting Page Numbers}
+
+@d Function...
+@{extern void collect_numbers(char *aux_name);
+@}
+
+@o scraps.c
+@{void collect_numbers(char *aux_name)
+{
+  if (number_flag) {
+    int i;
+    for (i=1; i<scraps; i++)
+      scrap_array(i).page = i;
+  }
+  else {
+    FILE *aux_file = fopen(aux_name, "r");
+    already_warned = FALSE;
+    if (aux_file) {
+      char aux_line[500];
+      while (fgets(aux_line, 500, aux_file)) {
+        @< Read line in \verb|.aux| file @>
+      }
+      fclose(aux_file);
+      @<Add letters to scraps with duplicate page numbers@>
+    }
+  }
+}
+@| collect_numbers @}
+
+The \textit{memoir} document class creates references in the
+\verb|.aux| file with nested braces, so after each open brace we have
+to wait for the matching closing brace.
+
+@d Read line in \verb|.aux| file @{@%
+int scrap_number;
+int page_number;
+int i;
+int dummy_idx;
+int bracket_depth = 1;
+if (1 == sscanf(aux_line,
+                "\\newlabel{scrap%d}{{%n",
+                &scrap_number,
+                &dummy_idx)) {
+  for (i = dummy_idx; i < (int)strlen(aux_line) && bracket_depth > 0; i++) {
+    if (aux_line[i] == '{') bracket_depth++;
+    else if (aux_line[i] == '}') bracket_depth--;
+  }
+  if (i > dummy_idx
+      && i < (int)strlen(aux_line)
+      && 1 == sscanf(aux_line+i, "{%d}" ,&page_number)) {
+    if (scrap_number < scraps)
+      scrap_array(scrap_number).page = page_number;
+    else
+      @<Warn...@>
+  }
+}
+@|@}
+
+
+@d Add letters to scraps with...
+@{{
+   int i = 0;
+
+   @<Step @'i@' to the next valid scrap@>
+   @<For all remaining scraps@> {
+      int j = i;
+      @<Step @'j@' to the next valid scrap@>
+      @<Perhaps add letters to the page numbers@>
+      i = j;
+   }
+}
+@}
+
+@d Step @'i@' to the next valid scrap
+@{do
+   @1++;
+while (@1 < scraps && scrap_array(@1).page == -1);
+@}
+
+@d For all remaining scraps
+@{while (i < scraps)@}
+
+@d Perhaps add letters to the page numbers
+@{if (scrap_array(i).page == scrap_array(j).page) {
+   if (scrap_array(i).letter == 0)
+      scrap_array(i).letter = 'a';
+   scrap_array(j).letter = scrap_array(i).letter + 1;
+}
+@}
+
