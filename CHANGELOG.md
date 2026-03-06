@@ -2,6 +2,42 @@
 
 All notable changes to weft are documented in this file.
 
+## [1.0.2] - 2026-03-05
+
+### Added
+
+- **Reverse map (`-R file[:line]`)**: new flag that reads section markers
+  from a tangled output file and emits JSON mapping each region back to
+  its `.weft` source file and line.  With a line number, returns the
+  single innermost scrap covering that line; without one, returns all
+  scrap regions.  No `.weft` source files are needed — operates entirely
+  on the tangled output.  Enables CI/CD error translation and AI agent
+  workflows.
+
+### Fixed
+
+- **Inline fragment expansion with `@l txt`**: fragments defined with
+  `@l txt` (or any language with no comment style) now expand inline
+  without section markers or extra newlines.  Three issues were resolved:
+  - `lang_to_flags()` set `location_flag = TRUE` even when the language
+    has no comment delimiters (`comment == 0`); now sets it to `FALSE`.
+  - "Apply pending language to macro" stored the `@l` tag but never
+    called `lang_to_flags()`, so `@d` fragments never got their own
+    flags; now mirrors the `@o` behaviour.
+  - "Copy macro into..." always used the parent's flags; now temporarily
+    overrides with the child's flags when the child has an explicit `@l`
+    tag, then restores them.
+
+### Changed
+
+- **Version in document titles via `@v`**: the hardcoded "weft 1.0" in
+  the titles of `weft.weft` and `weft-user-guide.weft` is now `weft @v`,
+  replaced at weave time by the `-V` flag.
+
+- **`make dist` requires `VERSION=`**: `make dist VERSION=1.0.2` passes
+  `-V` to weft when generating PDFs.  Running `make dist`, `make doc`,
+  or `make user-guide` without `VERSION=` now produces an error.
+
 ## [1.0.1] - 2026-03-04
 
 ### Fixed

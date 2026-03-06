@@ -102,6 +102,34 @@ local defaults = {
 
 ## Debugging Workflow
 
+### Automated: Reverse Map (`-R`)
+
+The fastest approach — use `weft -R` to resolve the error location
+programmatically, without opening any files:
+
+```bash
+# Single line: which .weft source produced server.js line 47?
+weft -R server.js:47
+# → {"scrap": 3, "file": "routes.weft", "line": 42}
+
+# Full file: map all scrap regions
+weft -R server.js
+# → {"source": "server.js", "regions": [...]}
+```
+
+`-R` parses the section markers already embedded in the tangled output.
+No `.weft` files are needed and pass1 is never invoked. This makes it
+ideal for CI/CD pipelines and AI agents that need to translate compiler
+errors back to the literate source.
+
+The output is JSON. An empty object `{}` is returned when the target
+line falls outside any scrap region.
+
+### Manual: Reading Section Markers
+
+When `-R` isn't available or you're browsing interactively, use the
+manual approach:
+
 ### Step 1: Locate the Error in Tangled Output
 
 You get an error like:
@@ -345,6 +373,13 @@ one independently.
   (no comment flags) to suppress markers for a specific output file
   when the comments would interfere (e.g., binary formats, data
   files, or files where comments aren't valid).
+
+- **Use `weft -R file:line`** to programmatically resolve any error
+  location back to its `.weft` source. No `.weft` files needed.
+
+- **Use `weft -R file`** (without line number) to get the full map of
+  all scrap regions in a tangled file. Useful for building a lookup
+  table when processing multiple errors in the same file.
 
 - **Use `weft -m | jq`** to get a structural overview before diving
   into individual files. The JSON map shows the complete dependency

@@ -142,11 +142,21 @@ reports errors against the `.weft` source directly.
 
 ### Debugging Workflow
 
-1. **Error at `server.js:47`** → open the tangled file at that line
-2. **Scan upward** for nearest opening marker: `// {3: routes.weft:42}`
-3. **Go to the `.weft` source** at `routes.weft:42` — the scrap with the
-   bug, surrounded by prose explaining its intent
-4. **Fix in `.weft`**, re-tangle, done
+**Manual**: open the tangled file, scan upward for the nearest opening
+marker, go to the `.weft` source.
+
+**Programmatic** (recommended): use `-R` for instant reverse mapping:
+
+```bash
+weft -R server.js:47
+# → {"scrap": 3, "file": "routes.weft", "line": 42}
+
+weft -R server.js          # full file mapping (all regions)
+```
+
+No `.weft` files are needed — `-R` parses the section markers already
+embedded in the tangled output. This enables CI/CD error translation
+and AI agent workflows.
 
 ### Language Override
 
@@ -159,9 +169,10 @@ for the complete debugging guide with examples by language.
 
 ## AI-Assisted Navigation
 
-weft provides two features designed for AI-assisted workflows: **JSON maps**
-and **fragment extraction**. Together they enable precise, directed navigation
-of literate codebases.
+weft provides three features designed for AI-assisted workflows: **JSON maps**
+(`-m`), **fragment extraction** (`-e`), and **reverse maps** (`-R`). Together
+they enable precise, directed navigation of literate codebases in both
+directions — from `.weft` source to tangled output and back.
 
 ### JSON Map (`-m`)
 
@@ -197,18 +208,50 @@ self-contained Markdown document to stdout. The output includes:
 - All fragments it references (recursively)
 - Source file and line information
 
+### Reverse Map (`-R`)
+
+```bash
+weft -R server.js:47
+```
+
+Given a tangled output file and a line number, returns the innermost `.weft`
+source location that generated that line:
+
+```json
+{"scrap": 3, "file": "routes.weft", "line": 42}
+```
+
+Without a line number, returns all scrap regions in the file:
+
+```bash
+weft -R server.js
+```
+
+```json
+{"source": "server.js", "regions": [
+  {"start": 2, "end": 15, "scrap": 3, "file": "routes.weft", "line": 42},
+  {"start": 5, "end": 8, "scrap": 7, "file": "database.weft", "line": 18}
+]}
+```
+
+Key property: operates on tangled output only — no `.weft` files needed,
+no pass1. Parses the section markers already embedded in the file.
+
 ### AI Workflow
 
-The map and extract features enable a **directed** workflow for AI agents:
+The map, extract, and reverse map features enable a **directed** workflow
+for AI agents:
 
 1. **Map first**: `weft -m | jq` → understand the project structure
 2. **Identify**: find the fragment relevant to the task
 3. **Extract**: `weft -e "fragment name"` → get exactly the code needed
 4. **Edit**: modify the `.weft` source at the indicated location
 5. **Verify**: re-tangle and test
+6. **Debug**: `weft -R file:line` → translate errors back to `.weft` source
 
-This approach uses ~6 directed operations instead of ~14 exploratory file
-reads, because the map provides the full dependency graph upfront.
+The reverse map closes the loop: when a compiler or linter reports an error
+in tangled output, `-R` resolves it to the `.weft` source instantly — no
+`.weft` files need to be loaded or parsed.
 
 
 ## Markdown Output

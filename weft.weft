@@ -203,7 +203,7 @@ urlcolor={linkcolor}%
 \setlength{\textwidth}{6.5in}
 \setlength{\marginparwidth}{0.5in}
 
-\title{\sffamily\bfseries {\fontsize{40}{48}\selectfont weft 1.0} \\ A Modern Literate Programming Tool}
+\title{\sffamily\bfseries {\fontsize{40}{48}\selectfont weft @v} \\ A Modern Literate Programming Tool}
 \date{\sffamily\today}
 \author{\sffamily Cuauhtemoc Pacheco
 \\ \normalfont\sffamily Derived from nuweb 1.64 by Preston Briggs\thanks{Original nuweb

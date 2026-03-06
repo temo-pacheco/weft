@@ -7,6 +7,7 @@
 @d Function pro...
 @{extern void write_map(Name *file_names, Name *macro_names);
 extern void write_extract(char *name, Name *file_names, Name *macro_names);
+extern void write_reverse_map(const char *arg);
 @}
 
 @o output.c

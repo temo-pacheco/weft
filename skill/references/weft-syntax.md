@@ -397,6 +397,7 @@ weft -w tex project.weft      # tangle + weave to LaTeX (override)
 | `-c` | Avoid testing output files for change before updating them (always overwrite). |
 | `-m` | Emit a JSON map of the document structure to stdout. Neither weaving nor tangling is performed. |
 | `-e name` | Extract the named fragment and its transitive dependencies as Markdown to stdout. Uses prefix matching (same as `@<name...@>`). Neither weaving nor tangling is performed. |
+| `-R file[:line]` | Reverse map: read section markers from a tangled output file and emit JSON mapping to stdout. If a line number is given, emit the innermost scrap covering that line. Without a line number, emit all scrap regions. No `.weft` source files are needed. |
 
 ### Additional flags
 
@@ -744,6 +745,7 @@ Note that fences are only stripped in Markdown mode (`-w md`). In LaTeX mode, ba
 | `-t` | Suppress weaving (override `-w` in scripts) |
 | `-m` | JSON map to stdout (no tangle/weave) |
 | `-e name` | Extract fragment as Markdown (no tangle/weave) |
+| `-R file[:line]` | Reverse map: JSON tracing tangled output → `.weft` source |
 | `-o` | Weave only (no tangle) |
 | `-c` | Always overwrite (no compare) |
 | `-v` | Verbose output |
@@ -802,7 +804,7 @@ When a fragment is expanded inside a scrap, the body of the fragment is indented
 
 ### 16.8 Use section markers for debugging
 
-When a compilation error points to a line in tangled output (e.g., `server.js:47`), don't guess which `.weft` file produced that line. Open the tangled file, find the nearest `{N: file.weft:line}` marker above the error, and go directly to the `.weft` source. See [debugging-tangled-code.md](debugging-tangled-code.md) for the complete debugging workflow.
+When a compilation error points to a line in tangled output (e.g., `server.js:47`), use `weft -R server.js:47` to instantly resolve the `.weft` source location. For manual inspection, open the tangled file and find the nearest `{N: file.weft:line}` marker above the error. See [debugging-tangled-code.md](debugging-tangled-code.md) for the complete debugging workflow.
 
 
 

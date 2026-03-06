@@ -11,6 +11,7 @@ int main(int argc, char **argv)
   int arg = 1;
   @<Interpret command-line arguments@>
   @<Set locale information@>
+  @<Handle reverse map mode@>
   initialise_delimit_scrap_array();
   @<Process the remaining arguments (file names)@>
   exit(0);
@@ -115,11 +116,13 @@ extern int weave_format_from_cli; /* if TRUE, CLI override of @@W */
 extern int map_flag;       /* if TRUE, emit JSON map to stdout */
 extern int extract_flag;   /* if TRUE, next arg is extract name */
 extern char *extract_name; /* fragment name to extract */
+extern int reverse_map_flag; /* if TRUE, reverse map mode */
+extern char *reverse_map_arg; /* file[:line] argument for -R */
 @| tex_flag output_flag compare_flag verbose_flag number_flag
 scrap_flag dangling_flag xref_flag version_info_flag
 version_string hyperref_flag hyperopt_flag hyperoptions includepath_flag
 incl markdown_flag weave_flag weave_format weave_format_from_cli
-map_flag extract_flag extract_name @}
+map_flag extract_flag extract_name reverse_map_flag reverse_map_arg @}
 
 The flags are all initialized for correct default behavior.
 
@@ -152,6 +155,8 @@ int weave_format_from_cli = FALSE;
 int map_flag = FALSE;
 int extract_flag = FALSE;
 char *extract_name = NULL;
+int reverse_map_flag = FALSE;
+char *reverse_map_arg = NULL;
 @}
 
 A global variable \verb|nw_char| will be used for the weft
@@ -192,6 +197,7 @@ command-line arguments.
     @<Perhaps get the hyperref options@>
     @<Perhaps add an include path@>
     @<Perhaps get the extract name@>
+    @<Perhaps get the reverse map argument@>
   }
   else break;
 }@}
@@ -231,6 +237,8 @@ and also avoids ambiguity about which value goes with which flag.
                 break;
       case 'e': extract_flag = TRUE;
                 goto HasValue;
+      case 'R': reverse_map_flag = TRUE;
+                goto HasValue;
       case 'm': map_flag = TRUE;
                 break;
       case 'v': verbose_flag = TRUE;
@@ -243,7 +251,7 @@ and also avoids ambiguity about which value goes with which flag.
       default:  fprintf(stderr, "%s: unexpected argument ignored.  ",
                         command_name);
                 fprintf(stderr, "Usage is: %s [-cdmnostvx] "
-                      "[-e name] [-I path] [-V version] "
+                      "[-e name] [-R file[:line]] [-I path] [-V version] "
                       "[-w [format]] [-h options] [-p path] file...\n",
                         command_name);
                 break;
@@ -340,6 +348,21 @@ and also avoids ambiguity about which value goes with which flag.
   extract_flag = FALSE;
 }@}
 
+@d Perhaps get the reverse map argument
+@{if (reverse_map_flag) {
+  reverse_map_arg = (*s != '\0') ? s : argv[arg++];
+  reverse_map_flag = FALSE;
+}@}
+
+If the user gave \verb|-R file[:line]|, we handle it immediately and
+exit.  No \verb|.weft| source files are required---only the tangled
+output file.
+@d Handle reverse map mode
+@{if (reverse_map_arg) {
+  write_reverse_map(reverse_map_arg);
+  exit(0);
+}@}
+
 In order to be able to process files in foreign languages we
 set the locale information. \texttt{isgraph()} and friends need
 this (see Section~\ref{names}).
@@ -368,7 +391,7 @@ the usage convention.
 @{{
   if (arg >= argc) {
     fprintf(stderr, "%s: expected a file name.  ", command_name);
-    fprintf(stderr, "Usage is: %s [-cdmnostvx] [-e name] [-w [format]] [-p path] file-name...\n", command_name);
+    fprintf(stderr, "Usage is: %s [-cdmnostvx] [-e name] [-R file[:line]] [-w [format]] [-p path] file-name...\n", command_name);
     exit(-1);
   }
   do {

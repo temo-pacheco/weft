@@ -6,7 +6,7 @@ static int scraps = 1;
 /* {:8} */
 
 #line 17 "literate/markdown-output.weft"
-/* {144: literate/markdown-output.weft:17} */
+/* {146: literate/markdown-output.weft:17} */
 static void md_copy_scrap(FILE *file, int prefix, Name *name);
 static void md_print_scrap_numbers(FILE *md_file, Scrap_Node *scraps);
 static void md_format_entry(Name *name, FILE *md_file, unsigned char sector);
@@ -17,10 +17,10 @@ static void md_write_literal(FILE *md_file, char *p);
 static void md_write_ArglistElement(FILE *file, Arglist *args, char **params);
 static void md_format_uses_refs(FILE *md_file, int scrap);
 static void md_format_defs_refs(FILE *md_file, int scrap);
-/* {:144} */
+/* {:146} */
 
 #line 33 "literate/markdown-output.weft"
-/* {145: literate/markdown-output.weft:33} */
+/* {147: literate/markdown-output.weft:33} */
 void write_md(char *file_name, char *md_name, unsigned char sector)
 {
   (void)sector;
@@ -32,7 +32,7 @@ void write_md(char *file_name, char *md_name, unsigned char sector)
     /* Copy \verb|source_file| into \verb|md_file| */
     
 #line 57 "literate/markdown-output.weft"
-    /* {146: literate/markdown-output.weft:57} */
+    /* {148: literate/markdown-output.weft:57} */
 {
       int c = source_get();
       int at_line_start = TRUE;
@@ -42,7 +42,7 @@ void write_md(char *file_name, char *md_name, unsigned char sector)
           /* Interpret md at-sequence */
           
 #line 106 "literate/markdown-output.weft"
-          /* {148: literate/markdown-output.weft:106} */
+          /* {150: literate/markdown-output.weft:106} */
 {
             int big_definition = FALSE;
             c = source_get();
@@ -56,7 +56,7 @@ void write_md(char *file_name, char *md_name, unsigned char sector)
                         FALLTHROUGH;
               case 'o': 
 #line 206 "literate/markdown-output.weft"
-                        /* {152: literate/markdown-output.weft:206} */
+                        /* {154: literate/markdown-output.weft:206} */
 {
                           Name *name = collect_file_name();
                           (void)big_definition;
@@ -70,7 +70,7 @@ void write_md(char *file_name, char *md_name, unsigned char sector)
                           /* Fill in the md scrap */
                           
 #line 283 "literate/markdown-output.weft"
-                          /* {156: literate/markdown-output.weft:283} */
+                          /* {158: literate/markdown-output.weft:283} */
 {
                             if (name->lang[0] != '\0')
                               fprintf(md_file, "<pre><code class=\"language-%s\">", name->lang);
@@ -79,20 +79,20 @@ void write_md(char *file_name, char *md_name, unsigned char sector)
                             extra_scraps = 0;
                             md_copy_scrap(md_file, TRUE, name);
                             fputs("</code></pre>\n", md_file);
-                          }/* {:156} */
+                          }/* {:158} */
 
 #line 216 "literate/markdown-output.weft"
 
                           /* Write md file cross-refs */
                           
 #line 313 "literate/markdown-output.weft"
-                          /* {159: literate/markdown-output.weft:313} */
+                          /* {161: literate/markdown-output.weft:313} */
 {
                             if ( scrap_flag ) {
                               /* Write md file defs */
                               
 #line 322 "literate/markdown-output.weft"
-                              /* {160: literate/markdown-output.weft:322} */
+                              /* {162: literate/markdown-output.weft:322} */
 {
                                 if (name->defs) {
                                   if (name->defs->next) {
@@ -104,32 +104,32 @@ void write_md(char *file_name, char *md_name, unsigned char sector)
                                           "would have crashed in 'Write md file defs' for '%s'\n",
                                            name->spelling);
                                 }
-                              }/* {:160} */
+                              }/* {:162} */
 
 #line 315 "literate/markdown-output.weft"
 
                             }
                             md_format_defs_refs(md_file, scraps);
                             md_format_uses_refs(md_file, scraps++);
-                          }/* {:159} */
+                          }/* {:161} */
 
 #line 217 "literate/markdown-output.weft"
 
                           /* Finish md scrap */
                           
 #line 295 "literate/markdown-output.weft"
-                          /* {157: literate/markdown-output.weft:295} */
+                          /* {159: literate/markdown-output.weft:295} */
 {
                             scraps += extra_scraps;
                             do
                               c = source_get();
                             while (isspace(c));
                             at_line_start = TRUE;
-                          }/* {:157} */
+                          }/* {:159} */
 
 #line 218 "literate/markdown-output.weft"
 
-                        }/* {:152} */
+                        }/* {:154} */
 
 #line 117 "literate/markdown-output.weft"
 
@@ -140,7 +140,7 @@ void write_md(char *file_name, char *md_name, unsigned char sector)
               case 'q':
               case 'd': 
 #line 223 "literate/markdown-output.weft"
-                        /* {153: literate/markdown-output.weft:223} */
+                        /* {155: literate/markdown-output.weft:223} */
 {
                           Name *name = collect_macro_name();
                           (void)big_definition;
@@ -151,7 +151,7 @@ void write_md(char *file_name, char *md_name, unsigned char sector)
                           /* Write the md macro's name */
                           
 #line 240 "literate/markdown-output.weft"
-                          /* {154: literate/markdown-output.weft:240} */
+                          /* {156: literate/markdown-output.weft:240} */
 {
                             char * p = name->spelling;
                             int i = 0;
@@ -164,7 +164,7 @@ void write_md(char *file_name, char *md_name, unsigned char sector)
                               else
                                  fputc(*p++, md_file);
                             }
-                          }/* {:154} */
+                          }/* {:156} */
 
 #line 230 "literate/markdown-output.weft"
 
@@ -174,7 +174,7 @@ void write_md(char *file_name, char *md_name, unsigned char sector)
                           /* Fill in the md scrap */
                           
 #line 283 "literate/markdown-output.weft"
-                          /* {156: literate/markdown-output.weft:283} */
+                          /* {158: literate/markdown-output.weft:283} */
 {
                             if (name->lang[0] != '\0')
                               fprintf(md_file, "<pre><code class=\"language-%s\">", name->lang);
@@ -183,32 +183,32 @@ void write_md(char *file_name, char *md_name, unsigned char sector)
                             extra_scraps = 0;
                             md_copy_scrap(md_file, TRUE, name);
                             fputs("</code></pre>\n", md_file);
-                          }/* {:156} */
+                          }/* {:158} */
 
 #line 234 "literate/markdown-output.weft"
 
                           /* Write md macro cross-refs */
                           
 #line 336 "literate/markdown-output.weft"
-                          /* {161: literate/markdown-output.weft:336} */
+                          /* {163: literate/markdown-output.weft:336} */
 {
                             /* Write md macro defs */
                             
 #line 344 "literate/markdown-output.weft"
-                            /* {162: literate/markdown-output.weft:344} */
+                            /* {164: literate/markdown-output.weft:344} */
 {
                               if (name->defs->next) {
                                 fputs("> *Fragment defined by* ", md_file);
                                 md_print_scrap_numbers(md_file, name->defs);
                               }
-                            }/* {:162} */
+                            }/* {:164} */
 
 #line 337 "literate/markdown-output.weft"
 
                             /* Write md macro refs */
                             
 #line 352 "literate/markdown-output.weft"
-                            /* {163: literate/markdown-output.weft:352} */
+                            /* {165: literate/markdown-output.weft:352} */
 {
                               if (name->uses) {
                                 if (name->uses->next) {
@@ -230,31 +230,31 @@ void write_md(char *file_name, char *md_name, unsigned char sector)
                                 fprintf(stderr, "%s: <%s> never referenced.\n",
                                         command_name, name->spelling);
                               }
-                            }/* {:163} */
+                            }/* {:165} */
 
 #line 338 "literate/markdown-output.weft"
 
                             md_format_defs_refs(md_file, scraps);
                             md_format_uses_refs(md_file, scraps++);
-                          }/* {:161} */
+                          }/* {:163} */
 
 #line 235 "literate/markdown-output.weft"
 
                           /* Finish md scrap */
                           
 #line 295 "literate/markdown-output.weft"
-                          /* {157: literate/markdown-output.weft:295} */
+                          /* {159: literate/markdown-output.weft:295} */
 {
                             scraps += extra_scraps;
                             do
                               c = source_get();
                             while (isspace(c));
                             at_line_start = TRUE;
-                          }/* {:157} */
+                          }/* {:159} */
 
 #line 236 "literate/markdown-output.weft"
 
-                        }/* {:153} */
+                        }/* {:155} */
 
 #line 123 "literate/markdown-output.weft"
 
@@ -263,12 +263,12 @@ void write_md(char *file_name, char *md_name, unsigned char sector)
                         /* Step to next sector */
                         
 #line 170 "literate/parser.weft"
-/* {45: literate/parser.weft:170} */
+/* {47: literate/parser.weft:170} */
 
                         prev_sector += 1;
                         current_sector = prev_sector;
                         c = source_get();
-                        /* {:45} */
+                        /* {:47} */
 
 #line 126 "literate/markdown-output.weft"
 
@@ -277,10 +277,10 @@ void write_md(char *file_name, char *md_name, unsigned char sector)
                         /* Close the current sector */
                         
 #line 177 "literate/parser.weft"
-                        /* {46: literate/parser.weft:177} */
+                        /* {48: literate/parser.weft:177} */
 current_sector = 1;
                         c = source_get();
-                        /* {:46} */
+                        /* {:48} */
 
 #line 129 "literate/markdown-output.weft"
 
@@ -289,17 +289,17 @@ current_sector = 1;
               case '[':
               case '(': 
 #line 304 "literate/markdown-output.weft"
-                        /* {158: literate/markdown-output.weft:304} */
+                        /* {160: literate/markdown-output.weft:304} */
 md_copy_scrap(md_file, FALSE, NULL);
                         c = source_get();
-                        /* {:158} */
+                        /* {:160} */
 
 #line 133 "literate/markdown-output.weft"
 
                         break;
               case '<': 
 #line 170 "literate/markdown-output.weft"
-                        /* {151: literate/markdown-output.weft:170} */
+                        /* {153: literate/markdown-output.weft:170} */
 {
                            Parameters local_parameters = 0;
                            int changed;
@@ -316,43 +316,43 @@ md_copy_scrap(md_file, FALSE, NULL);
                            name->mark = FALSE;
                            c = source_get();
                         }
-                        /* {:151} */
+                        /* {:153} */
 
 #line 135 "literate/markdown-output.weft"
 
                         break;
               case 'x': 
 #line 734 "literate/latex-output.weft"
-                        /* {117: literate/latex-output.weft:734} */
+                        /* {119: literate/latex-output.weft:734} */
 {
                            /* Get label from */
                            
 #line 591 "literate/search-labels.weft"
-                           /* {380: literate/search-labels.weft:591} */
+                           /* {386: literate/search-labels.weft:591} */
 char  label_name[MAX_NAME_LEN];
                            char * p = label_name;
                            while (c = 
 #line 735 "literate/latex-output.weft"
-                                      /* {118: literate/latex-output.weft:735} */
-source_get()/* {:118} */
+                                      /* {120: literate/latex-output.weft:735} */
+source_get()/* {:120} */
 , c != nw_char) /* Here is ?-01 */
                               *p++ = c;
                            *p = '\0';
                            c = 
 #line 735 "literate/latex-output.weft"
-                               /* {118: literate/latex-output.weft:735} */
-source_get()/* {:118} */
+                               /* {120: literate/latex-output.weft:735} */
+source_get()/* {:120} */
 ;
-                           /* {:380} */
+                           /* {:386} */
 
 #line 735 "literate/latex-output.weft"
 
                            write_label(label_name, 
 #line 137 "literate/markdown-output.weft"
-                                                   /* {149: literate/markdown-output.weft:137} */
-md_file/* {:149} */
+                                                   /* {151: literate/markdown-output.weft:137} */
+md_file/* {:151} */
 );
-                        }/* {:117} */
+                        }/* {:119} */
 
 #line 137 "literate/markdown-output.weft"
 
@@ -363,7 +363,7 @@ md_file/* {:149} */
                         break;
               case 'f': 
 #line 670 "literate/markdown-output.weft"
-                        /* {176: literate/markdown-output.weft:670} */
+                        /* {178: literate/markdown-output.weft:670} */
 {
                           if (file_names) {
                             fputs("\n", md_file);
@@ -371,14 +371,14 @@ md_file/* {:149} */
                             fputs("\n", md_file);
                           }
                           c = source_get();
-                        }/* {:176} */
+                        }/* {:178} */
 
 #line 143 "literate/markdown-output.weft"
 
                         break;
               case 'm': 
 #line 713 "literate/markdown-output.weft"
-                        /* {180: literate/markdown-output.weft:713} */
+                        /* {182: literate/markdown-output.weft:713} */
 {
                           unsigned char sector = current_sector;
                           int c = source_get();
@@ -395,14 +395,14 @@ md_file/* {:149} */
                           }
                         }
                         c = source_get();
-                        /* {:180} */
+                        /* {:182} */
 
 #line 145 "literate/markdown-output.weft"
 
                         break;
               case 'u': 
 #line 819 "literate/markdown-output.weft"
-                        /* {186: literate/markdown-output.weft:819} */
+                        /* {188: literate/markdown-output.weft:819} */
 {
                             unsigned char sector = current_sector;
                             c = source_get();
@@ -415,17 +415,17 @@ md_file/* {:149} */
                               md_format_user_entry(user_names, md_file, sector);
                               fputs("\n", md_file);
                             }
-                        }/* {:186} */
+                        }/* {:188} */
 
 #line 147 "literate/markdown-output.weft"
 
                         break;
               case 'v': 
 #line 165 "literate/markdown-output.weft"
-                        /* {150: literate/markdown-output.weft:165} */
+                        /* {152: literate/markdown-output.weft:165} */
 fputs(version_string, md_file);
                         c = source_get();
-                        /* {:150} */
+                        /* {:152} */
 
 #line 149 "literate/markdown-output.weft"
 
@@ -433,24 +433,24 @@ fputs(version_string, md_file);
               case 'l':
               case 'L': 
 #line 102 "literate/parser.weft"
-                        /* {43: literate/parser.weft:102} */
+                        /* {45: literate/parser.weft:102} */
 { int lc = source_get();
                           while (lc != '\n' && lc != EOF)
                             lc = source_get();
                         }
-                        c = source_get();/* {:43} */
+                        c = source_get();/* {:45} */
 
 #line 152 "literate/markdown-output.weft"
 
                         break;
               case 'W': 
 #line 102 "literate/parser.weft"
-                        /* {43: literate/parser.weft:102} */
+                        /* {45: literate/parser.weft:102} */
 { int lc = source_get();
                           while (lc != '\n' && lc != EOF)
                             lc = source_get();
                         }
-                        c = source_get();/* {:43} */
+                        c = source_get();/* {:45} */
 
 #line 154 "literate/markdown-output.weft"
 
@@ -461,7 +461,7 @@ fputs(version_string, md_file);
                     c = source_get();
                         break;
             }
-          }/* {:148} */
+          }/* {:150} */
 
 #line 63 "literate/markdown-output.weft"
 
@@ -470,7 +470,7 @@ fputs(version_string, md_file);
           /* Check for cosmetic fence line */
           
 #line 82 "literate/markdown-output.weft"
-          /* {147: literate/markdown-output.weft:82} */
+          /* {149: literate/markdown-output.weft:82} */
 {
             int c2 = source_get();
             int c3 = (c2 == '`') ? source_get() : 0;
@@ -492,7 +492,7 @@ fputs(version_string, md_file);
               }
               at_line_start = FALSE;
             }
-          }/* {:147} */
+          }/* {:149} */
 
 #line 66 "literate/markdown-output.weft"
 
@@ -504,7 +504,7 @@ fputs(version_string, md_file);
           c = source_get();
         }
       }
-    }/* {:146} */
+    }/* {:148} */
 
 #line 41 "literate/markdown-output.weft"
 
@@ -513,10 +513,10 @@ fputs(version_string, md_file);
   else
     fprintf(stderr, "%s: can't open %s\n", command_name, md_name);
 }
-/* {:145} */
+/* {:147} */
 
 #line 255 "literate/markdown-output.weft"
-/* {155: literate/markdown-output.weft:255} */
+/* {157: literate/markdown-output.weft:255} */
 static void md_write_arg(FILE * md_file, char * p)
 {
    fputs("<i>", md_file);
@@ -541,10 +541,10 @@ static void md_write_arg(FILE * md_file, char * p)
    }
    fputs("</i>", md_file);
 }
-/* {:155} */
+/* {:157} */
 
 #line 376 "literate/markdown-output.weft"
-/* {164: literate/markdown-output.weft:376} */
+/* {166: literate/markdown-output.weft:376} */
 static void md_print_scrap_numbers(FILE *md_file, Scrap_Node *scraps)
 {
   int page;
@@ -564,10 +564,10 @@ static void md_print_scrap_numbers(FILE *md_file, Scrap_Node *scraps)
   }
   fputs(".\n", md_file);
 }
-/* {:164} */
+/* {:166} */
 
 #line 405 "literate/markdown-output.weft"
-/* {165: literate/markdown-output.weft:405} */
+/* {167: literate/markdown-output.weft:405} */
 static int md_scrap_type = 0;
 
 static void md_copy_scrap(FILE *file, int prefix, Name *name)
@@ -586,7 +586,7 @@ static void md_copy_scrap(FILE *file, int prefix, Name *name)
                  break;
       case '\t': 
 #line 451 "literate/markdown-output.weft"
-                 /* {167: literate/markdown-output.weft:451} */
+                 /* {169: literate/markdown-output.weft:451} */
 {
                    int delta = 8 - (indent % 8);
                    indent += delta;
@@ -594,7 +594,7 @@ static void md_copy_scrap(FILE *file, int prefix, Name *name)
                      putc(' ', file);
                      delta--;
                    }
-                 }/* {:167} */
+                 }/* {:169} */
 
 #line 421 "literate/markdown-output.weft"
 
@@ -605,62 +605,62 @@ static void md_copy_scrap(FILE *file, int prefix, Name *name)
              /* Check md at-sequence for end-of-scrap */
              
 #line 461 "literate/markdown-output.weft"
-             /* {168: literate/markdown-output.weft:461} */
+             /* {170: literate/markdown-output.weft:461} */
 {
                c = source_get();
                switch (c) {
                  case 'c': 
 #line 519 "literate/markdown-output.weft"
-                           /* {170: literate/markdown-output.weft:519} */
+                           /* {172: literate/markdown-output.weft:519} */
 {
                              fputs("<i>(Comment)</i>", file);
                            }
-                           /* {:170} */
+                           /* {:172} */
 
 #line 464 "literate/markdown-output.weft"
 
                            break;
                  case 'x': 
 #line 734 "literate/latex-output.weft"
-                           /* {117: literate/latex-output.weft:734} */
+                           /* {119: literate/latex-output.weft:734} */
 {
                               /* Get label from */
                               
 #line 591 "literate/search-labels.weft"
-                              /* {380: literate/search-labels.weft:591} */
+                              /* {386: literate/search-labels.weft:591} */
 char  label_name[MAX_NAME_LEN];
                               char * p = label_name;
                               while (c = 
 #line 735 "literate/latex-output.weft"
-                                         /* {118: literate/latex-output.weft:735} */
-source_get()/* {:118} */
+                                         /* {120: literate/latex-output.weft:735} */
+source_get()/* {:120} */
 , c != nw_char) /* Here is ?-01 */
                                  *p++ = c;
                               *p = '\0';
                               c = 
 #line 735 "literate/latex-output.weft"
-                                  /* {118: literate/latex-output.weft:735} */
-source_get()/* {:118} */
+                                  /* {120: literate/latex-output.weft:735} */
+source_get()/* {:120} */
 ;
-                              /* {:380} */
+                              /* {:386} */
 
 #line 735 "literate/latex-output.weft"
 
                               write_label(label_name, 
 #line 466 "literate/markdown-output.weft"
-                                                      /* {169: literate/markdown-output.weft:466} */
-file/* {:169} */
+                                                      /* {171: literate/markdown-output.weft:466} */
+file/* {:171} */
 );
-                           }/* {:117} */
+                           }/* {:119} */
 
 #line 466 "literate/markdown-output.weft"
 
                            break;
                  case 'v': 
 #line 730 "literate/latex-output.weft"
-                           /* {116: literate/latex-output.weft:730} */
+                           /* {118: literate/latex-output.weft:730} */
 fputs(version_string, file);
-                           /* {:116} */
+                           /* {:118} */
 
 #line 468 "literate/markdown-output.weft"
 
@@ -671,7 +671,7 @@ fputs(version_string, file);
                  case '*':
                  case '|': 
 #line 743 "literate/latex-output.weft"
-                           /* {119: literate/latex-output.weft:743} */
+                           /* {121: literate/latex-output.weft:743} */
 {
                              do {
                                do
@@ -679,7 +679,7 @@ fputs(version_string, file);
                                while (c != nw_char);
                                c = source_get();
                              } while (c != '}' && c != ']' && c != ')' );
-                           }/* {:119} */
+                           }/* {:121} */
 
 #line 474 "literate/markdown-output.weft"
 
@@ -689,7 +689,7 @@ fputs(version_string, file);
                  case '}': return;
                  case '<': 
 #line 545 "literate/markdown-output.weft"
-                           /* {173: literate/markdown-output.weft:545} */
+                           /* {175: literate/markdown-output.weft:545} */
 {
                              Arglist *args = collect_scrap_name(-1);
                              Name *name = args->name;
@@ -738,26 +738,26 @@ fputs(version_string, file);
                                        command_name, name->spelling);
                              }
                              fputs("</a>&gt;", file);
-                           }/* {:173} */
+                           }/* {:175} */
 
 #line 479 "literate/markdown-output.weft"
 
                            break;
                  case '%': 
 #line 753 "literate/latex-output.weft"
-                           /* {120: literate/latex-output.weft:753} */
+                           /* {122: literate/latex-output.weft:753} */
 {
                                    do
                                            c = source_get();
                                    while (c != '\n');
-                           }/* {:120} */
+                           }/* {:122} */
 
 #line 481 "literate/markdown-output.weft"
 
                            break;
                  case '_': 
 #line 525 "literate/markdown-output.weft"
-                           /* {171: literate/markdown-output.weft:525} */
+                           /* {173: literate/markdown-output.weft:525} */
 {
                              fprintf(file, "<b>");
                              c = source_get();
@@ -770,27 +770,27 @@ fputs(version_string, file);
                              } while (c != nw_char);
                              c = source_get();
                              fprintf(file, "</b>");
-                           }/* {:171} */
+                           }/* {:173} */
 
 #line 483 "literate/markdown-output.weft"
 
                            break;
                  case 't': 
 #line 540 "literate/markdown-output.weft"
-                           /* {172: literate/markdown-output.weft:540} */
+                           /* {174: literate/markdown-output.weft:540} */
 {
                              fprintf(file, "<i>fragment title</i>");
-                           }/* {:172} */
+                           }/* {:174} */
 
 #line 485 "literate/markdown-output.weft"
 
                            break;
                  case 'f': 
 #line 540 "literate/markdown-output.weft"
-                           /* {172: literate/markdown-output.weft:540} */
+                           /* {174: literate/markdown-output.weft:540} */
 {
                              fprintf(file, "<i>file name</i>");
-                           }/* {:172} */
+                           }/* {:174} */
 
 #line 487 "literate/markdown-output.weft"
 
@@ -822,7 +822,7 @@ fputs(version_string, file);
                        /* ignore these since pass1 will have warned about them */
                            break;
                }
-             }/* {:168} */
+             }/* {:170} */
 
 #line 426 "literate/markdown-output.weft"
 
@@ -832,13 +832,13 @@ fputs(version_string, file);
            /* HTML-escape character c */
            
 #line 443 "literate/markdown-output.weft"
-           /* {166: literate/markdown-output.weft:443} */
+           /* {168: literate/markdown-output.weft:443} */
 switch (c) {
              case '<': fputs("&lt;", file); break;
              case '>': fputs("&gt;", file); break;
              case '&': fputs("&amp;", file); break;
              default:  putc(c, file); break;
-           }/* {:166} */
+           }/* {:168} */
 
 #line 430 "literate/markdown-output.weft"
 
@@ -851,10 +851,10 @@ switch (c) {
     c = source_get();
   }
 }
-/* {:165} */
+/* {:167} */
 
 #line 597 "literate/markdown-output.weft"
-/* {174: literate/markdown-output.weft:597} */
+/* {176: literate/markdown-output.weft:597} */
 static void md_write_literal(FILE * md_file, char * p)
 {
    while (*p!= '\000') {
@@ -865,10 +865,10 @@ static void md_write_literal(FILE * md_file, char * p)
      p++;
    }
 }
-/* {:174} */
+/* {:176} */
 
 #line 610 "literate/markdown-output.weft"
-/* {175: literate/markdown-output.weft:610} */
+/* {177: literate/markdown-output.weft:610} */
 static void
 md_write_ArglistElement(FILE * file, Arglist * args, char ** params)
 {
@@ -924,10 +924,10 @@ md_write_ArglistElement(FILE * file, Arglist * args, char ** params)
     fputs("&gt;", file);
   }
 }
-/* {:175} */
+/* {:177} */
 
 #line 680 "literate/markdown-output.weft"
-/* {177: literate/markdown-output.weft:680} */
+/* {179: literate/markdown-output.weft:680} */
 static void md_format_file_entry(Name *name, FILE *md_file)
 {
   while (name) {
@@ -935,13 +935,13 @@ static void md_format_file_entry(Name *name, FILE *md_file)
     /* Format a md file index entry */
     
 #line 691 "literate/markdown-output.weft"
-    /* {178: literate/markdown-output.weft:691} */
+    /* {180: literate/markdown-output.weft:691} */
 fputs("- ", md_file);
     fprintf(md_file, "`\"%s\"` ", name->spelling);
     /* Write md file's defining scrap numbers */
 
 #line 697 "literate/markdown-output.weft"
-    /* {179: literate/markdown-output.weft:697} */
+    /* {181: literate/markdown-output.weft:697} */
     {
       Scrap_Node *p = name->defs;
       fputs("*Defined by* ", md_file);
@@ -955,21 +955,21 @@ fputs("- ", md_file);
         write_single_scrap_ref(md_file, p->scrap);
         fputs("</a>.", md_file);
       }
-    }/* {:179} */
+    }/* {:181} */
 
 #line 693 "literate/markdown-output.weft"
 
-    putc('\n', md_file);/* {:178} */
+    putc('\n', md_file);/* {:180} */
 
 #line 684 "literate/markdown-output.weft"
 
     name = name->rlink;
   }
 }
-/* {:177} */
+/* {:179} */
 
 #line 732 "literate/markdown-output.weft"
-/* {181: literate/markdown-output.weft:732} */
+/* {183: literate/markdown-output.weft:732} */
 static int md_load_entry(Name * name, Name ** nms, int n)
 {
    while (name) {
@@ -979,10 +979,10 @@ static int md_load_entry(Name * name, Name ** nms, int n)
    }
    return n;
 }
-/* {:181} */
+/* {:183} */
 
 #line 744 "literate/markdown-output.weft"
-/* {182: literate/markdown-output.weft:744} */
+/* {184: literate/markdown-output.weft:744} */
 static void md_format_entry(Name *name, FILE *md_file, unsigned char sector)
 {
   Name ** nms = malloc(num_scraps()*sizeof(Name *));
@@ -992,7 +992,7 @@ static void md_format_entry(Name *name, FILE *md_file, unsigned char sector)
   /* Sort 'nms' of size 'n' for <Rob's ordering> */
   
 #line 1003 "literate/latex-output.weft"
-  /* {134: literate/latex-output.weft:1003} */
+  /* {136: literate/latex-output.weft:1003} */
 int j;
   for (j = 1; j < n; j++)
   {
@@ -1005,8 +1005,8 @@ int j;
 
         if (
 #line 1000 "literate/latex-output.weft"
-            /* {133: literate/latex-output.weft:1000} */
-robs_strcmp(ki->spelling, kj->spelling) < 0/* {:133} */
+            /* {135: literate/latex-output.weft:1000} */
+robs_strcmp(ki->spelling, kj->spelling) < 0/* {:135} */
 )
            break;
         nms[i + 1] = ki;
@@ -1014,7 +1014,7 @@ robs_strcmp(ki->spelling, kj->spelling) < 0/* {:133} */
      } while (i >= 0);
      nms[i + 1] = kj;
   }
-  /* {:134} */
+  /* {:136} */
 
 #line 750 "literate/markdown-output.weft"
 
@@ -1025,14 +1025,14 @@ robs_strcmp(ki->spelling, kj->spelling) < 0/* {:133} */
      /* Format a md index entry */
      
 #line 762 "literate/markdown-output.weft"
-     /* {183: literate/markdown-output.weft:762} */
+     /* {185: literate/markdown-output.weft:762} */
 if (name->sector == sector){
        fputs("- ", md_file);
        fputs("&lt;*", md_file);
        /* Write the md macro's name */
        
 #line 240 "literate/markdown-output.weft"
-       /* {154: literate/markdown-output.weft:240} */
+       /* {156: literate/markdown-output.weft:240} */
 {
          char * p = name->spelling;
          int i = 0;
@@ -1045,7 +1045,7 @@ if (name->sector == sector){
            else
               fputc(*p++, md_file);
          }
-       }/* {:154} */
+       }/* {:156} */
 
 #line 765 "literate/markdown-output.weft"
 
@@ -1053,7 +1053,7 @@ if (name->sector == sector){
        /* Write md defining scrap numbers */
        
 #line 774 "literate/markdown-output.weft"
-       /* {184: literate/markdown-output.weft:774} */
+       /* {186: literate/markdown-output.weft:774} */
 {
          Scrap_Node *p = name->defs;
          if (p) {
@@ -1075,7 +1075,7 @@ if (name->sector == sector){
          }
          else
            putc('?', md_file);
-       }/* {:184} */
+       }/* {:186} */
 
 #line 767 "literate/markdown-output.weft"
 
@@ -1083,7 +1083,7 @@ if (name->sector == sector){
        /* Write md referencing scrap numbers */
        
 #line 798 "literate/markdown-output.weft"
-       /* {185: literate/markdown-output.weft:798} */
+       /* {187: literate/markdown-output.weft:798} */
 {
          Scrap_Node *p = name->uses;
          if (p) {
@@ -1101,22 +1101,22 @@ if (name->sector == sector){
          }
          else
            fputs("*Not referenced*.", md_file);
-       }/* {:185} */
+       }/* {:187} */
 
 #line 769 "literate/markdown-output.weft"
 
        putc('\n', md_file);
-     }/* {:183} */
+     }/* {:185} */
 
 #line 755 "literate/markdown-output.weft"
 
   }
   free(nms);
 }
-/* {:182} */
+/* {:184} */
 
 #line 835 "literate/markdown-output.weft"
-/* {187: literate/markdown-output.weft:835} */
+/* {189: literate/markdown-output.weft:835} */
 static void md_format_user_entry(Name *name, FILE *md_file, unsigned char sector)
 {
   while (name) {
@@ -1124,7 +1124,7 @@ static void md_format_user_entry(Name *name, FILE *md_file, unsigned char sector
     /* Format a md user index entry */
     
 #line 847 "literate/markdown-output.weft"
-    /* {188: literate/markdown-output.weft:847} */
+    /* {190: literate/markdown-output.weft:847} */
 if (name->sector == sector){
       Scrap_Node *uses = name->uses;
       if ( uses || dangling_flag ) {
@@ -1188,17 +1188,17 @@ if (name->sector == sector){
         }
         fputs(".\n", md_file);
       }
-    }/* {:188} */
+    }/* {:190} */
 
 #line 839 "literate/markdown-output.weft"
 
     name = name->rlink;
   }
 }
-/* {:187} */
+/* {:189} */
 
 #line 919 "literate/markdown-output.weft"
-/* {189: literate/markdown-output.weft:919} */
+/* {191: literate/markdown-output.weft:919} */
 
 static void
 md_format_uses_refs(FILE * md_file, int scrap)
@@ -1208,7 +1208,7 @@ md_format_uses_refs(FILE * md_file, int scrap)
     /* Write md uses references */
     
 #line 930 "literate/markdown-output.weft"
-    /* {190: literate/markdown-output.weft:930} */
+    /* {192: literate/markdown-output.weft:930} */
 {
       char join = ' ';
       fputs("> *Uses:*", md_file);
@@ -1216,7 +1216,7 @@ md_format_uses_refs(FILE * md_file, int scrap)
         /* Write one md use reference */
         
 #line 942 "literate/markdown-output.weft"
-        /* {191: literate/markdown-output.weft:942} */
+        /* {193: literate/markdown-output.weft:942} */
 Name * name = p->defn;
         Scrap_Node *defs = name->defs;
         int first = TRUE, page = -1;
@@ -1229,12 +1229,12 @@ Name * name = p->defn;
             /* Write one md referenced scrap */
             
 #line 963 "literate/markdown-output.weft"
-            /* {192: literate/markdown-output.weft:963} */
+            /* {194: literate/markdown-output.weft:963} */
 fputs("<a href=\"#weft", md_file);
             write_scrap_ref(md_file, defs->scrap, -1, &page);
             fputs("\">", md_file);
             write_scrap_ref(md_file, defs->scrap, first, &page);
-            fputs("</a>", md_file);/* {:192} */
+            fputs("</a>", md_file);/* {:194} */
 
 #line 951 "literate/markdown-output.weft"
 
@@ -1246,7 +1246,7 @@ fputs("<a href=\"#weft", md_file);
         {
           fputs("*(not defined globally)*", md_file);
         }
-        /* {:191} */
+        /* {:193} */
 
 #line 934 "literate/markdown-output.weft"
 
@@ -1254,15 +1254,15 @@ fputs("<a href=\"#weft", md_file);
         p = p->next;
       }while (p != NULL);
       fputs(".\n", md_file);
-    }/* {:190} */
+    }/* {:192} */
 
 #line 925 "literate/markdown-output.weft"
 
 }
-/* {:189} */
+/* {:191} */
 
 #line 971 "literate/markdown-output.weft"
-/* {193: literate/markdown-output.weft:971} */
+/* {195: literate/markdown-output.weft:971} */
 
 static void
 md_format_defs_refs(FILE * md_file, int scrap)
@@ -1272,7 +1272,7 @@ md_format_defs_refs(FILE * md_file, int scrap)
     /* Write md defs references */
     
 #line 982 "literate/markdown-output.weft"
-    /* {194: literate/markdown-output.weft:982} */
+    /* {196: literate/markdown-output.weft:982} */
 {
       char join = ' ';
       fputs("> *Defines:*", md_file);
@@ -1280,7 +1280,7 @@ md_format_defs_refs(FILE * md_file, int scrap)
         /* Write one md def reference */
         
 #line 994 "literate/markdown-output.weft"
-        /* {195: literate/markdown-output.weft:994} */
+        /* {197: literate/markdown-output.weft:994} */
 Name * name = p->defn;
         Scrap_Node *defs = name->uses;
         int first = TRUE, page = -1;
@@ -1297,12 +1297,12 @@ Name * name = p->defn;
                /* Write one md referenced scrap */
                
 #line 963 "literate/markdown-output.weft"
-               /* {192: literate/markdown-output.weft:963} */
+               /* {194: literate/markdown-output.weft:963} */
 fputs("<a href=\"#weft", md_file);
                write_scrap_ref(md_file, defs->scrap, -1, &page);
                fputs("\">", md_file);
                write_scrap_ref(md_file, defs->scrap, first, &page);
-               fputs("</a>", md_file);/* {:192} */
+               fputs("</a>", md_file);/* {:194} */
 
 #line 1007 "literate/markdown-output.weft"
 
@@ -1311,7 +1311,7 @@ fputs("<a href=\"#weft", md_file);
             defs = defs->next;
           }while (defs!= NULL);
         }
-        /* {:195} */
+        /* {:197} */
 
 #line 986 "literate/markdown-output.weft"
 
@@ -1319,9 +1319,9 @@ fputs("<a href=\"#weft", md_file);
         p = p->next;
       }while (p != NULL);
       fputs(".\n", md_file);
-    }/* {:194} */
+    }/* {:196} */
 
 #line 977 "literate/markdown-output.weft"
 
 }
-/* {:193} */
+/* {:195} */

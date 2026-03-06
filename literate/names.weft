@@ -703,7 +703,7 @@ static void lang_to_flags(const char *lang,
   if (e) {
     *comment_flag = e->comment;
     *debug_flag = e->line_directive;
-    *location_flag = TRUE;
+    *location_flag = (e->comment != 0);
   } else {
     /* Unknown language: default to // comments, no #line */
     *comment_flag = 2;
@@ -1017,14 +1017,23 @@ if (new_name->suppress_markers) {
   new_name->location_flag = FALSE;
 }@}
 
-For \verb|@@d| (macro) definitions, the language tag is stored but
-no flags are inferred---macros inherit their flags from the output
-file that eventually includes them.
+For \verb|@@d| (macro) definitions, the language tag is stored and
+flags are inferred from \verb|@@l|, just as for output files.  At
+expansion time, if a fragment carries an explicit \verb|@@l| tag its
+own flags override the parent's---so \verb|@@l txt| before
+\verb|@@d| suppresses markers and newlines, enabling true inline
+expansion.
 
 @d Apply pending language to macro
 @{if (pending_lang[0] != '\0') {
   strncpy(node->lang, pending_lang, 63);
   node->lang[63] = '\0';
+  if (node->comment_flag == 0 && !node->debug_flag) {
+    lang_to_flags(pending_lang,
+                  &node->comment_flag,
+                  &node->debug_flag,
+                  &node->location_flag);
+  }
   pending_lang[0] = '\0';
 }@}
 

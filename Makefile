@@ -55,10 +55,14 @@ check:
 
 # Developer reference (full source with code listings)
 doc:
-	./weft -o -w tex -r weft.weft
+	@if [ -z "$(VERSION)" ]; then \
+	  echo "Error: VERSION is required.  Usage: make doc VERSION=1.0.2"; \
+	  exit 1; \
+	fi
+	./weft -o -w tex -r -V "$(VERSION)" weft.weft
 	-$(TEXENV) pdflatex -interaction=nonstopmode weft.tex
 	-$(TEXENV) bibtex weft
-	./weft -o -w tex -r weft.weft
+	./weft -o -w tex -r -V "$(VERSION)" weft.weft
 	-$(TEXENV) pdflatex -interaction=nonstopmode weft.tex
 	-$(TEXENV) pdflatex -interaction=nonstopmode weft.tex
 	@rm -f weft.tex weft.aux weft.log weft.out weft.toc weft.brf \
@@ -67,7 +71,11 @@ doc:
 
 # User guide (introduction chapter only)
 user-guide:
-	./weft -o -w tex -r weft-user-guide.weft
+	@if [ -z "$(VERSION)" ]; then \
+	  echo "Error: VERSION is required.  Usage: make user-guide VERSION=1.0.2"; \
+	  exit 1; \
+	fi
+	./weft -o -w tex -r -V "$(VERSION)" weft-user-guide.weft
 	-$(TEXENV) pdflatex -interaction=nonstopmode weft-user-guide.tex
 	-$(TEXENV) bibtex weft-user-guide
 	-$(TEXENV) pdflatex -interaction=nonstopmode weft-user-guide.tex
@@ -82,6 +90,10 @@ user-guide:
 # Prepare the repo for release: tangle, compile, test, generate docs.
 # If ./weft doesn't exist yet, bootstrap from pre-generated src/*.c first.
 dist:
+	@if [ -z "$(VERSION)" ]; then \
+	  echo "Error: VERSION is required.  Usage: make dist VERSION=1.0.2"; \
+	  exit 1; \
+	fi
 	@if [ ! -x ./weft ]; then \
 	  echo "No weft binary found, bootstrapping from src/..."; \
 	  $(MAKE) --no-print-directory bootstrap; \
@@ -89,10 +101,10 @@ dist:
 	$(MAKE) --no-print-directory weft
 	$(MAKE) --no-print-directory clean
 	$(MAKE) --no-print-directory check
-	$(MAKE) --no-print-directory doc
-	$(MAKE) --no-print-directory user-guide
+	$(MAKE) --no-print-directory doc VERSION=$(VERSION)
+	$(MAKE) --no-print-directory user-guide VERSION=$(VERSION)
 	@echo ""
-	@echo "Distribution ready. Generated files:"
+	@echo "Distribution ready (version $(VERSION)). Generated files:"
 	@echo "  weft                  (binary)"
 	@echo "  src/*.c src/*.h       (bootstrap sources)"
 	@echo "  weft.pdf              (developer reference)"

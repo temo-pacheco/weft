@@ -49,9 +49,12 @@
   {1.5ex \@@plus .2ex}%
   {\normalfont\normalsize\bfseries\sffamily}}
 \makeatother
-\title{\sffamily\bfseries {\fontsize{40}{48}\selectfont weft 1.0}\\[6pt] A Modern Literate Programming Tool\\[4pt] \Large User Guide}
-\author{\sffamily Cuauhtemoc Pacheco}
-\date{\sffamily\today}
+\title{\sffamily\bfseries {\fontsize{40}{48}\selectfont weft @v}\\[6pt] A Modern Literate Programming Tool\\[4pt] \Large User Guide}
+\author{\sffamily Cuauhtemoc Pacheco\\[4pt]
+\small Derived from nuweb 1.64 by Preston Briggs\footnote{Original nuweb author.}\\
+\small with contributions by Keith Harwood, Simon Wright,\\
+\small Marc W. Mengel, John D. Ramsdell, and Gregor Goldbach}
+\date{\sffamily March 5, 2026}
 \begin{document}
 \maketitle
 \tableofcontents

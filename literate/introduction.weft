@@ -715,6 +715,13 @@ its code and dependency information as Markdown to stdout.
 The match uses the same prefix logic as \verb|@@<name...@@>|.
 Neither weaving nor tangling is performed.
 See Section~\ref{map-extract} for details.
+\item[\tt -R {\it file\/}[\tt :{\it line\/}]] Read section markers
+from a tangled output file and emit JSON mapping to stdout.
+If a line number is given, emit the single innermost scrap covering
+that line.  Without a line number, emit all scrap regions in the
+file.  No \verb|.weft| source files are needed---the reverse map
+operates entirely on the tangled output.
+See Section~\ref{map-extract} for details.
 \end{description}
 
 \section{Markdown Output}
@@ -1353,6 +1360,45 @@ contains the full closure of the requested fragment.
 This allows an AI assistant to retrieve exactly the code it needs
 to understand or modify a specific fragment, together with all its
 dependencies, in one step.
+
+\subsection{Reverse Map (\texttt{-R})}
+
+The \verb|-m| and \verb|-e| flags require the \verb|.weft| source
+files.  The reverse map provides the opposite direction: given a
+tangled output file, it parses the section markers already embedded in
+that file and reports which \verb|.weft| source and line produced each
+region.  No source files are needed and pass~1 is never invoked.
+
+\paragraph{Single-line query.}
+\begin{quote}
+\verb|weft -R server.js:47|
+\end{quote}
+emits a JSON object identifying the innermost scrap covering line~47:
+\begin{verbatim}
+    {"scrap": 3, "file": "routes.weft", "line": 42}
+\end{verbatim}
+If the line is outside any scrap region, an empty object \verb|{}| is
+returned.
+
+\paragraph{Full-file mapping.}
+\begin{quote}
+\verb|weft -R server.js|
+\end{quote}
+emits a JSON object listing every scrap region in the file:
+\begin{verbatim}
+    {"source": "server.js", "regions": [
+      {"start": 2, "end": 15, "scrap": 3,
+       "file": "routes.weft", "line": 42},
+      {"start": 5, "end": 8, "scrap": 7,
+       "file": "database.weft", "line": 18}
+    ]}
+\end{verbatim}
+Regions may overlap when fragments are nested.
+
+\noindent
+This enables CI/CD pipelines to translate compiler errors back to the
+literate source automatically, and lets AI agents resolve tangled-output
+locations without loading the \verb|.weft| files at all.
 
 \section{Acknowledgements}
 

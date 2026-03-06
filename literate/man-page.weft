@@ -62,6 +62,11 @@ Useful for AI tooling and project navigation.
 dependencies as Markdown to stdout. Fragment names support prefix
 matching. No weave or tangle is performed.
 .br
+\fB-R file[:line]\fP Read section markers from a tangled output file
+and emit JSON mapping to stdout. If a line number is given, emit the
+single innermost scrap covering that line. Without a line number,
+emit all scrap regions. No .weft source files are needed.
+.br
 \fB-w [format]\fP Request weave output. Without a format token,
 the format is taken from the \fB@@W\fP directive in the source file.
 With \fBmd\fP, a \fB.md\fP file is generated; with \fBtex\fP,

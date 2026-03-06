@@ -80,6 +80,11 @@ language. weft **tangles** it into executable source files and, when asked,
 - **Syntax highlighting in Markdown** — the Markdown weave emits
   `<code class="language-X">` automatically, enabling highlight.js,
   Prism, and GitHub syntax colouring.
+- **Reverse map (`-R`)** — given a tangled output file and
+  optionally a line number, emits JSON mapping back to the `.weft`
+  source. No `.weft` files needed — operates on section markers
+  already in the tangled output. Enables CI/CD error translation
+  and AI agent workflows.
 - **57 automated tests**.
 
 ## Quick Start
@@ -276,6 +281,7 @@ Syntax: `@L name style [+d]` where *style* is `//`, `#`, `--`,
 | `-w [fmt]` | Weave: `-w` alone uses `@@W`; `-w md` or `-w tex` overrides |
 | `-m` | Emit JSON map of document structure to stdout (no tangle/weave) |
 | `-e name` | Extract fragment and dependencies as Markdown to stdout |
+| `-R file[:line]` | Reverse map: emit JSON tracing tangled output back to `.weft` source |
 | `-r` | Enable hyperlinks (hyperref) in LaTeX output |
 | `-h opts` | Provide hyperref package options |
 | `-l` | Use `listings` package for scrap formatting |
@@ -344,7 +350,7 @@ and as a skill for AI assistants.
 - **Architecture guide** — concept-oriented organization, assembly pattern
 - **Build pipeline** — justfile templates for Go, Rust, Python, Flutter, etc.
 - **Debugging workflow** — tracing errors from tangled output back to `.weft` source
-- **AI navigation** — using `-m` (JSON map) and `-e` (fragment extraction)
+- **AI navigation** — using `-m` (JSON map), `-e` (fragment extraction), and `-R` (reverse map)
 - **Naming conventions** — chunk naming, narrative rules, anti-patterns
 - **Worked example** — a single concept spanning Go + Flutter + SQL + Protobuf
 
@@ -381,6 +387,7 @@ Example prompts:
 > Create a literate project for a REST API in Go with auth and payments
 
 > I have a bug at server.js:47, help me trace it back to the .weft source
+>   (uses: weft -R server.js:47)
 
 > Add a notifications concept to my literate project
 

@@ -868,12 +868,23 @@ else
     exit(-1);
   }
   if (name->defs && !defs->quoted) {
+    unsigned char saved_comment = comment_flag;
+    char saved_location = location_flag;
+    char saved_debug = debug_flag;
+    if (name->lang[0] != '\0') {
+      comment_flag = name->comment_flag;
+      location_flag = name->location_flag;
+      debug_flag = name->debug_flag;
+    }
     @<Perhaps comment this macro@>
     name->mark = TRUE;
     indent = write_scraps(file, spelling, name->defs, global_indent + indent,
                           indent_chars, debug_flag, tab_flag, indent_flag,
                           comment_flag, location_flag, args, name->arg,
                           local_parameters, name->spelling);
+    comment_flag = saved_comment;
+    location_flag = saved_location;
+    debug_flag = saved_debug;
     indent -= global_indent;
     name->mark = FALSE;
   }

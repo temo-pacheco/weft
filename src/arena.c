@@ -5,22 +5,22 @@
 /* {:13} */
 
 #line 37 "literate/arena.weft"
-/* {394: literate/arena.weft:37} */
+/* {400: literate/arena.weft:37} */
 typedef struct chunk {
   struct chunk *next;
   char *limit;
   char *avail;
 } Chunk;
-/* {:394} */
+/* {:400} */
 
 #line 51 "literate/arena.weft"
-/* {395: literate/arena.weft:51} */
+/* {401: literate/arena.weft:51} */
 static Chunk first = { NULL, NULL, NULL };
 static Chunk *arena = &first;
-/* {:395} */
+/* {:401} */
 
 #line 65 "literate/arena.weft"
-/* {396: literate/arena.weft:65} */
+/* {402: literate/arena.weft:65} */
 void *arena_getmem(size_t n)
 {
   char *q;
@@ -34,7 +34,7 @@ void *arena_getmem(size_t n)
   /* Find a new chunk of memory */
   
 #line 86 "literate/arena.weft"
-  /* {397: literate/arena.weft:86} */
+  /* {403: literate/arena.weft:86} */
 {
     Chunk *ap = arena;
     Chunk *np = ap->next;
@@ -51,7 +51,7 @@ void *arena_getmem(size_t n)
     /* Allocate a new chunk of memory */
     
 #line 106 "literate/arena.weft"
-    /* {398: literate/arena.weft:106} */
+    /* {404: literate/arena.weft:106} */
 {
       size_t m = n + 10000;
       np = (Chunk *) malloc(m);
@@ -61,22 +61,22 @@ void *arena_getmem(size_t n)
       ap->next = np;
       arena = np;
       return sizeof(Chunk) + (char *) np;
-    }/* {:398} */
+    }/* {:404} */
 
 #line 99 "literate/arena.weft"
 
-  }/* {:397} */
+  }/* {:403} */
 
 #line 75 "literate/arena.weft"
 
 }
-/* {:396} */
+/* {:402} */
 
 #line 123 "literate/arena.weft"
-/* {399: literate/arena.weft:123} */
+/* {405: literate/arena.weft:123} */
 void arena_free(void)
 {
   arena = &first;
   arglist_reset();
 }
-/* {:399} */
+/* {:405} */

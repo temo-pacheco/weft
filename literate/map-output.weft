@@ -272,3 +272,242 @@ Clear marks after extraction so the name trees remain usable:
   clear_marks(macros);
 }
 @| write_extract @}
+
+
+\subsection{Reverse Map Output}
+
+The reverse map feature provides programmatic navigation from tangled
+output back to the \texttt{.weft} source.  Given a tangled output file
+(and optionally a line number), it parses the section markers embedded
+in that file and emits JSON mapping each region to its originating
+scrap, source file, and source line.
+
+This operates entirely on the tangled output---no \texttt{.weft} files
+are needed and \verb|pass1| is never invoked.  The section markers
+have the form:
+
+\begin{verbatim}
+  COMMENT_BEGIN{N: file:line}COMMENT_END    (opening)
+  COMMENT_BEGIN{:N}COMMENT_END              (closing)
+\end{verbatim}
+
+\noindent
+where \verb|COMMENT_BEGIN| and \verb|COMMENT_END| vary by language
+(\verb|/* ... */|, \verb|// ...|, \verb|# ...|, etc.).
+
+A \verb|MarkerFrame| records the data extracted from one opening marker.
+We maintain a stack of these to handle nested fragment expansions.
+
+@o output.c
+@{typedef struct {
+  int scrap;
+  char file[FILENAME_MAX];
+  int line;
+  int start_line;  /* line in the tangled file where this marker opened */
+} MarkerFrame;
+@| MarkerFrame @}
+
+The \verb|parse_open_marker| function scans a line for the pattern
+\verb|{N: file:line}|.  It returns 1 on success, filling in the
+supplied \verb|MarkerFrame|.  The scan is intentionally loose about
+what precedes the opening brace so that any comment style works.
+
+@o output.c
+@{static int parse_open_marker(const char *line, MarkerFrame *mf)
+{
+  const char *p = line;
+  while (*p) {
+    if (*p == '{') {
+      const char *start = p + 1;
+      /* scrap number */
+      if (*start < '0' || *start > '9') { p++; continue; }
+      int scrap = 0;
+      while (*start >= '0' && *start <= '9')
+        scrap = scrap * 10 + (*start++ - '0');
+      if (*start != ':' || *(start+1) != ' ') { p++; continue; }
+      start += 2; /* skip ": " */
+      /* file:line — find the closing brace, then work backwards for :line */
+      const char *end = strchr(start, '}');
+      if (!end) { p++; continue; }
+      /* find last ':' between start and end */
+      const char *colon = NULL;
+      for (const char *q = end - 1; q >= start; q--) {
+        if (*q == ':') { colon = q; break; }
+      }
+      if (!colon) { p++; continue; }
+      /* digits after colon? */
+      int src_line = 0;
+      const char *d = colon + 1;
+      if (d == end) { p++; continue; }
+      while (d < end) {
+        if (*d < '0' || *d > '9') break;
+        src_line = src_line * 10 + (*d++ - '0');
+      }
+      if (d != end) { p++; continue; }
+      /* success */
+      mf->scrap = scrap;
+      mf->line = src_line;
+      {
+        size_t len = (size_t)(colon - start);
+        if (len >= FILENAME_MAX) len = FILENAME_MAX - 1;
+        memcpy(mf->file, start, len);
+        mf->file[len] = '\0';
+      }
+      return 1;
+    }
+    p++;
+  }
+  return 0;
+}
+@| parse_open_marker @}
+
+The \verb|parse_close_marker| function scans for \verb|{:N}| and
+returns the scrap number, or $-1$ on failure.
+
+@o output.c
+@{static int parse_close_marker(const char *line)
+{
+  const char *p = line;
+  while (*p) {
+    if (*p == '{' && *(p+1) == ':') {
+      const char *start = p + 2;
+      if (*start < '0' || *start > '9') { p++; continue; }
+      int scrap = 0;
+      while (*start >= '0' && *start <= '9')
+        scrap = scrap * 10 + (*start++ - '0');
+      if (*start == '}')
+        return scrap;
+    }
+    p++;
+  }
+  return -1;
+}
+@| parse_close_marker @}
+
+The main function \verb|write_reverse_map| parses its argument to
+split an optional line number from the filename, opens the tangled
+file, and reads it line by line.  A stack of \verb|MarkerFrame|
+entries tracks nested scrap regions.
+
+In \emph{line mode} (a specific line was requested), as soon as
+\verb|current_line| reaches the target the innermost stack frame is
+emitted and the function returns.
+
+In \emph{full mode} (no line number), every time a close marker is
+encountered the region from the matching open to the current line is
+emitted.
+
+@o output.c
+@{void write_reverse_map(const char *arg)
+{
+  char filename[FILENAME_MAX];
+  int target_line = -1;
+  FILE *fp;
+  char buf[8192];
+  MarkerFrame stack[256];
+  int depth = 0;
+  int current_line = 0;
+  int first_region = 1;
+
+  /* Parse arg: find last ':' where suffix is all digits */
+  {
+    const char *colon = NULL;
+    const char *p;
+    for (p = arg + strlen(arg) - 1; p > arg; p--) {
+      if (*p == ':') { colon = p; break; }
+    }
+    if (colon) {
+      const char *d = colon + 1;
+      int all_digits = (*d != '\0');
+      while (*d) {
+        if (*d < '0' || *d > '9') { all_digits = 0; break; }
+        d++;
+      }
+      if (all_digits) {
+        target_line = atoi(colon + 1);
+        snprintf(filename, FILENAME_MAX, "%.*s", (int)(colon - arg), arg);
+      } else {
+        snprintf(filename, FILENAME_MAX, "%s", arg);
+      }
+    } else {
+      snprintf(filename, FILENAME_MAX, "%s", arg);
+    }
+  }
+
+  fp = fopen(filename, "r");
+  if (!fp) {
+    fprintf(stderr, "weft: cannot open %s: ", filename);
+    perror(NULL);
+    exit(1);
+  }
+
+  if (target_line < 0) {
+    /* Full mode header */
+    fputs("{\"source\": ", stdout);
+    json_puts(stdout, filename);
+    fputs(", \"regions\": [\n", stdout);
+  }
+
+  while (fgets(buf, sizeof(buf), fp)) {
+    MarkerFrame mf;
+    int close_scrap;
+    current_line++;
+
+    if (parse_open_marker(buf, &mf)) {
+      mf.start_line = current_line;
+      if (depth < 256)
+        stack[depth++] = mf;
+      continue;
+    }
+
+    close_scrap = parse_close_marker(buf);
+    if (close_scrap >= 0) {
+      /* Find matching frame on stack */
+      int i;
+      for (i = depth - 1; i >= 0; i--) {
+        if (stack[i].scrap == close_scrap) {
+          if (target_line < 0) {
+            /* Full mode: emit region */
+            if (!first_region) fputs(",\n", stdout);
+            first_region = 0;
+            fprintf(stdout,
+              "  {\"start\": %d, \"end\": %d, \"scrap\": %d, \"file\": ",
+              stack[i].start_line + 1, current_line - 1, stack[i].scrap);
+            json_puts(stdout, stack[i].file);
+            fprintf(stdout, ", \"line\": %d}", stack[i].line);
+          }
+          /* Remove frame by shifting */
+          depth--;
+          for (; i < depth; i++)
+            stack[i] = stack[i + 1];
+          break;
+        }
+      }
+      continue;
+    }
+
+    /* Regular line — check for line mode match */
+    if (target_line > 0 && current_line == target_line) {
+      if (depth > 0) {
+        MarkerFrame *inner = &stack[depth - 1];
+        fprintf(stdout, "{\"scrap\": %d, \"file\": ", inner->scrap);
+        json_puts(stdout, inner->file);
+        fprintf(stdout, ", \"line\": %d}\n", inner->line);
+      } else {
+        fputs("{}\n", stdout);
+      }
+      fclose(fp);
+      return;
+    }
+  }
+
+  fclose(fp);
+
+  if (target_line > 0) {
+    /* Line was beyond end of file or not inside a scrap */
+    fputs("{}\n", stdout);
+  } else {
+    fputs("\n]}\n", stdout);
+  }
+}
+@| write_reverse_map @}
