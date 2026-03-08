@@ -85,7 +85,10 @@ language. weft **tangles** it into executable source files and, when asked,
   source. No `.weft` files needed — operates on section markers
   already in the tangled output. Enables CI/CD error translation
   and AI agent workflows.
-- **57 automated tests**.
+- **`--help` for humans and AI** — comprehensive help output covering
+  all options, usage examples, directive quick reference, and an
+  AI-specific section with rules and step-by-step workflow.
+- **61 automated tests**.
 
 ## Quick Start
 
@@ -134,6 +137,12 @@ make veryclean        # remove build/ + weft binary + PDFs + LaTeX intermediates
 
 **Rule of thumb:** never edit `src/*.c` or `build/`. All changes go
 through `.weft` files.
+
+### Getting help
+
+```sh
+./weft --help             # comprehensive reference (options, examples, AI workflow)
+```
 
 ### Basic usage
 
@@ -288,6 +297,7 @@ Syntax: `@L name style [+d]` where *style* is `//`, `#`, `--`,
 | `-p path` | Prepend path to output file names |
 | `-I path` | Add directory to include search path |
 | `-V str` | Set version string for `@v` substitution |
+| `--help` | Comprehensive help: options, examples, directives, AI workflow |
 
 ## Output File Flags
 

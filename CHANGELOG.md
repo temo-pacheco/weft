@@ -2,6 +2,33 @@
 
 All notable changes to weft are documented in this file.
 
+## [1.0.3] - 2026-03-07
+
+### Added
+
+- **`--help` flag**: comprehensive help message covering usage, all options,
+  examples, directives quick reference, and an AI-specific section.  The
+  help text is structured so that both human users and AI assistants can
+  orient themselves when they lose context during a session.  Includes:
+  - **WHAT IS WEFT?** — explains literate programming and the tangle/weave
+    model from scratch.
+  - **HOW IT WORKS** — shows `@o`, `@d`, `@<Name@>` with inline examples.
+  - **RULES FOR AI ASSISTANTS** — six numbered imperatives (never edit
+    tangled output, always edit `.weft` source, how to use `-R`, `-m`,
+    `-e`).
+  - **STEP-BY-STEP AI WORKFLOW** — the map→extract→edit→tangle→build→debug
+    loop.
+  - **DIRECTIVES QUICK REFERENCE** — all directives with syntax.
+
+### Changed
+
+- **Error messages reference `--help`**: when weft is invoked without files
+  or with an unrecognised flag, the error now says
+  `Try 'weft --help' for more information.` instead of repeating a
+  cryptic usage line.
+
+- **Man page updated**: `--help` documented in the `weft(1)` man page.
+
 ## [1.0.2] - 2026-03-05
 
 ### Added

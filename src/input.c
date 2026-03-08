@@ -5,23 +5,23 @@
 /* {:10} */
 
 #line 32 "literate/source-io.weft"
-/* {221: literate/source-io.weft:32} */
+/* {223: literate/source-io.weft:32} */
 static FILE *source_file;  /* the current input file */
 static int double_at;
 static int include_depth;
-/* {:221} */
+/* {:223} */
 
 #line 39 "literate/source-io.weft"
-/* {222: literate/source-io.weft:39} */
+/* {224: literate/source-io.weft:39} */
 static struct {
   FILE *file;
   char *name;
   int line;
 } stack[10];
-/* {:222} */
+/* {:224} */
 
 #line 56 "literate/source-io.weft"
-/* {223: literate/source-io.weft:56} */
+/* {225: literate/source-io.weft:56} */
 
 int source_peek;
 int source_last;
@@ -32,7 +32,7 @@ int source_get(void)
   switch (c) {
     case EOF:  
 #line 208 "literate/source-io.weft"
-               /* {229: literate/source-io.weft:208} */
+               /* {231: literate/source-io.weft:208} */
 {
                  fclose(source_file);
                  if (include_depth) {
@@ -43,7 +43,7 @@ int source_get(void)
                    source_peek = getc(source_file);
                    c = source_get();
                  }
-               }/* {:229} */
+               }/* {:231} */
 
 #line 64 "literate/source-io.weft"
 
@@ -56,7 +56,7 @@ int source_get(void)
                /* Handle an ``at'' character */
                
 #line 104 "literate/source-io.weft"
-               /* {226: literate/source-io.weft:104} */
+               /* {228: literate/source-io.weft:104} */
 {
                  c = getc(source_file);
                  if (double_at) {
@@ -68,7 +68,7 @@ int source_get(void)
                    switch (c) {
                      case 'i': 
 #line 147 "literate/source-io.weft"
-                               /* {227: literate/source-io.weft:147} */
+                               /* {229: literate/source-io.weft:147} */
 {
                                  char name[FILENAME_MAX];
                                  char fullname[FILENAME_MAX];
@@ -82,7 +82,7 @@ int source_get(void)
                                  /* Collect include-file name */
                                  
 #line 187 "literate/source-io.weft"
-                                 /* {228: literate/source-io.weft:187} */
+                                 /* {230: literate/source-io.weft:187} */
 {
                                      char *p = name;
                                      do
@@ -98,7 +98,7 @@ int source_get(void)
                                                command_name, source_name, source_line);
                                        exit(-1);
                                      }
-                                 }/* {:228} */
+                                 }/* {:230} */
 
 #line 157 "literate/source-io.weft"
 
@@ -128,7 +128,7 @@ int source_get(void)
                                  }
                                  source_peek = getc(source_file);
                                  c = source_get();
-                               }/* {:227} */
+                               }/* {:229} */
 
 #line 113 "literate/source-io.weft"
 
@@ -162,7 +162,7 @@ int source_get(void)
                                     command_name, nw_char, c, c, source_name, source_line);
                             exit(-1);
                    }
-               }/* {:226} */
+               }/* {:228} */
 
 #line 71 "literate/source-io.weft"
 
@@ -172,10 +172,10 @@ int source_get(void)
                return c;
   }
 }
-/* {:223} */
+/* {:225} */
 
 #line 88 "literate/source-io.weft"
-/* {225: literate/source-io.weft:88} */
+/* {227: literate/source-io.weft:88} */
 void source_ungetc(int *c)
 {
   ungetc(source_peek, source_file);
@@ -183,10 +183,10 @@ void source_ungetc(int *c)
     source_line--;
   source_peek=*c;
 }
-/* {:225} */
+/* {:227} */
 
 #line 227 "literate/source-io.weft"
-/* {230: literate/source-io.weft:227} */
+/* {232: literate/source-io.weft:227} */
 void source_open(char *name)
 {
   source_file = fopen(name, "r");
@@ -201,4 +201,4 @@ void source_open(char *name)
   double_at = FALSE;
   include_depth = 0;
 }
-/* {:230} */
+/* {:232} */

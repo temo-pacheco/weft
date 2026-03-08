@@ -71,47 +71,47 @@ char *command_name = NULL;
 /* {:22} */
 
 #line 187 "literate/parser.weft"
-/* {50: literate/parser.weft:187} */
+/* {52: literate/parser.weft:187} */
 unsigned char current_sector = 1;
 unsigned char prev_sector = 1;
-/* {:50} */
+/* {:52} */
 
 #line 384 "literate/parser.weft"
-/* {64: literate/parser.weft:384} */
+/* {66: literate/parser.weft:384} */
 char blockBuff[6400];
-/* {:64} */
+/* {:66} */
 
 #line 406 "literate/latex-output.weft"
-/* {99: literate/latex-output.weft:406} */
+/* {101: literate/latex-output.weft:406} */
 int extra_scraps = 0;
- /* {:99} */
+ /* {:101} */
 
 #line 24 "literate/source-io.weft"
-/* {220: literate/source-io.weft:24} */
+/* {222: literate/source-io.weft:24} */
 char *source_name = NULL;
 int source_line = 0;
-/* {:220} */
+/* {:222} */
 
 #line 144 "literate/scraps.weft"
-/* {245: literate/scraps.weft:144} */
+/* {247: literate/scraps.weft:144} */
 int already_warned = 0;
-/* {:245} */
+/* {:247} */
 
 #line 69 "literate/names.weft"
-/* {306: literate/names.weft:69} */
+/* {308: literate/names.weft:69} */
 Name *file_names = NULL;
 Name *macro_names = NULL;
 Name *user_names = NULL;
 int scrap_name_has_parameters;
 int scrap_ended_with;
 char pending_lang[64] = "";
-/* {:306} */
+/* {:308} */
 
 #line 162 "literate/architecture.weft"
 
 /* {:14} */
 
 #line 2 "literate/arena.weft"
-/* {396: literate/arena.weft:2} */
+/* {398: literate/arena.weft:2} */
 label_node * label_tab = NULL;
-/* {:396} */
+/* {:398} */

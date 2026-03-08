@@ -399,6 +399,17 @@ weft -w tex project.weft      # tangle + weave to LaTeX (override)
 | `-e name` | Extract the named fragment and its transitive dependencies as Markdown to stdout. Uses prefix matching (same as `@<name...@>`). Neither weaving nor tangling is performed. |
 | `-R file[:line]` | Reverse map: read section markers from a tangled output file and emit JSON mapping to stdout. If a line number is given, emit the innermost scrap covering that line. Without a line number, emit all scrap regions. No `.weft` source files are needed. |
 
+### Help
+
+```bash
+weft --help
+```
+
+Prints a comprehensive reference to stdout covering all options, usage
+examples, a directives quick reference, and an AI-specific section with
+rules (e.g. never edit tangled output) and a step-by-step workflow.
+If you lose context during a session, this is the fastest way to reorient.
+
 ### Additional flags
 
 | Flag | Effect |
@@ -759,6 +770,7 @@ Note that fences are only stripped in Markdown mode (`-w md`). In LaTeX mode, ba
 | `-h opts` | Hyperref options (LaTeX) |
 | `-r` | Enable hyperlinks (LaTeX) |
 | `-l` | Use listings package (LaTeX) |
+| `--help` | Comprehensive help (options, examples, AI workflow) |
 
 
 

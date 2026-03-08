@@ -237,17 +237,30 @@ weft -R server.js
 Key property: operates on tangled output only — no `.weft` files needed,
 no pass1. Parses the section markers already embedded in the file.
 
+### Built-in Help (`--help`)
+
+If you lose context during a session, run:
+
+```bash
+weft --help
+```
+
+The output includes everything needed to reorient: what weft is, how it
+works, all options, examples, a directives quick reference, and an
+AI-specific section with rules and a step-by-step workflow.
+
 ### AI Workflow
 
 The map, extract, and reverse map features enable a **directed** workflow
 for AI agents:
 
-1. **Map first**: `weft -m | jq` → understand the project structure
-2. **Identify**: find the fragment relevant to the task
-3. **Extract**: `weft -e "fragment name"` → get exactly the code needed
-4. **Edit**: modify the `.weft` source at the indicated location
-5. **Verify**: re-tangle and test
-6. **Debug**: `weft -R file:line` → translate errors back to `.weft` source
+1. **Orient**: `weft --help` → understand what weft is and how to use it
+2. **Map**: `weft -m project.weft | jq` → discover the project structure
+3. **Identify**: find the fragment relevant to the task
+4. **Extract**: `weft -e "fragment name" project.weft` → get exactly the code needed
+5. **Edit**: modify the `.weft` source at the indicated location
+6. **Verify**: re-tangle and test
+7. **Debug**: `weft -R file:line` → translate errors back to `.weft` source
 
 The reverse map closes the loop: when a compiler or linter reports an error
 in tangled output, `-R` resolves it to the `.weft` source instantly — no

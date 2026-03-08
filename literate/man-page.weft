@@ -73,6 +73,9 @@ With \fBmd\fP, a \fB.md\fP file is generated; with \fBtex\fP,
 a \fB.tex\fP file is generated. A CLI format overrides \fB@@W\fP.
 If \fB-w\fP is given without a format and no \fB@@W\fP exists,
 weft exits with an error.
+.br
+\fB--help\fP Print a comprehensive help message including all options,
+usage examples, and an AI-assisted workflow guide, then exit.
 
 .SH FORMAT OF WEFT FILES
 A

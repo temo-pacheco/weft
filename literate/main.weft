@@ -190,6 +190,7 @@ command-line arguments.
 @{while (arg < argc) {
   char *s = argv[arg];
   if (*s++ == '-') {
+    @<Check for long options@>
     @<Interpret the argument string \verb|s|@>
     arg++;
     @<Perhaps get the prepend path@>
@@ -202,6 +203,129 @@ command-line arguments.
   else break;
 }@}
 
+\subsection{Help Message}
+
+When the user passes \verb|--help|, we display a comprehensive reference
+that serves both human users and AI assistants.  The help text is structured
+in sections---usage, options grouped by purpose, examples, and an AI
+workflow summary---so that a language model can parse it and use weft
+correctly without additional context.
+
+We intercept long options before the character-by-character flag parsing.
+Currently \verb|--help| is the only long option.
+@d Check for long options
+@{if (*s == '-') {
+  if (strcmp(s + 1, "help") == 0) {
+    @<Print help message@>
+    exit(0);
+  }
+}@}
+
+The help message itself.  We write to \verb|stdout| (not \verb|stderr|)
+because \verb|--help| is a deliberate request, not an error condition.
+Options are grouped by function: tangle control, weave control, analysis
+tools, \LaTeX{}-specific, and general.  The \textsc{ai workflow} section
+at the end documents the map--extract--edit--tangle--debug loop that
+makes weft particularly suited to AI-assisted development.
+@d Print help message
+@{printf("weft -- A Modern Literate Programming Tool\n\n");
+printf("USAGE\n");
+printf("  %s [options] file...\n\n", command_name);
+printf("WHAT IS WEFT?\n");
+printf("  weft is a literate programming tool.  You write .weft files where\n");
+printf("  documentation and code live together as a single narrative.  weft\n");
+printf("  then TANGLES the .weft source into executable output files, and\n");
+printf("  optionally WEAVES it into formatted documentation (LaTeX or Markdown).\n\n");
+printf("  The .weft files are the ONLY source of truth.  The tangled output\n");
+printf("  files (*.c, *.go, *.js, etc.) are GENERATED -- never edit them.\n");
+printf("  All changes must go through the .weft source.\n\n");
+printf("  Default behavior: tangle only (generate output files from @@o directives).\n\n");
+printf("HOW IT WORKS\n");
+printf("  A .weft file contains prose with embedded code chunks:\n");
+printf("    @@o file.c @@{ ... @@}    Output file: tangle writes this to file.c\n");
+printf("    @@d Name   @@{ ... @@}    Fragment: reusable code block, invoked by name\n");
+printf("    @@<Name@@>                Invocation: inserts the named fragment here\n");
+printf("    @@@@                      Literal @@: escapes the meta-character\n");
+printf("    @@i other.weft            Include: pulls in another .weft file\n\n");
+printf("  Fragments compose hierarchically.  An @@o chunk may invoke @@d fragments,\n");
+printf("  which invoke other fragments, forming a tree that weft flattens into\n");
+printf("  the final output file.\n\n");
+printf("OPTIONS\n");
+printf("  Tangle control:\n");
+printf("    -o              Suppress output file generation (parse only)\n");
+printf("    -c              Overwrite files without comparing first\n");
+printf("    -p path         Prepend path to all output file names\n");
+printf("    -I path         Add directory to include search path (repeatable)\n");
+printf("    -x              Include cross-reference numbers in section markers\n\n");
+printf("  Weave control:\n");
+printf("    -w [format]     Weave documentation (format: md or tex)\n");
+printf("                    Without format, uses @@W directive from source\n");
+printf("    -t              Suppress weave output (even if -w given)\n");
+printf("    -n              Sequential scrap numbering (auto for Markdown)\n");
+printf("    -s              Omit scrap composition lists\n\n");
+printf("  Analysis (AI-friendly tools):\n");
+printf("    -m              Emit JSON structure map to stdout (all fragments,\n");
+printf("                    files, definitions, and dependency graph)\n");
+printf("    -e name         Extract named fragment and all its transitive\n");
+printf("                    dependencies as self-contained Markdown to stdout\n");
+printf("    -R file[:line]  Reverse map: given a tangled output file (and\n");
+printf("                    optional line number), prints the .weft source\n");
+printf("                    location that generated it.  Needs NO .weft files\n");
+printf("                    -- reads section markers embedded in the output\n\n");
+printf("  LaTeX:\n");
+printf("    -r              Enable hyperref cross-reference links\n");
+printf("    -h options      Pass options to hyperref package\n");
+printf("    -l              Use listings package for scrap formatting\n");
+printf("    -d              List dangling identifier references\n\n");
+printf("  General:\n");
+printf("    -V string       Set version string (expands @@v in source)\n");
+printf("    -v              Verbose progress output\n");
+printf("    --help          Show this help message\n\n");
+printf("EXAMPLES\n");
+printf("  %s project.weft                        Tangle (default)\n", command_name);
+printf("  %s -w md project.weft                  Weave to Markdown\n", command_name);
+printf("  %s -w tex project.weft                 Weave to LaTeX\n", command_name);
+printf("  %s -m project.weft | jq '.files'       JSON structure map\n", command_name);
+printf("  %s -e \"Validate\" project.weft           Extract fragment\n", command_name);
+printf("  %s -R server.js:47                     Reverse map line\n", command_name);
+printf("  %s -R server.js                        All regions in file\n", command_name);
+printf("  %s -v -p build/ project.weft           Verbose + path prefix\n", command_name);
+printf("  %s -o project.weft                     Parse only, no output\n\n", command_name);
+printf("RULES FOR AI ASSISTANTS\n");
+printf("  1. NEVER edit tangled output files (*.c, *.go, *.js, etc.)\n");
+printf("     They are generated.  Your changes will be overwritten.\n");
+printf("  2. ALWAYS edit .weft source files instead.\n");
+printf("     Use -R to find which .weft file generates a given output line.\n");
+printf("  3. After editing .weft files, re-tangle:\n");
+printf("       %s project.weft\n", command_name);
+printf("  4. To understand a project's structure before editing:\n");
+printf("       %s -m project.weft | jq '.fragments'\n", command_name);
+printf("  5. To get the code of a specific fragment:\n");
+printf("       %s -e \"fragment name\" project.weft\n", command_name);
+printf("  6. When a compiler reports an error in tangled output:\n");
+printf("       %s -R output.c:42   # find the .weft source location\n", command_name);
+printf("     Then fix the code in the .weft file, not in output.c.\n\n");
+printf("STEP-BY-STEP AI WORKFLOW\n");
+printf("  1. Map:     %s -m project.weft | jq    Discover structure\n", command_name);
+printf("  2. Extract: %s -e \"name\" project.weft   Read specific fragment\n", command_name);
+printf("  3. Edit:    modify the .weft source       (never tangled output!)\n");
+printf("  4. Tangle:  %s project.weft              Regenerate output files\n", command_name);
+printf("  5. Build:   compile/test as usual         Verify the change works\n");
+printf("  6. Debug:   %s -R file:line              Trace errors to source\n\n", command_name);
+printf("DIRECTIVES QUICK REFERENCE\n");
+printf("  @@o file flags @@{ ... @@}   Define output file (tangled to disk)\n");
+printf("  @@d Name       @@{ ... @@}   Define reusable fragment\n");
+printf("  @@<Name@@>                   Invoke fragment (insert its contents)\n");
+printf("  @@@@                         Literal @@ character in output\n");
+printf("  @@i file                     Include another .weft file\n");
+printf("  @@W fmt                      Declare weave format (md or tex)\n");
+printf("  @@l tag                      Set language for next @@o/@@d\n");
+printf("  @@L name style [+d]          Define custom language mapping\n");
+printf("  @@v                          Expand to version string (-V)\n");
+printf("  @@%%                          Comment (omitted from output)\n");
+printf("  @@f @@m @@u                    Emit file/fragment/identifier indexes\n");@}
+
+\subsection{Short Flags}
 Several flags can be stacked behind a single minus sign; therefore,
 we've got to loop through the string, handling them all.
 If this flag requires an argument we skip to getting its argument
@@ -248,12 +372,9 @@ and also avoids ambiguity about which value goes with which flag.
       case 'w': goto HasWeaveFormat;
       case 'x': xref_flag = TRUE;
                 break;
-      default:  fprintf(stderr, "%s: unexpected argument ignored.  ",
-                        command_name);
-                fprintf(stderr, "Usage is: %s [-cdmnostvx] "
-                      "[-e name] [-R file[:line]] [-I path] [-V version] "
-                      "[-w [format]] [-h options] [-p path] file...\n",
-                        command_name);
+      default:  fprintf(stderr, "%s: unexpected argument ignored.  "
+                        "Try '%s --help' for usage information.\n",
+                        command_name, command_name);
                 break;
     }
     c = *s++;
@@ -390,8 +511,10 @@ the usage convention.
 @d Process the remaining...
 @{{
   if (arg >= argc) {
-    fprintf(stderr, "%s: expected a file name.  ", command_name);
-    fprintf(stderr, "Usage is: %s [-cdmnostvx] [-e name] [-R file[:line]] [-w [format]] [-p path] file-name...\n", command_name);
+    fprintf(stderr, "%s: expected a file name.\n"
+            "Usage: %s [options] file...\n"
+            "Try '%s --help' for more information.\n",
+            command_name, command_name, command_name);
     exit(-1);
   }
   do {
