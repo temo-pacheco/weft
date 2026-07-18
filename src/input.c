@@ -30,10 +30,7 @@ int source_get(void)
   int c;
   source_last = c = source_peek;
   switch (c) {
-    case EOF:  
-#line 208 "literate/source-io.weft"
-               /* {231: literate/source-io.weft:208} */
-{
+    case EOF:  {
                  fclose(source_file);
                  if (include_depth) {
                    include_depth--;
@@ -43,8 +40,7 @@ int source_get(void)
                    source_peek = getc(source_file);
                    c = source_get();
                  }
-               }/* {:231} */
-
+               }
 #line 64 "literate/source-io.weft"
 
                return c;
@@ -66,10 +62,7 @@ int source_get(void)
                  }
                  else
                    switch (c) {
-                     case 'i': 
-#line 147 "literate/source-io.weft"
-                               /* {229: literate/source-io.weft:147} */
-{
+                     case 'i': {
                                  char name[FILENAME_MAX];
                                  char fullname[FILENAME_MAX];
                                  struct incl * p = include_list;
@@ -79,11 +72,7 @@ int source_get(void)
                                            command_name, source_name, source_line);
                                    exit(-1);
                                  }
-                                 /* Collect include-file name */
-                                 
-#line 187 "literate/source-io.weft"
-                                 /* {230: literate/source-io.weft:187} */
-{
+                                 {
                                      char *p = name;
                                      do
                                        c = getc(source_file);
@@ -98,10 +87,7 @@ int source_get(void)
                                                command_name, source_name, source_line);
                                        exit(-1);
                                      }
-                                 }/* {:230} */
-
-#line 157 "literate/source-io.weft"
-
+                                 }
                                  stack[include_depth].file = source_file;
                                  fullname[0] = '\0';
                                  for (;;) {
@@ -128,8 +114,7 @@ int source_get(void)
                                  }
                                  source_peek = getc(source_file);
                                  c = source_get();
-                               }/* {:229} */
-
+                               }
 #line 113 "literate/source-io.weft"
 
                                break;

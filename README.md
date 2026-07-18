@@ -85,10 +85,16 @@ language. weft **tangles** it into executable source files and, when asked,
   source. No `.weft` files needed — operates on section markers
   already in the tangled output. Enables CI/CD error translation
   and AI agent workflows.
+- **Mid-line inline expansion** — when a fragment reference `@<name@>`
+  appears mid-line (after visible characters on the same line), section
+  markers, `#line` directives, and fragment-name comments are
+  automatically suppressed. The fragment content is spliced in
+  seamlessly. At start-of-line references (including indented ones),
+  markers are emitted normally.
 - **`--help` for humans and AI** — comprehensive help output covering
   all options, usage examples, directive quick reference, and an
   AI-specific section with rules and step-by-step workflow.
-- **61 automated tests**.
+- **62 automated tests**.
 
 ## Quick Start
 
@@ -109,7 +115,7 @@ needed. Object files go to `build/`, the binary lands in the project root.
 ```sh
 vim literate/*.weft   # 1. edit source of truth
 make weft             # 2. tangle → src/*.c → build/*.o → ./weft
-make check            # 3. run all 57 tests
+make check            # 3. run all 62 tests
 ```
 
 ### Documentation
@@ -262,6 +268,36 @@ The marker format adapts to each language's comment syntax:
 | `--` | Lua, SQL, Haskell | `-- {1: f.weft:5}` | `-- {:1}` |
 | `<!-- -->` | HTML, XML | `<!-- {1: f.weft:5} -->` | `<!-- {:1} -->` |
 
+### Mid-line references
+
+When a fragment reference `@<name@>` appears **mid-line** (after at
+least one visible character on the same line), markers are automatically
+suppressed. This lets you define small constant fragments and splice
+them inline without breaking the surrounding expression:
+
+```latex
+@d port @{4000@}
+@d host @{"localhost"@}
+
+@l c
+@o config.c -s
+@{const char *host = @<host@>;
+int port = @<port@>;
+@}
+```
+
+Tangling produces clean inline expansion:
+
+```c
+const char *host = "localhost";
+int port = 4000;
+```
+
+If the same reference appears at the **start of a line** (even indented),
+it is treated as a block expansion and markers are emitted normally.
+No special flags or directives are needed — the position on the line
+is the only thing that matters.
+
 ## Custom Languages (`@L`)
 
 For languages not in the built-in table, define them in the preamble:
@@ -345,7 +381,7 @@ skill/                    <- Claude Code skill for literate programming
 └── references/           <- detailed guides
 bib/                      <- bibliography for make doc
 test/
-└── 00/                   <- 57 automated tests
+└── 00/                   <- 62 automated tests
 ```
 
 ## Literate Programming Guide

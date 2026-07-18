@@ -38,28 +38,17 @@ void pass1(char *file_name)
                   update_delimit_scrap();
                   break;
             case 'O':
-            case 'o': 
-#line 201 "literate/parser.weft"
-                      /* {53: literate/parser.weft:201} */
-{
+            case 'o': {
                         Name *name = collect_file_name(); /* returns a pointer to the name entry */
                         int scrap = collect_scrap();      /* returns an index to the scrap */
-                        /* Add \verb|scrap| to \verb|name|'s definition list */
-                        
-#line 220 "literate/parser.weft"
-                        /* {55: literate/parser.weft:220} */
-{
+                        {
                           Scrap_Node *def = (Scrap_Node *) arena_getmem(sizeof(Scrap_Node));
                           def->scrap = scrap;
                           def->quoted = quoted;
                           def->next = name->defs;
                           name->defs = def;
-                        }/* {:55} */
-
-#line 204 "literate/parser.weft"
-
-                      }/* {:53} */
-
+                        }
+                      }
 #line 127 "literate/parser.weft"
 
                       break;
@@ -67,28 +56,17 @@ void pass1(char *file_name)
             case 'q': quoted = 1;
                       FALLTHROUGH;
             case 'D':
-            case 'd': 
-#line 209 "literate/parser.weft"
-                      /* {54: literate/parser.weft:209} */
-{
+            case 'd': {
                         Name *name = collect_macro_name();
                         int scrap = collect_scrap();
-                        /* Add \verb|scrap| to \verb|name|'s definition list */
-                        
-#line 220 "literate/parser.weft"
-                        /* {55: literate/parser.weft:220} */
-{
+                        {
                           Scrap_Node *def = (Scrap_Node *) arena_getmem(sizeof(Scrap_Node));
                           def->scrap = scrap;
                           def->quoted = quoted;
                           def->next = name->defs;
                           name->defs = def;
-                        }/* {:55} */
-
-#line 212 "literate/parser.weft"
-
-                      }/* {:54} */
-
+                        }
+                      }
 #line 133 "literate/parser.weft"
 
                       break;
@@ -122,19 +100,12 @@ current_sector = 1;
             case '(':
             case '[':
             case '{': 
-#line 229 "literate/parser.weft"
-/* {56: literate/parser.weft:229} */
-
                       {
                          int c;
                          int depth = 1;
                          while ((c = source_get()) != EOF) {
                             if (c == nw_char)
-                               /* Skip over at-sign or go to skipped */
                                
-#line 246 "literate/parser.weft"
-/* {57: literate/parser.weft:246} */
-
                                {
                                   c = source_get();
                                   switch (c) {
@@ -161,10 +132,7 @@ current_sector = 1;
                                        break;
                                   }
                                }
-                               /* {:57} */
-
-#line 235 "literate/parser.weft"
-
+                               
                          }
                          fprintf(stderr, "%s: unexpected EOF in text at (%s, %d)\n",
                                           command_name, source_name, source_line);
@@ -172,45 +140,26 @@ current_sector = 1;
 
                       skipped:  ;
                       }
-                      /* {:56} */
-
+                      
 #line 144 "literate/parser.weft"
 
                       break;
-            case 'c': 
-#line 277 "literate/parser.weft"
-                      /* {58: literate/parser.weft:277} */
-{
+            case 'c': {
                          char * p = blockBuff;
                          char * e = blockBuff + (sizeof(blockBuff)/sizeof(blockBuff[0])) - 1;
 
-                         /* Skip whitespace */
-                         
-#line 295 "literate/parser.weft"
-                         /* {59: literate/parser.weft:295} */
-while (source_peek == ' '
+                         while (source_peek == ' '
                                 || source_peek == '\t'
                                 || source_peek == '\n')
                             (void)source_get();
-                         /* {:59} */
-
-#line 281 "literate/parser.weft"
-
+                         
                          while (p < e)
                          {
-                            /* Add one char to the block buffer */
-                            
-#line 302 "literate/parser.weft"
-                            /* {60: literate/parser.weft:302} */
-int c = source_get();
+                            int c = source_get();
 
                             if (c == nw_char)
                             {
-                               /* Add an at character to the block or break */
-                               
-#line 320 "literate/parser.weft"
-                               /* {61: literate/parser.weft:320} */
-int cc = source_peek;
+                               int cc = source_peek;
 
                                if (cc == 'c')
                                {
@@ -236,10 +185,7 @@ int cc = source_peek;
                                   *p++ = c;
                                   *p++ = source_get();
                                }
-                               /* {:61} */
-
-#line 306 "literate/parser.weft"
-
+                               
                             }
                             else if (c == EOF)
                             {
@@ -248,16 +194,8 @@ int cc = source_peek;
                             }
                             else
                             {
-                               /* Add any other character to the block */
                                
-#line 349 "literate/parser.weft"
-/* {62: literate/parser.weft:349} */
-
-                                  /* Perhaps skip white-space */
-                                  
-#line 355 "literate/parser.weft"
-                                  /* {63: literate/parser.weft:355} */
-if (c == ' ')
+                                  if (c == ' ')
                                   {
                                      while (source_peek == ' ')
                                         c = source_get();
@@ -273,46 +211,26 @@ if (c == ' ')
                                      else
                                         c = ' ';
                                   }
-                                  /* {:63} */
-
-#line 350 "literate/parser.weft"
-
+                                  
                                   *p++ = c;
-                               /* {:62} */
-
-#line 315 "literate/parser.weft"
-
+                               
                             }
-                            /* {:60} */
-
-#line 284 "literate/parser.weft"
-
+                            
                          }
                          if (p == e)
                          {
-                            /* Skip to the next nw-char */
-                            
-#line 374 "literate/parser.weft"
-                            /* {64: literate/parser.weft:374} */
-int c;
+                            int c;
 
                             while ((c = source_get()), c != nw_char && c != EOF)/* Skip */
-                            source_ungetc(&c);/* {:64} */
-
-#line 288 "literate/parser.weft"
-
+                            source_ungetc(&c);
                          }
                          *p = '\000';
                       }
-                      /* {:58} */
-
+                      
 #line 146 "literate/parser.weft"
 
                       break;
-            case 'l': 
-#line 65 "literate/parser.weft"
-                      /* {44: literate/parser.weft:65} */
-{
+            case 'l': {
                         char lang[64];
                         char *lp = lang;
                         int lc = source_get();
@@ -333,24 +251,15 @@ int c;
                         /* consume rest of line */
                         while (lc != EOF && lc != '\n')
                           lc = source_get();
-                      }/* {:44} */
-
+                      }
 #line 148 "literate/parser.weft"
 
                       break;
-            case 'L': 
-#line 96 "literate/parser.weft"
-                      /* {45: literate/parser.weft:96} */
-collect_lang_def();/* {:45} */
-
+            case 'L': collect_lang_def();
 #line 150 "literate/parser.weft"
 
                       break;
-            case 'W': 
-#line 99 "literate/parser.weft"
-                      /* {46: literate/parser.weft:99} */
-collect_weave_format();/* {:46} */
-
+            case 'W': collect_weave_format();
 #line 152 "literate/parser.weft"
 
                       break;

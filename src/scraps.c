@@ -84,8 +84,8 @@ static Arglist *arglist_lookup(int idx)
 }
 /* {:276} */
 
-#line 968 "literate/scraps.weft"
-/* {295: literate/scraps.weft:968} */
+#line 973 "literate/scraps.weft"
+/* {295: literate/scraps.weft:973} */
 static void
 comment_ArglistElement(FILE * file, Arglist * args, int quote)
 {
@@ -100,20 +100,20 @@ comment_ArglistElement(FILE * file, Arglist * args, int quote)
   } else if (name == (Name *)1) {
      /* Include an embedded scrap in comment */
      
-#line 988 "literate/scraps.weft"
-     /* {296: literate/scraps.weft:988} */
+#line 993 "literate/scraps.weft"
+     /* {296: literate/scraps.weft:993} */
 Embed_Node * e = (Embed_Node *)q;
      fputc('{', file);
      write_scraps(file, "", e->defs, -1, "", 0, 0, 0, 0, 0, e->args, NULL, NULL, "");
      fputc('}', file);/* {:296} */
 
-#line 980 "literate/scraps.weft"
+#line 985 "literate/scraps.weft"
 
   } else {
      /* Include a fragment use in comment */
      
-#line 994 "literate/scraps.weft"
-     /* {297: literate/scraps.weft:994} */
+#line 999 "literate/scraps.weft"
+     /* {297: literate/scraps.weft:999} */
 char * p = name->spelling;
      if (quote)
         fputc(nw_char, file);
@@ -133,7 +133,7 @@ char * p = name->spelling;
         fputc(nw_char, file);
      fputc('>', file);/* {:297} */
 
-#line 982 "literate/scraps.weft"
+#line 987 "literate/scraps.weft"
 
   }
 }
@@ -332,10 +332,7 @@ int collect_scrap(void)
                   case '+':
                   case '-':
                   case '*':
-                  case '|': 
-#line 301 "literate/scraps.weft"
-                            /* {257: literate/scraps.weft:301} */
-{
+                  case '|': {
                               do {
                                 int type = c;
                                 do {
@@ -355,58 +352,37 @@ int collect_scrap(void)
                                     switch (type) {
                                     case '*':
                                        sector = current_sector;
-                                       /* Add user identifier use */
-                                       
-#line 345 "literate/scraps.weft"
-                                       /* {258: literate/scraps.weft:345} */
-name = name_add(&user_names, new_name, sector);
+                                       name = name_add(&user_names, new_name, sector);
                                        if (!name->uses || name->uses->scrap != current_scrap) {
                                          Scrap_Node *use = (Scrap_Node *) arena_getmem(sizeof(Scrap_Node));
                                          use->scrap = current_scrap;
                                          use->next = name->uses;
                                          name->uses = use;
                                          add_uses(&(scrap_array(current_scrap).uses), name);
-                                       }/* {:258} */
-
-#line 321 "literate/scraps.weft"
-
+                                       }
                                        break;
                                     case '-':
-                                       /* Add user identifier use */
-                                       
-#line 345 "literate/scraps.weft"
-                                       /* {258: literate/scraps.weft:345} */
-name = name_add(&user_names, new_name, sector);
+                                       name = name_add(&user_names, new_name, sector);
                                        if (!name->uses || name->uses->scrap != current_scrap) {
                                          Scrap_Node *use = (Scrap_Node *) arena_getmem(sizeof(Scrap_Node));
                                          use->scrap = current_scrap;
                                          use->next = name->uses;
                                          name->uses = use;
                                          add_uses(&(scrap_array(current_scrap).uses), name);
-                                       }/* {:258} */
-
-#line 324 "literate/scraps.weft"
-
+                                       }
                                        /* Fall through */
                                     case '|':
                                        sector = current_sector;
                                        /* Fall through */
                                     case '+':
-                                       /* Add user identifier definition */
-                                       
-#line 355 "literate/scraps.weft"
-                                       /* {259: literate/scraps.weft:355} */
-name = name_add(&user_names, new_name, sector);
+                                       name = name_add(&user_names, new_name, sector);
                                        if (!name->defs || name->defs->scrap != current_scrap) {
                                          Scrap_Node *def = (Scrap_Node *) arena_getmem(sizeof(Scrap_Node));
                                          def->scrap = current_scrap;
                                          def->next = name->defs;
                                          name->defs = def;
                                          add_uses(&(scrap_array(current_scrap).defs), name);
-                                       }/* {:259} */
-
-#line 330 "literate/scraps.weft"
-
+                                       }
                                        break;
                                     }
                                   }
@@ -418,8 +394,7 @@ name = name_add(&user_names, new_name, sector);
                                         command_name, nw_char, c, source_name, source_line);
                                 exit(-1);
                               }
-                            }/* {:257} */
-
+                            }
 #line 244 "literate/scraps.weft"
 
                             /* Fall through */
@@ -432,17 +407,10 @@ name = name_add(&user_names, new_name, sector);
                             push('\0', &writer);
                             scrap_ended_with = c;
                             return current_scrap;
-                  case '<': 
-#line 365 "literate/scraps.weft"
-                            /* {260: literate/scraps.weft:365} */
-{
+                  case '<': {
                               Arglist * args = collect_scrap_name(current_scrap);
                               Name *name = args->name;
-                              /* Save macro name */
-                              
-#line 380 "literate/scraps.weft"
-                              /* {261: literate/scraps.weft:380} */
-{
+                              {
                                 char buff[24];
 
                                 push(nw_char, &writer);
@@ -450,17 +418,10 @@ name = name_add(&user_names, new_name, sector);
                                 push(name->sector, &writer);
                                 sprintf(buff, "%d", arglist_register(args));
                                 pushs(buff, &writer);
-                              }/* {:261} */
-
-#line 368 "literate/scraps.weft"
-
+                              }
                               add_to_use(name, current_scrap);
                               if (scrap_name_has_parameters) {
-                                /* Save macro parameters */
-                                
-#line 574 "literate/parser.weft"
-                                /* {77: literate/parser.weft:574} */
-{
+                                {
                                   int param_scrap;
                                   char param_buf[10];
 
@@ -483,69 +444,35 @@ name = name_add(&user_names, new_name, sector);
                                   if (c != '>') {
                                     /* ZZZ print error */;
                                   }
-                                }/* {:77} */
-
-#line 371 "literate/scraps.weft"
-
+                                }
                               }
                               push(nw_char, &writer);
                               push('>', &writer);
                               c = source_get();
-                            }/* {:260} */
-
+                            }
 #line 255 "literate/scraps.weft"
 
                             break;
-                  case '%': 
-#line 753 "literate/latex-output.weft"
-                            /* {124: literate/latex-output.weft:753} */
-{
+                  case '%': {
                                     do
                                             c = source_get();
                                     while (c != '\n');
-                            }/* {:124} */
-
+                            }
 #line 257 "literate/scraps.weft"
 
                             /* emit line break to the output file to keep #line in sync. */
                             push('\n', &writer);
                             c = source_get();
                             break;
-                  case 'x': 
-#line 290 "literate/scraps.weft"
-                            /* {255: literate/scraps.weft:290} */
-{
-                               /* Get label from */
-                               
-#line 591 "literate/search-labels.weft"
-                               /* {388: literate/search-labels.weft:591} */
-char  label_name[MAX_NAME_LEN];
+                  case 'x': {
+                               char  label_name[MAX_NAME_LEN];
                                char * p = label_name;
-                               while (c = 
-#line 291 "literate/scraps.weft"
-                                          /* {256: literate/scraps.weft:291} */
-source_get()/* {:256} */
-, c != nw_char) /* Here is ?-01 */
+                               while (c = source_get(), c != nw_char) /* Here is ?-01 */
                                   *p++ = c;
                                *p = '\0';
-                               c = 
-#line 291 "literate/scraps.weft"
-                                   /* {256: literate/scraps.weft:291} */
-source_get()/* {:256} */
-;
-                               /* {:388} */
-
-#line 291 "literate/scraps.weft"
-
-                               /* Save label to label store */
+                               c = source_get();
                                
-#line 617 "literate/search-labels.weft"
-                               /* {393: literate/search-labels.weft:617} */
-if (label_name[0])
-                               /* Search for label(<Complain about duplicate labels>,<Create a new label entry>) */
-
-#line 639 "literate/search-labels.weft"
-                               /* {397: literate/search-labels.weft:639} */
+                               if (label_name[0])
                                {
                                   label_node * * plbl = &label_tab;
                                   for (;;)
@@ -564,63 +491,36 @@ if (label_name[0])
                                            plbl = &lbl->right;
                                         else
                                         {
-                                           /* Complain about duplicate labels */
-                                           
-#line 633 "literate/search-labels.weft"
-                                           /* {395: literate/search-labels.weft:633} */
-fprintf(stderr, "Duplicate label %s.\n", label_name);/* {:395} */
-
+                                           fprintf(stderr, "Duplicate label %s.\n", label_name);
                                            break;
                                         }
                                      }
                                      else
                                      {
-                                         /* Create a new label entry */
-                                         
-#line 625 "literate/search-labels.weft"
-                                         /* {394: literate/search-labels.weft:625} */
-lbl = (label_node *)arena_getmem(sizeof(label_node) + (p - label_name));
+                                         lbl = (label_node *)arena_getmem(sizeof(label_node) + (p - label_name));
                                          lbl->left = lbl->right = NULL;
                                          strcpy(lbl->name, label_name);
                                          lbl->scrap = current_scrap;
                                          lbl->seq = ++lblseq;
-                                         *plbl = lbl;/* {:394} */
-
+                                         *plbl = lbl;
                                          break;
                                      }
                                   }
                                }
-                               /* {:397} */
-
-#line 618 "literate/search-labels.weft"
-
+                               
                                else
                                {
-                                  /* Complain about empty label */
-                                  
-#line 636 "literate/search-labels.weft"
-                                  /* {396: literate/search-labels.weft:636} */
-fprintf(stderr, "Empty label.\n");/* {:396} */
-
-#line 621 "literate/search-labels.weft"
-
-                               }/* {:393} */
-
-#line 292 "literate/scraps.weft"
-
+                                  fprintf(stderr, "Empty label.\n");
+                               }
                                push(nw_char, &writer);
                                push('x', &writer);
                                pushs(label_name, &writer);
                                push(nw_char, &writer);
-                            }/* {:255} */
-
+                            }
 #line 262 "literate/scraps.weft"
 
                             break;
-                  case 'c': 
-#line 403 "literate/parser.weft"
-                            /* {68: literate/parser.weft:403} */
-{
+                  case 'c': {
                                char * p = blockBuff;
 
                                push(nw_char, &writer);
@@ -629,8 +529,7 @@ fprintf(stderr, "Empty label.\n");/* {:396} */
                                   push(c, &writer);
                                   c = *p++;
                                } while (c != '\0');
-                            }/* {:68} */
-
+                            }
 #line 264 "literate/scraps.weft"
 
                             break;
@@ -970,12 +869,8 @@ if (debug_flag) {
           char c1 = pop(&reader);
           char c2 = pop(&reader);
 
-          if (indent_flag && !(
-#line 782 "literate/scraps.weft"
-                               /* {284: literate/scraps.weft:782} */
-c1 == '\n'
-                               || (c1 == nw_char && (c2 == '#' || (delayed_indent |= (c2 == '<'))))/* {:284} */
-
+          if (indent_flag && !(c1 == '\n'
+                               || (c1 == nw_char && (c2 == '#' || (delayed_indent |= (c2 == '<'))))
 #line 760 "literate/scraps.weft"
         )) {
             /* Put out the indent */
@@ -1028,12 +923,8 @@ if (location_flag && comment_flag) {
           char c1 = pop(&reader);
           char c2 = pop(&reader);
 
-          if (indent_flag && !(
-#line 782 "literate/scraps.weft"
-                               /* {284: literate/scraps.weft:782} */
-c1 == '\n'
-                               || (c1 == nw_char && (c2 == '#' || (delayed_indent |= (c2 == '<'))))/* {:284} */
-
+          if (indent_flag && !(c1 == '\n'
+                               || (c1 == nw_char && (c2 == '#' || (delayed_indent |= (c2 == '<'))))
 #line 760 "literate/scraps.weft"
         )) {
             /* Put out the indent */
@@ -1075,12 +966,8 @@ if (tab_flag)
                  char c1 = pop(&reader);
                  char c2 = pop(&reader);
 
-                 if (indent_flag && !(
-#line 782 "literate/scraps.weft"
-                                      /* {284: literate/scraps.weft:782} */
-c1 == '\n'
-                                      || (c1 == nw_char && (c2 == '#' || (delayed_indent |= (c2 == '<'))))/* {:284} */
-
+                 if (indent_flag && !(c1 == '\n'
+                                      || (c1 == nw_char && (c2 == '#' || (delayed_indent |= (c2 == '<'))))
 #line 760 "literate/scraps.weft"
                )) {
                    /* Put out the indent */
@@ -1110,45 +997,27 @@ if (tab_flag)
                fputs(". . .", file);
                return 0;
              }
-          case '\t': 
-#line 786 "literate/scraps.weft"
-                     /* {285: literate/scraps.weft:786} */
-{
+          case '\t': {
                        if (tab_flag)
-                         /* Expand tab into spaces */
-                         
-#line 664 "literate/latex-output.weft"
-                         /* {117: literate/latex-output.weft:664} */
-{
+                         {
                            int delta = 8 - (indent % 8);
                            indent += delta;
                            while (delta > 0) {
                              putc(' ', file);
                              delta--;
                            }
-                         }/* {:117} */
-
-#line 788 "literate/scraps.weft"
-
+                         }
                        else {
                          putc('\t', file);
                          if (global_indent >= 0) {
-                           /* Add more indentation ''\t'' */
-                           
-#line 718 "literate/scraps.weft"
-                           /* {278: literate/scraps.weft:718} */
-{
+                           {
                              if (global_indent + indent < MAX_INDENT)
                                indent_chars[global_indent + indent] = '\t';
-                           }/* {:278} */
-
-#line 792 "literate/scraps.weft"
-
+                           }
                          }
                          indent++;
                        }
-                     }/* {:285} */
-
+                     }
 #line 690 "literate/scraps.weft"
 
                      delayed_indent = 0;
@@ -1165,19 +1034,12 @@ if (tab_flag)
                    char oldcf = comment_flag;
                    c = pop(&reader);
                    switch (c) {
-                     case 't': 
-#line 934 "literate/scraps.weft"
-                               /* {293: literate/scraps.weft:934} */
-{
+                     case 't': {
                                   char * p = title;
                                   Arglist *q = inArgs;
                                   int narg;
 
-                                  /* Comment this macro use */
-                                  
-#line 947 "literate/scraps.weft"
-                                  /* {294: literate/scraps.weft:947} */
-narg = 0;
+                                  narg = 0;
                                   while (*p != '\000') {
                                     if (*p == ARG_CHR) {
                                       if (q == NULL) {
@@ -1195,64 +1057,36 @@ narg = 0;
                                     }
                                     else
                                        fputc(*p++, file);
-                                  }/* {:294} */
-
-#line 939 "literate/scraps.weft"
-
+                                  }
                                   if (xref_flag) {
                                      putc(' ', file);
                                      write_single_scrap_ref(file, defs->scrap);
                                   }
-                               }/* {:293} */
-
+                               }
 #line 805 "literate/scraps.weft"
 
                                break;
-                     case 'c': 
-#line 415 "literate/parser.weft"
-                               /* {69: literate/parser.weft:415} */
-{
+                     case 'c': {
                                   int bgn = indent + global_indent;
                                   int posn = bgn + strlen(comment_begin[comment_flag]);
                                   int i;
 
-                                  /* Perhaps put a delayed indent */
-                                  
-#line 928 "literate/scraps.weft"
-                                  /* {292: literate/scraps.weft:928} */
-if (delayed_indent)
+                                  if (delayed_indent)
                                      for (i = indent + global_indent; --i >= 0; )
                                         putc(' ', file);
-                                  /* {:292} */
-
-#line 420 "literate/parser.weft"
-
+                                  
                                   c = pop(&reader);
                                   fputs(comment_begin[comment_flag], file);
                                   while (c != '\0')
                                   {
-                                     /* Move a word to the file */
-                                     
-#line 444 "literate/parser.weft"
-                                     /* {70: literate/parser.weft:444} */
-do
+                                     do
                                      {
                                         putc(c, file);
                                         posn += 1;
                                         c = pop(&reader);
                                      } while (c > ' ');
-                                     /* {:70} */
-
-#line 425 "literate/parser.weft"
-
-                                     /* If we break the line at this word */
                                      
-#line 453 "literate/parser.weft"
-                                     /* {71: literate/parser.weft:453} */
-if (c == '\n' || (c == ' ' && posn > 60))/* {:71} */
-
-#line 426 "literate/parser.weft"
-
+                                     if (c == '\n' || (c == ' ' && posn > 60))
                                      {
                                         putc('\n', file);
                                         for (i = 0; i < bgn ; i++)
@@ -1267,71 +1101,40 @@ if (c == '\n' || (c == ' ' && posn > 60))/* {:71} */
                                   }
                                   fputs(comment_end[comment_flag], file);
                                }
-                               /* {:69} */
-
+                               
 #line 807 "literate/scraps.weft"
 
                                break;
-                     case 'f': 
-#line 848 "literate/scraps.weft"
-                               /* {289: literate/scraps.weft:848} */
-if (defs->quoted)
+                     case 'f': if (defs->quoted)
                                   fprintf(file, "%cf", nw_char);
                                else
                                   fputs(spelling, file);
-                               /* {:289} */
-
+                               
 #line 809 "literate/scraps.weft"
 
                                break;
-                     case 'x': 
-#line 842 "literate/scraps.weft"
-                               /* {287: literate/scraps.weft:842} */
-{
-                                  /* Get label from */
-                                  
-#line 591 "literate/search-labels.weft"
-                                  /* {388: literate/search-labels.weft:591} */
-char  label_name[MAX_NAME_LEN];
+                     case 'x': {
+                                  char  label_name[MAX_NAME_LEN];
                                   char * p = label_name;
-                                  while (c = 
-#line 843 "literate/scraps.weft"
-                                             /* {288: literate/scraps.weft:843} */
-pop(&reader)/* {:288} */
-, c != nw_char) /* Here is ?-01 */
+                                  while (c = pop(&reader), c != nw_char) /* Here is ?-01 */
                                      *p++ = c;
                                   *p = '\0';
-                                  c = 
-#line 843 "literate/scraps.weft"
-                                      /* {288: literate/scraps.weft:843} */
-pop(&reader)/* {:288} */
-;
-                                  /* {:388} */
-
-#line 843 "literate/scraps.weft"
-
+                                  c = pop(&reader);
+                                  
                                   write_label(label_name, file);
-                               }/* {:287} */
-
+                               }
 #line 811 "literate/scraps.weft"
 
                      case '_': break;
-                     case 'v': 
-#line 730 "literate/latex-output.weft"
-                               /* {120: literate/latex-output.weft:730} */
-fputs(version_string, file);
-                               /* {:120} */
-
+                     case 'v': fputs(version_string, file);
+                               
 #line 813 "literate/scraps.weft"
 
                                break;
                      case 's': indent = -global_indent;
                                comment_flag = 0;
                                break;
-                     case '<': 
-#line 855 "literate/scraps.weft"
-                               /* {290: literate/scraps.weft:855} */
-{
+                     case '<': {
                                  Arglist *a = pop_scrap_name(&reader, &local_parameters);
                                  Name *name = a->name;
                                  int changed;
@@ -1355,28 +1158,18 @@ fputs(version_string, file);
                                      location_flag = name->location_flag;
                                      debug_flag = name->debug_flag;
                                    }
-                                   /* Perhaps comment this macro */
-                                   
-#line 911 "literate/scraps.weft"
-                                   /* {291: literate/scraps.weft:911} */
-if (comment_flag && newline) {
-                                      /* Perhaps put a delayed indent */
-                                      
-#line 928 "literate/scraps.weft"
-                                      /* {292: literate/scraps.weft:928} */
-if (delayed_indent)
+                                   if (!newline) {
+                                     comment_flag = 0;
+                                     location_flag = FALSE;
+                                     debug_flag = FALSE;
+                                   }
+                                   if (comment_flag && newline) {
+                                      if (delayed_indent)
                                          for (i = indent + global_indent; --i >= 0; )
                                             putc(' ', file);
-                                      /* {:292} */
-
-#line 912 "literate/scraps.weft"
-
-                                      fputs(comment_begin[comment_flag], file);
-                                      /* Comment this macro use */
                                       
-#line 947 "literate/scraps.weft"
-                                      /* {294: literate/scraps.weft:947} */
-narg = 0;
+                                      fputs(comment_begin[comment_flag], file);
+                                      narg = 0;
                                       while (*p != '\000') {
                                         if (*p == ARG_CHR) {
                                           if (q == NULL) {
@@ -1394,10 +1187,7 @@ narg = 0;
                                         }
                                         else
                                            fputc(*p++, file);
-                                      }/* {:294} */
-
-#line 914 "literate/scraps.weft"
-
+                                      }
                                       if (xref_flag) {
                                          putc(' ', file);
                                          write_single_scrap_ref(file, name->defs->scrap);
@@ -1408,10 +1198,7 @@ narg = 0;
                                          for (i = indent + global_indent; --i >= 0; )
                                             putc(' ', file);
                                    }
-                                   /* {:291} */
-
-#line 879 "literate/scraps.weft"
-
+                                   
                                    name->mark = TRUE;
                                    indent = write_scraps(file, spelling, name->defs, global_indent + indent,
                                                          indent_chars, debug_flag, tab_flag, indent_flag,
@@ -1434,11 +1221,7 @@ narg = 0;
                                    fprintf(file, "%c<",  nw_char);
                                    if (name->sector == 0)
                                       fputc('+', file);
-                                   /* Comment this macro use */
-                                   
-#line 947 "literate/scraps.weft"
-                                   /* {294: literate/scraps.weft:947} */
-narg = 0;
+                                   narg = 0;
                                    while (*p != '\000') {
                                      if (*p == ARG_CHR) {
                                        if (q == NULL) {
@@ -1456,17 +1239,13 @@ narg = 0;
                                      }
                                      else
                                         fputc(*p++, file);
-                                   }/* {:294} */
-
-#line 902 "literate/scraps.weft"
-
+                                   }
                                    fprintf(file, "%c>",  nw_char);
                                    if (!defs->quoted && !tex_flag)
                                      fprintf(stderr, "%s: macro never defined <%s>\n",
                                            command_name, name->spelling);
                                  }
-                               }/* {:290} */
-
+                               }
 #line 818 "literate/scraps.weft"
 
                                /* Insert debugging information if required */
@@ -1484,12 +1263,8 @@ if (debug_flag) {
                                    char c1 = pop(&reader);
                                    char c2 = pop(&reader);
 
-                                   if (indent_flag && !(
-#line 782 "literate/scraps.weft"
-                                                        /* {284: literate/scraps.weft:782} */
-c1 == '\n'
-                                                        || (c1 == nw_char && (c2 == '#' || (delayed_indent |= (c2 == '<'))))/* {:284} */
-
+                                   if (indent_flag && !(c1 == '\n'
+                                                        || (c1 == nw_char && (c2 == '#' || (delayed_indent |= (c2 == '<'))))
 #line 760 "literate/scraps.weft"
                                  )) {
                                      /* Put out the indent */
@@ -1551,25 +1326,25 @@ if (tab_flag)
 
                             /* Perhaps comment this macro */
                             
-#line 911 "literate/scraps.weft"
-                            /* {291: literate/scraps.weft:911} */
+#line 916 "literate/scraps.weft"
+                            /* {291: literate/scraps.weft:916} */
 if (comment_flag && newline) {
                                /* Perhaps put a delayed indent */
                                
-#line 928 "literate/scraps.weft"
-                               /* {292: literate/scraps.weft:928} */
+#line 933 "literate/scraps.weft"
+                               /* {292: literate/scraps.weft:933} */
 if (delayed_indent)
                                   for (i = indent + global_indent; --i >= 0; )
                                      putc(' ', file);
                                /* {:292} */
 
-#line 912 "literate/scraps.weft"
+#line 917 "literate/scraps.weft"
 
                                fputs(comment_begin[comment_flag], file);
                                /* Comment this macro use */
                                
-#line 947 "literate/scraps.weft"
-                               /* {294: literate/scraps.weft:947} */
+#line 952 "literate/scraps.weft"
+                               /* {294: literate/scraps.weft:952} */
 narg = 0;
                                while (*p != '\000') {
                                  if (*p == ARG_CHR) {
@@ -1590,7 +1365,7 @@ narg = 0;
                                     fputc(*p++, file);
                                }/* {:294} */
 
-#line 914 "literate/scraps.weft"
+#line 919 "literate/scraps.weft"
 
                                if (xref_flag) {
                                   putc(' ', file);
@@ -1739,8 +1514,8 @@ if (location_flag && comment_flag) {
 }
 /* {:274} */
 
-#line 1020 "literate/scraps.weft"
-/* {299: literate/scraps.weft:1020} */
+#line 1025 "literate/scraps.weft"
+/* {299: literate/scraps.weft:1025} */
 void collect_numbers(char *aux_name)
 {
   if (number_flag) {
@@ -1756,8 +1531,8 @@ void collect_numbers(char *aux_name)
       while (fgets(aux_line, 500, aux_file)) {
         /* Read line in \verb|.aux| file */
         
-#line 1046 "literate/scraps.weft"
-/* {300: literate/scraps.weft:1046} */
+#line 1051 "literate/scraps.weft"
+/* {300: literate/scraps.weft:1051} */
 
         int scrap_number;
         int page_number;
@@ -1790,58 +1565,58 @@ void collect_numbers(char *aux_name)
                 }
               }/* {:245} */
 
-#line 1066 "literate/scraps.weft"
+#line 1071 "literate/scraps.weft"
 
           }
         }
         /* {:300} */
 
-#line 1033 "literate/scraps.weft"
+#line 1038 "literate/scraps.weft"
 
       }
       fclose(aux_file);
       /* Add letters to scraps with duplicate page numbers */
       
-#line 1073 "literate/scraps.weft"
-      /* {301: literate/scraps.weft:1073} */
+#line 1078 "literate/scraps.weft"
+      /* {301: literate/scraps.weft:1078} */
 {
          int i = 0;
 
          /* Step 'i' to the next valid scrap */
          
-#line 1087 "literate/scraps.weft"
-         /* {302: literate/scraps.weft:1087} */
+#line 1092 "literate/scraps.weft"
+         /* {302: literate/scraps.weft:1092} */
 do
             i++;
          while (i < scraps && scrap_array(i).page == -1);
          /* {:302} */
 
-#line 1076 "literate/scraps.weft"
+#line 1081 "literate/scraps.weft"
 
          /* For all remaining scraps */
          
-#line 1093 "literate/scraps.weft"
-         /* {303: literate/scraps.weft:1093} */
+#line 1098 "literate/scraps.weft"
+         /* {303: literate/scraps.weft:1098} */
 while (i < scraps)/* {:303} */
 
-#line 1077 "literate/scraps.weft"
+#line 1082 "literate/scraps.weft"
        {
             int j = i;
             /* Step 'j' to the next valid scrap */
             
-#line 1087 "literate/scraps.weft"
-            /* {302: literate/scraps.weft:1087} */
+#line 1092 "literate/scraps.weft"
+            /* {302: literate/scraps.weft:1092} */
 do
                j++;
             while (j < scraps && scrap_array(j).page == -1);
             /* {:302} */
 
-#line 1079 "literate/scraps.weft"
+#line 1084 "literate/scraps.weft"
 
             /* Perhaps add letters to the page numbers */
             
-#line 1096 "literate/scraps.weft"
-            /* {304: literate/scraps.weft:1096} */
+#line 1101 "literate/scraps.weft"
+            /* {304: literate/scraps.weft:1101} */
 if (scrap_array(i).page == scrap_array(j).page) {
                if (scrap_array(i).letter == 0)
                   scrap_array(i).letter = 'a';
@@ -1849,14 +1624,14 @@ if (scrap_array(i).page == scrap_array(j).page) {
             }
             /* {:304} */
 
-#line 1080 "literate/scraps.weft"
+#line 1085 "literate/scraps.weft"
 
             i = j;
          }
       }
       /* {:301} */
 
-#line 1036 "literate/scraps.weft"
+#line 1041 "literate/scraps.weft"
 
     }
   }

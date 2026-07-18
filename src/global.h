@@ -310,8 +310,8 @@ extern void add_to_use(Name * name, int current_scrap);
 Arglist *instance(Arglist *a, Arglist *par, char *arg[9], int *ch);
 /* {:269} */
 
-#line 1016 "literate/scraps.weft"
-/* {298: literate/scraps.weft:1016} */
+#line 1021 "literate/scraps.weft"
+/* {298: literate/scraps.weft:1021} */
 extern void collect_numbers(char *aux_name);
 /* {:298} */
 

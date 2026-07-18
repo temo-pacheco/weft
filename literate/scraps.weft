@@ -876,6 +876,11 @@ else
       location_flag = name->location_flag;
       debug_flag = name->debug_flag;
     }
+    if (!newline) {
+      comment_flag = 0;
+      location_flag = FALSE;
+      debug_flag = FALSE;
+    }
     @<Perhaps comment this macro@>
     name->mark = TRUE;
     indent = write_scraps(file, spelling, name->defs, global_indent + indent,

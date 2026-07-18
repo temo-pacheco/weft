@@ -331,6 +331,13 @@ Inside a scrap, several special sequences are recognized.
   recursive invocations.  If the fragment name contains embedded
   parameters, the invocation supplies arguments at the same
   positions (see above).
+
+  When the reference appears {\em mid-line\/}---that is, after at least
+  one visible character on the same line---section markers, \verb|#line|
+  directives, and fragment-name comments are automatically suppressed.
+  The fragment content is spliced seamlessly into the surrounding text.
+  At start-of-line positions (including indented lines), markers are
+  emitted normally.  See Section~\ref{section-markers} for details.
 \end{description}
 
 \paragraph{Argument substitution.}
@@ -880,6 +887,48 @@ information are available, weft resolves them in this order:
 \item \textbf{File extension} of the \verb|@@o| name---the default
       when no \verb|@@l| is present.
 \end{enumerate}
+
+\subsection{Mid-Line Inline Expansion}
+\label{mid-line-expansion}
+
+When a fragment reference \verb|@@<name@@>| appears in the middle of a
+line---after at least one visible character---weft automatically
+suppresses all tangle annotations for that expansion: section markers,
+\verb|#line| directives, and fragment-name comments.  The fragment
+content is spliced directly into the surrounding text, producing clean
+inline output.
+
+This makes small constant fragments practical:
+
+\begin{verbatim}
+    @@d port @@{4000@@}
+    @@d host @@{"localhost"@@}
+
+    @@l c
+    @@o config.c -s
+    @@{const char *host = @@<host@@>;
+    int port = @@<port@@>;
+    @@}
+\end{verbatim}
+
+\noindent
+Tangling produces:
+\begin{verbatim}
+    const char *host = "localhost";
+    int port = 4000;
+\end{verbatim}
+
+\noindent
+If the same reference appears at the {\em start\/} of a line (even if
+indented), it is treated as a block expansion and markers are emitted
+normally.  No special flags or directives are needed---the position on
+the line is the only thing that determines the behaviour.
+
+\medskip\noindent
+This works with any language and any fragment size.  When a multi-line
+fragment is expanded mid-line, its content is still spliced without
+markers---the rule is based on the {\em reference site\/}, not the
+fragment body.
 
 \subsection{The \texttt{@@L} Command: Defining New Languages}
 \label{at-L-intro}

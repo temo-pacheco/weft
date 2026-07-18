@@ -74,17 +74,13 @@ Name *prefix_add(Name **rt, char *spelling, unsigned char sector)
                     if (cmp == EXTENSION)
                        node->spelling = save_string(spelling);
                     return node;
-    case PREFIX:    
-#line 171 "literate/names.weft"
-                    /* {313: literate/names.weft:171} */
-{
+    case PREFIX:    {
                       if (ambiguous_prefix(node->llink, spelling, sector) ||
                           ambiguous_prefix(node->rlink, spelling, sector))
                         fprintf(stderr,
                                 "%s: ambiguous prefix %c<%s...%c> (%s, line %d)\n",
                                 command_name, nw_char, spelling, nw_char, source_name, source_line);
-                    }/* {:313} */
-
+                    }
 #line 157 "literate/names.weft"
 
                     return node;
@@ -812,10 +808,7 @@ Name *collect_file_name(void)
                       break;
             case 's': new_name->suppress_markers = TRUE;
                       break;
-            case 'c': 
-#line 973 "literate/names.weft"
-                      /* {325: literate/names.weft:973} */
-c = source_get();
+            case 'c': c = source_get();
                       if (c == 'c')
                          new_name->comment_flag = 1;
                       else if (c == '+')
@@ -825,8 +818,7 @@ c = source_get();
                       else
                          fprintf(stderr, "%s: Unrecognised comment flag (%s, %d)\n",
                                  command_name, source_name, source_line);
-                      /* {:325} */
-
+                      
 #line 948 "literate/names.weft"
 
                       break;
@@ -919,10 +911,7 @@ Name *collect_macro_name(void)
                    c = source_get();
                  while (c == ' ' || c == '\t');
                  break;
-      case '\n': 
-#line 1195 "literate/names.weft"
-                 /* {335: literate/names.weft:1195} */
-{
+      case '\n': {
                    do
                      c = source_get();
                    while (isspace(c));
@@ -932,11 +921,7 @@ Name *collect_macro_name(void)
                              command_name, nw_char, source_name, start_line);
                      exit(-1);
                    }
-                   /* Cleanup and install name */
-                   
-#line 1178 "literate/names.weft"
-                   /* {334: literate/names.weft:1178} */
-{
+                   {
                      if (p > name && p[-1] == ' ')
                        p--;
                      if (p - name > 3 && p[-1] == '.' && p[-2] == '.' && p[-3] == '.') {
@@ -950,15 +935,8 @@ Name *collect_macro_name(void)
                      }
                      *p = '\0';
                      node = prefix_add(&macro_names, name, sector);
-                   }/* {:334} */
-
-#line 1205 "literate/names.weft"
-
-                   /* Apply pending language to macro */
-                   
-#line 1028 "literate/names.weft"
-                   /* {327: literate/names.weft:1028} */
-if (pending_lang[0] != '\0') {
+                   }
+                   if (pending_lang[0] != '\0') {
                      strncpy(node->lang, pending_lang, 63);
                      node->lang[63] = '\0';
                      if (node->comment_flag == 0 && !node->debug_flag) {
@@ -968,13 +946,9 @@ if (pending_lang[0] != '\0') {
                                      &node->location_flag);
                      }
                      pending_lang[0] = '\0';
-                   }/* {:327} */
-
-#line 1206 "literate/names.weft"
-
+                   }
                    return install_args(node, argc, arg);
-                 }/* {:335} */
-
+                 }
 #line 1103 "literate/names.weft"
 
       default:
@@ -989,10 +963,7 @@ if (pending_lang[0] != '\0') {
                switch (c) {
                  case '(':
                  case '[':
-                 case '{': 
-#line 1178 "literate/names.weft"
-                           /* {334: literate/names.weft:1178} */
-{
+                 case '{': {
                              if (p > name && p[-1] == ' ')
                                p--;
                              if (p - name > 3 && p[-1] == '.' && p[-2] == '.' && p[-3] == '.') {
@@ -1006,8 +977,7 @@ if (pending_lang[0] != '\0') {
                              }
                              *p = '\0';
                              node = prefix_add(&macro_names, name, sector);
-                           }/* {:334} */
-
+                           }
 #line 1129 "literate/names.weft"
 
                           /* Apply pending language to macro */
@@ -1029,26 +999,16 @@ if (pending_lang[0] != '\0') {
 #line 1130 "literate/names.weft"
 
                           return install_args(node, argc, arg);
-                 case '\'': 
-#line 1148 "literate/names.weft"
-                            /* {331: literate/names.weft:1148} */
-arg[argc] = argp;
+                 case '\'': arg[argc] = argp;
                             while ((c = source_get()) != EOF) {
                                if (c==nw_char) {
                                   c2 = source_get();
                                   if (c2=='\'') {
-                                    /* Make this argument */
-                                    
-#line 1171 "literate/names.weft"
-                                    /* {333: literate/names.weft:1171} */
-if (argc < 9) {
+                                    if (argc < 9) {
                                       *argp++ = '\000';
                                       argc += 1;
                                     }
-                                    /* {:333} */
-
-#line 1153 "literate/names.weft"
-
+                                    
                                     c = source_get();
                                     break;
                                   }
@@ -1059,8 +1019,7 @@ if (argc < 9) {
                                  *argp++ = c;
                             }
                             *p++ = ARG_CHR;
-                            /* {:331} */
-
+                            
 #line 1132 "literate/names.weft"
 
                             break;
