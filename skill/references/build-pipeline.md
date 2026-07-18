@@ -130,7 +130,7 @@ For rapid iteration, use a file watcher to re-tangle on save:
 
 ### Using watchexec
 ```bash
-watchexec -e weft,w -- just tangle
+watchexec -e weft -- just tangle
 ```
 
 ### Using entr
@@ -142,7 +142,7 @@ find . -name '*.weft' | entr just tangle
 ```just
 # Watch .weft files and re-tangle on change
 watch:
-    watchexec -e weft,w -- just tangle
+    watchexec -e weft -- just tangle
 ```
 
 Watch mode is especially useful during initial development when you're
@@ -212,9 +212,17 @@ The tangled files are overwritten every time you run `weft`.
 
 ### Section markers help locate errors
 When a compiler or runtime error points to a line in tangled output,
-open that file and look for the nearest `{N: file.weft:line}` marker
-above the error line. It tells you exactly which `.weft` file and line
-produced that code.
+use `weft -R file:line` to instantly resolve the `.weft` source location:
+
+```bash
+weft -R server.js:47
+# → {"scrap": 3, "file": "routes.weft", "line": 42}
+```
+
+No `.weft` files are needed — `-R` parses the section markers already
+embedded in the tangled output. This is ideal for CI/CD pipelines and
+AI agents. For manual inspection, open the tangled file and look for
+the nearest `{N: file.weft:line}` marker above the error line.
 
 ### Chunk name "not defined" error
 Check for exact name match including capitalization and whitespace.

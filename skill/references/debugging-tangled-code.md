@@ -273,7 +273,7 @@ order:
 | Priority | Method | Example | Where |
 |----------|--------|---------|-------|
 | 1 (highest) | Explicit flags on `@o` | `@o file.c -d -cc` | `.weft` |
-| 2 | `@l` override | `@l js` inside a scrap | `.weft` |
+| 2 | `@l` override | `@l js` before the directive | `.weft` |
 | 3 (auto) | File extension | `.js`, `.py`, `.go`, etc. | Automatic |
 | 4 | `@L` definition | `@L nim #` in preamble | `.weft` |
 

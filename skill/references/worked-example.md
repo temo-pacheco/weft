@@ -107,7 +107,7 @@ enum PaymentStatus {
     FRAUD_DETECTED
 }
 
-type Payment @key(fields: "id") {
+type Payment @@key(fields: "id") {
     id: ID!
     amount: Float!
     currency: String!
@@ -132,7 +132,7 @@ extend type Query {
 @}
 ```
 
-The `@key(fields: "id")` directive enables Apollo Federation --- this
+The `@@key(fields: "id")` directive (escaped as `@@@@key` in `.weft` source) enables Apollo Federation --- this
 payment type can be referenced from other services. Notice that the
 enum values match the PostgreSQL enum exactly; the narrative makes this
 correspondence explicit.
@@ -315,7 +315,7 @@ class PaymentScreen extends ConsumerWidget {
     required this.currency,
   });
 
-  @override
+  @@override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(title: const Text('Confirm Payment')),
@@ -632,7 +632,7 @@ The LP structure is always the same. Only these details change:
 | Output extension | `.go` | `.dart` | `.py` | `.sql` | `.sh` | `.proto` |
 | Post-tangle tool | `goimports` | `dart format` | `black` | — | `chmod +x` | `protoc` |
 | Build step | `go build` | `flutter build` | — | `psql -f` | — | `protoc` |
-| Special escaping | `@key` in GQL | `@override` | `@decorator` | — | — | — |
+| Special escaping | `@@key` in GQL | `@@override` | `@@decorator` | — | — | — |
 | Test tool | `go test` | `flutter test` | `pytest` | — | `bats` | — |
 
 **What never changes:**

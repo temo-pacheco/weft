@@ -185,6 +185,23 @@ declared in the previous section.
 
 Expands the fragment inline. It is an error to specify recursive fragment invocations.
 
+When the reference appears **mid-line** (after at least one visible character on the same line), section markers, `#line` directives, and fragment-name comments are automatically suppressed — the fragment content is spliced seamlessly into the surrounding text. At start-of-line positions (even indented), markers are emitted normally. No special flags are needed; the position on the line determines the behaviour.
+
+Example:
+
+```
+@d port @{4000@}
+@d host @{"localhost"@}
+
+@l c
+@o config.c -s
+@{const char *host = @<host@>;
+int port = @<port@>;
+@}
+```
+
+Produces `const char *host = "localhost";` and `int port = 4000;` — no markers injected mid-line.
+
 ### 5.2 With arguments (old style)
 
 ```

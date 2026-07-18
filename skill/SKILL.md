@@ -25,6 +25,14 @@ built with weft.
 Literate programming inverts code and documentation: you write a **narrative
 first**, with code woven in. The `.weft` file is the single source of truth.
 
+The goal is to produce **literary and artistic works of programming** —
+programs that achieve excellence in exposition, software quality, and
+debuggability. A literate program is not code with comments; it is a
+carefully crafted essay where code and prose illuminate each other.
+The standard is publishable quality: a reader should be able to understand
+the system by reading the document from beginning to end, as one reads
+a well-written book.
+
 Core principles:
 
 - **Paradigm, not documentation** — LP is a programming paradigm where
@@ -86,6 +94,11 @@ the only file with `@o` directives. Concepts never know their output paths.
 
 **6. Iterate** — all changes go through `.weft` files. Never edit tangled output.
 
+**Definition of done**: a change is **not complete** until its surrounding
+prose is updated. Code and narrative must always be in sync. If you modify
+a chunk, update the prose that explains it. If you add a chunk, write the
+prose that introduces it. A code change without updated prose is not finished.
+
 ### Common `@` Escaping by Language
 
 Inside `.weft` chunks, every literal `@` in the desired output must be `@@`:
@@ -112,7 +125,12 @@ CLI options), see [references/weft-syntax.md](references/weft-syntax.md).
 
 Key points: `@o` defines output files, `@d` defines reusable fragments,
 `@<Name@>` invokes them, `@@` escapes literal `@`. weft tangles by default;
-use `-w md` or `-w tex` to activate weave.
+use `-w md` or `-w tex` to activate weave (or declare `@W md`/`@W tex` in
+the source). Use `-I dir` to add include search paths for `@i`.
+
+Additional commands: `@O`/`@D`/`@Q` are page-break variants of `@o`/`@d`/`@q`.
+`@c` defines block comments. `@%` comments out lines inside scraps. `@r x`
+changes the escape character from `@` to `x`.
 
 
 ## Section Markers and Debugging
@@ -157,6 +175,34 @@ weft -R server.js          # full file mapping (all regions)
 No `.weft` files are needed — `-R` parses the section markers already
 embedded in the tangled output. This enables CI/CD error translation
 and AI agent workflows.
+
+### Mid-Line Inline Expansion
+
+When a fragment reference `@<name@>` appears **mid-line** (after at least
+one visible character on the same line), section markers, `#line` directives,
+and fragment-name comments are automatically suppressed. The fragment content
+is spliced seamlessly into the surrounding text:
+
+```
+@d port @{4000@}
+@d host @{"localhost"@}
+
+@l c
+@o config.c -s
+@{const char *host = @<host@>;
+int port = @<port@>;
+@}
+```
+
+Produces:
+
+```c
+const char *host = "localhost";
+int port = 4000;
+```
+
+At start-of-line positions (even indented), markers are emitted normally.
+No special flags needed — the position on the line determines the behaviour.
 
 ### Language Override
 
@@ -371,9 +417,15 @@ Use `Domain: description` format:
 - Generic names like "helper" or "utils"
 - Editing tangled output instead of `.weft` source
 - Monolithic `.weft` files (split by concept)
+- Marking a change as done without updating the prose — code and
+  narrative must stay in sync; stale prose is a bug
 
 See [references/naming-conventions.md](references/naming-conventions.md)
 for the complete conventions guide.
+
+See [references/literate-craft.md](references/literate-craft.md)
+for the complete craft guide: narrative patterns, prose quality,
+migration strategies, and review checklists.
 
 
 ## Worked Example: Cross-System Concepts
