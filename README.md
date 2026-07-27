@@ -94,6 +94,18 @@ language. weft **tangles** it into executable source files and, when asked,
 - **`--help` for humans and AI** — comprehensive help output covering
   all options, usage examples, directive quick reference, and an
   AI-specific section with rules and step-by-step workflow.
+- **`end_line` in JSON map** — each `defs` entry in `-m` JSON now
+  includes `"end_line"` for the full line span of every scrap.
+- **`--bodies`** — include raw scrap code in `-m` JSON output.
+- **`--prose`** — include preceding documentation in `-m` JSON output.
+- **`--diff`** — dry-run tangle showing unified diff of changes (no
+  files written).
+- **`--lint`** — static analysis: unused fragments, undefined refs,
+  fuzzy-match suggestions for typos.
+- **`--callers`** — with `-e`, show call chain from `@o` roots to
+  the named fragment.
+- **`--errors`** — annotate compiler errors from stdin with `.weft`
+  source locations using section markers.
 - **62 automated tests**.
 
 ## Quick Start
@@ -333,7 +345,14 @@ Syntax: `@L name style [+d]` where *style* is `//`, `#`, `--`,
 | `-p path` | Prepend path to output file names |
 | `-I path` | Add directory to include search path |
 | `-V str` | Set version string for `@v` substitution |
+| `--bodies` | Include raw scrap body text in `-m` JSON output |
+| `--prose` | Include preceding documentation in `-m` JSON output |
+| `--diff` | Show unified diff of what tangle would change (no files written) |
+| `--lint` | Static analysis: unused fragments, undefined refs, typo suggestions |
+| `--callers` | With `-e`, show call chain from `@o` roots to fragment |
+| `--errors` | Annotate compiler errors from stdin with `.weft` source locations |
 | `--help` | Comprehensive help: options, examples, directives, AI workflow |
+| `--version` | Show version number |
 
 ## Output File Flags
 

@@ -74,6 +74,31 @@ a \fB.tex\fP file is generated. A CLI format overrides \fB@@W\fP.
 If \fB-w\fP is given without a format and no \fB@@W\fP exists,
 weft exits with an error.
 .br
+\fB--bodies\fP Include raw scrap body text in \fB-m\fP JSON output.
+Each definition entry gets a \fB"body"\fP field with the JSON-escaped
+source code of the scrap.
+.br
+\fB--prose\fP Include the documentation paragraph preceding each
+\fB@@d\fP/\fB@@o\fP directive as a \fB"prose"\fP field in \fB-m\fP JSON output.
+.br
+\fB--diff\fP Dry-run tangle: show a unified diff of what would change
+in each output file without writing anything.  If a file does not
+yet exist, all lines are shown with a \fB+\fP prefix.
+.br
+\fB--lint\fP Static analysis of the literate source.  Reports unused
+fragments (defined but never referenced), undefined references
+(used but never defined), and fuzzy-match suggestions for likely
+typos (Levenshtein distance \(<= 3).
+.br
+\fB--callers\fP When combined with \fB-e name\fP, show the upward
+call chain from \fB@@o\fP roots down to the named fragment as an
+indented tree.
+.br
+\fB--errors\fP Read compiler or linter output from stdin and annotate
+\fBfile:line:\fP patterns with \fB.weft\fP source locations by parsing
+section markers embedded in the tangled output.  No \fB.weft\fP source
+files are needed.  Example: \fBmake 2>&1 | weft --errors\fP.
+.br
 \fB--help\fP Print a comprehensive help message including all options,
 usage examples, and an AI-assisted workflow guide, then exit.
 

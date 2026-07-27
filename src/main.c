@@ -1,6 +1,6 @@
 
-#line 95 "literate/architecture.weft"
-/* {5: literate/architecture.weft:95} */
+#line 101 "literate/architecture.weft"
+/* {5: literate/architecture.weft:101} */
 #include "global.h"
 /* {:5} */
 
@@ -13,38 +13,35 @@ int main(int argc, char **argv)
   int arg = 1;
   /* Interpret command-line arguments */
   
-#line 184 "literate/main.weft"
-  /* {23: literate/main.weft:184} */
+#line 197 "literate/main.weft"
+  /* {23: literate/main.weft:197} */
 command_name = argv[0];
   /* {:23} */
 
-#line 190 "literate/main.weft"
-  /* {24: literate/main.weft:190} */
+#line 203 "literate/main.weft"
+  /* {24: literate/main.weft:203} */
 while (arg < argc) {
     char *s = argv[arg];
     if (*s++ == '-') {
       /* Check for long options */
       
-#line 217 "literate/main.weft"
-      /* {25: literate/main.weft:217} */
+#line 230 "literate/main.weft"
+      /* {25: literate/main.weft:230} */
 if (*s == '-') {
         if (strcmp(s + 1, "help") == 0) {
           /* Print help message */
           
-#line 231 "literate/main.weft"
-          /* {26: literate/main.weft:231} */
-printf("weft -- A Modern Literate Programming Tool\n\n");
+#line 278 "literate/main.weft"
+          /* {26: literate/main.weft:278} */
+printf("weft %s -- A Literate Programming Tool\n\n", WEFT_VERSION);
           printf("USAGE\n");
           printf("  %s [options] file...\n\n", command_name);
           printf("WHAT IS WEFT?\n");
-          printf("  weft is a literate programming tool.  You write .weft files where\n");
-          printf("  documentation and code live together as a single narrative.  weft\n");
-          printf("  then TANGLES the .weft source into executable output files, and\n");
-          printf("  optionally WEAVES it into formatted documentation (LaTeX or Markdown).\n\n");
-          printf("  The .weft files are the ONLY source of truth.  The tangled output\n");
-          printf("  files (*.c, *.go, *.js, etc.) are GENERATED -- never edit them.\n");
-          printf("  All changes must go through the .weft source.\n\n");
-          printf("  Default behavior: tangle only (generate output files from @o directives).\n\n");
+          printf("  weft is a literate programming tool: write .weft files where\n");
+          printf("  documentation and code live as one narrative.  weft TANGLES them\n");
+          printf("  into executable output files and optionally WEAVES formatted\n");
+          printf("  documentation (LaTeX or Markdown).  .weft files are the ONLY\n");
+          printf("  source of truth; tangled outputs are GENERATED -- never edit them.\n\n");
           printf("HOW IT WORKS\n");
           printf("  A .weft file contains prose with embedded code chunks:\n");
           printf("    @o file.c @{ ... @}    Output file: tangle writes this to file.c\n");
@@ -76,7 +73,18 @@ printf("weft -- A Modern Literate Programming Tool\n\n");
           printf("    -R file[:line]  Reverse map: given a tangled output file (and\n");
           printf("                    optional line number), prints the .weft source\n");
           printf("                    location that generated it.  Needs NO .weft files\n");
-          printf("                    -- reads section markers embedded in the output\n\n");
+          printf("                    -- reads section markers embedded in the output\n");
+          printf("    --bodies        Include raw scrap body text in -m JSON output\n");
+          printf("    --prose         Include preceding documentation in -m JSON output\n");
+          printf("    --diff          Show unified diff of what tangle would change\n");
+          printf("                    (no files written)\n");
+          printf("    --lint          Static analysis: unused fragments, undefined refs,\n");
+          printf("                    and fuzzy-match suggestions for likely typos\n");
+          printf("    --callers       With -e, show call chain from %co roots to fragment\n", nw_char);
+          printf("    --errors        Annotate compiler errors from stdin with .weft\n");
+          printf("                    source locations (reads section markers, no\n");
+          printf("                    .weft files needed)\n");
+          printf("                    Example: make 2>&1 | weft --errors\n\n");
           printf("  LaTeX:\n");
           printf("    -r              Enable hyperref cross-reference links\n");
           printf("    -h options      Pass options to hyperref package\n");
@@ -85,7 +93,66 @@ printf("weft -- A Modern Literate Programming Tool\n\n");
           printf("  General:\n");
           printf("    -V string       Set version string (expands @v in source)\n");
           printf("    -v              Verbose progress output\n");
-          printf("    --help          Show this help message\n\n");
+          printf("    --help          Show this help message\n");
+          printf("    --version       Show version number\n\n");
+          printf("PER-FILE FLAGS (on @o)\n");
+          printf("  @o file [-d] [-i] [-t] [-s] [-cc|-c+|-cp] @{ ... @}\n");
+          printf("    -d           Emit #line N \"file\" directives (C/C++ debuggers)\n");
+          printf("    -i           Suppress auto-indentation of expanded fragments\n");
+          printf("    -t           Suppress tab expansion (write tabs literally)\n");
+          printf("    -cc          C block-comment markers:   /* {N: file:line} */\n");
+          printf("    -c+          C++ line-comment markers:  // {N: file:line}\n");
+          printf("    -cp          Hash-comment markers:      # {N: file:line}\n");
+          printf("    -s           Suppress all section markers in output\n");
+          printf("  Without explicit flags, weft auto-detects from file extension\n");
+          printf("  (250+ extensions recognized).  Use @l tag before @o to override.\n\n");
+          printf("SECTION MARKERS\n");
+          printf("  When comment style is known, tangled output includes markers:\n");
+          printf("    /* {5: source.weft:42} */   opening -- scrap 5, from line 42\n");
+          printf("    /* {:5} */                  closing\n");
+          printf("  Comment adapts to language: // for C++/Go, # for Python/shell, etc.\n");
+          printf("  Use weft -R to parse these markers and reverse-map to source.\n\n");
+          printf("DIRECTIVES REFERENCE\n");
+          printf("  Core structure:\n");
+          printf("    @o file [flags] @{ code @}  Output file (tangled to disk)\n");
+          printf("    @d Name @{ code @}          Define reusable named fragment\n");
+          printf("    @d+ Name @{ code @}         Global fragment (visible across sectors)\n");
+          printf("    @q Name @{ code @}          Quoted fragment (no expansion on include)\n");
+          printf("    @O / @D / @Q                Uppercase = big-format scrap in LaTeX\n");
+          printf("    @<Name@>                     Invoke (expand) a named fragment\n");
+          printf("    @<+Name@>                    Invoke the global version of a fragment\n");
+          printf("    @i file                       Include another .weft file\n");
+          printf("    @@                           Literal @ character\n\n");
+          printf("  Fragment parameters:\n");
+          printf("    @'text@'                     Pass literal text argument to a fragment\n");
+          printf("    @1 .. @9                     Substitute nth argument inside fragment\n");
+          printf("    @{ code @} as argument       Pass anonymous inline scrap as argument\n\n");
+          printf("  Inside scraps:\n");
+          printf("    @f                            Current output file name\n");
+          printf("    @t                            Current fragment title (as invoked)\n");
+          printf("    @v                            Version string (set by -V flag)\n");
+          printf("    @c                            Expand block comment at current indent\n");
+          printf("    @#                            Suppress auto-indent for this line\n");
+          printf("    @%%                            Comment to end of line (omitted)\n");
+          printf("    @| name                       Mark identifier(s) as defined here\n");
+          printf("    @+ @- @*                      Global-export / import / used markers\n");
+          printf("    @_ text @_                   Bold (LaTeX weave); skipped in tangle\n");
+          printf("    @x label @x                  Cross-reference label (anchor position)\n\n");
+          printf("  Scrap delimiters (LaTeX weave):\n");
+          printf("    @{ ... @}                    Verbatim code (default)\n");
+          printf("    @[ ... @]                    Paragraph mode\n");
+          printf("    @( ... @)                    Math mode\n\n");
+          printf("  Sections and structure:\n");
+          printf("    @s                            Start a new sector (section boundary)\n");
+          printf("    @S                            Close current sector (return to base)\n");
+          printf("    @W fmt                        Declare weave format: md or tex\n\n");
+          printf("  Language and formatting:\n");
+          printf("    @l tag                        Set language for next @o or @d\n");
+          printf("    @L name style [+d]            Define custom language (// # -- /* <!--)\n");
+          printf("    @r x                          Change escape character from @ to x\n\n");
+          printf("  Indexes (weave output only):\n");
+          printf("    @f @m @u                      File / fragment / identifier indexes\n");
+          printf("    @m+ @u+                       Global fragment / identifier indexes\n\n");
           printf("EXAMPLES\n");
           printf("  %s project.weft                        Tangle (default)\n", command_name);
           printf("  %s -w md project.weft                  Weave to Markdown\n", command_name);
@@ -96,52 +163,83 @@ printf("weft -- A Modern Literate Programming Tool\n\n");
           printf("  %s -R server.js                        All regions in file\n", command_name);
           printf("  %s -v -p build/ project.weft           Verbose + path prefix\n", command_name);
           printf("  %s -o project.weft                     Parse only, no output\n\n", command_name);
-          printf("RULES FOR AI ASSISTANTS\n");
-          printf("  1. NEVER edit tangled output files (*.c, *.go, *.js, etc.)\n");
-          printf("     They are generated.  Your changes will be overwritten.\n");
-          printf("  2. ALWAYS edit .weft source files instead.\n");
-          printf("     Use -R to find which .weft file generates a given output line.\n");
-          printf("  3. After editing .weft files, re-tangle:\n");
-          printf("       %s project.weft\n", command_name);
-          printf("  4. To understand a project's structure before editing:\n");
-          printf("       %s -m project.weft | jq '.fragments'\n", command_name);
-          printf("  5. To get the code of a specific fragment:\n");
-          printf("       %s -e \"fragment name\" project.weft\n", command_name);
-          printf("  6. When a compiler reports an error in tangled output:\n");
-          printf("       %s -R output.c:42   # find the .weft source location\n", command_name);
-          printf("     Then fix the code in the .weft file, not in output.c.\n\n");
-          printf("STEP-BY-STEP AI WORKFLOW\n");
-          printf("  1. Map:     %s -m project.weft | jq    Discover structure\n", command_name);
-          printf("  2. Extract: %s -e \"name\" project.weft   Read specific fragment\n", command_name);
-          printf("  3. Edit:    modify the .weft source       (never tangled output!)\n");
-          printf("  4. Tangle:  %s project.weft              Regenerate output files\n", command_name);
-          printf("  5. Build:   compile/test as usual         Verify the change works\n");
-          printf("  6. Debug:   %s -R file:line              Trace errors to source\n\n", command_name);
-          printf("DIRECTIVES QUICK REFERENCE\n");
-          printf("  @o file flags @{ ... @}   Define output file (tangled to disk)\n");
-          printf("  @d Name       @{ ... @}   Define reusable fragment\n");
-          printf("  @<Name@>                   Invoke fragment (insert its contents)\n");
-          printf("  @@                         Literal @ character in output\n");
-          printf("  @i file                     Include another .weft file\n");
-          printf("  @W fmt                      Declare weave format (md or tex)\n");
-          printf("  @l tag                      Set language for next @o/@d\n");
-          printf("  @L name style [+d]          Define custom language mapping\n");
-          printf("  @v                          Expand to version string (-V)\n");
-          printf("  @%%                          Comment (omitted from output)\n");
-          printf("  @f @m @u                    Emit file/fragment/identifier indexes\n");/* {:26} */
+          printf("AI ASSISTANT WORKFLOW\n");
+          printf("  GOLDEN RULE: .weft files are the ONLY source of truth.\n");
+          printf("  Tangled outputs (*.c, *.go, etc.) are GENERATED -- never edit them.\n");
+          printf("  If you edit a tangled file, your changes WILL be lost on next tangle.\n\n");
+          printf("  Step 1 -- Understand the project structure:\n");
+          printf("    %s -m project.weft > map.json\n", command_name);
+          printf("    The JSON contains: files (all @o output files), fragments (all @d\n");
+          printf("    named blocks), and a dependency graph (which fragments invoke which).\n");
+          printf("    Useful jq queries:\n");
+          printf("      jq '.files'                         List output files\n");
+          printf("      jq '.fragments'                     List all fragments\n");
+          printf("      jq '.fragments[] | select(.name | test(\"Auth\"))'  Search\n\n");
+          printf("  Step 2 -- Read specific code without opening .weft files:\n");
+          printf("    %s -e \"fragment name\" project.weft\n", command_name);
+          printf("    Prints the fragment AND all its transitive dependencies as\n");
+          printf("    self-contained Markdown to stdout.  Ideal for understanding\n");
+          printf("    one piece of the system without reading the whole source.\n\n");
+          printf("  Step 3 -- Edit the .weft source (NEVER tangled output):\n");
+          printf("    Locate the right .weft file (use -m to find it), then edit\n");
+          printf("    the @d or @o scrap that contains the code you need to change.\n");
+          printf("    Use standard text editing -- the prose around code is LaTeX or\n");
+          printf("    plain text, and code lives between @{ and @}.\n\n");
+          printf("  Step 4 -- Regenerate and verify:\n");
+          printf("    %s project.weft           Tangle (regenerate all output files)\n", command_name);
+          printf("    Then build and test as usual.\n\n");
+          printf("  Step 5 -- Debug errors with reverse map:\n");
+          printf("    %s -R output.c:42          Find .weft source for line 42\n", command_name);
+          printf("    %s -R output.c             Show ALL .weft regions in file\n", command_name);
+          printf("    Reads section markers in the tangled output -- needs NO .weft files.\n");
+          printf("    Fix errors in the .weft source, then re-tangle (step 4).\n");/* {:26} */
 
-#line 219 "literate/main.weft"
+#line 232 "literate/main.weft"
 
           exit(0);
         }
+        if (strcmp(s + 1, "version") == 0) {
+          printf("weft %s\n", WEFT_VERSION);
+          exit(0);
+        }
+        if (strcmp(s + 1, "bodies") == 0) {
+          bodies_flag = TRUE;
+          arg++;
+          continue;
+        }
+        if (strcmp(s + 1, "prose") == 0) {
+          prose_flag = TRUE;
+          arg++;
+          continue;
+        }
+        if (strcmp(s + 1, "diff") == 0) {
+          diff_flag = TRUE;
+          arg++;
+          continue;
+        }
+        if (strcmp(s + 1, "callers") == 0) {
+          callers_flag = TRUE;
+          arg++;
+          continue;
+        }
+        if (strcmp(s + 1, "lint") == 0) {
+          lint_flag = TRUE;
+          arg++;
+          continue;
+        }
+        if (strcmp(s + 1, "errors") == 0) {
+          errors_flag = TRUE;
+          arg++;
+          continue;
+        }
       }/* {:25} */
 
-#line 193 "literate/main.weft"
+#line 206 "literate/main.weft"
 
       /* Interpret the argument string \verb|s| */
       
-#line 336 "literate/main.weft"
-      /* {27: literate/main.weft:336} */
+#line 447 "literate/main.weft"
+      /* {27: literate/main.weft:447} */
 {
         char c = *s++;
         while (c) {
@@ -222,13 +320,13 @@ HasWeaveFormat:
 HasValue:;
       }/* {:27} */
 
-#line 194 "literate/main.weft"
+#line 207 "literate/main.weft"
 
       arg++;
       /* Perhaps get the prepend path */
       
-#line 418 "literate/main.weft"
-      /* {28: literate/main.weft:418} */
+#line 529 "literate/main.weft"
+      /* {28: literate/main.weft:529} */
 if (prepend_flag)
       {
         if (*s == '\0')
@@ -238,12 +336,12 @@ if (prepend_flag)
       }
       /* {:28} */
 
-#line 196 "literate/main.weft"
+#line 209 "literate/main.weft"
 
       /* Perhaps get the version info string */
       
-#line 446 "literate/main.weft"
-      /* {30: literate/main.weft:446} */
+#line 557 "literate/main.weft"
+      /* {30: literate/main.weft:557} */
 if (version_info_flag)
       {
          if (*s == '\0')
@@ -253,12 +351,12 @@ if (version_info_flag)
       }
       /* {:30} */
 
-#line 197 "literate/main.weft"
+#line 210 "literate/main.weft"
 
       /* Perhaps get the hyperref options */
       
-#line 456 "literate/main.weft"
-      /* {31: literate/main.weft:456} */
+#line 567 "literate/main.weft"
+      /* {31: literate/main.weft:567} */
 if (hyperopt_flag)
       {
         if (*s == '\0')
@@ -269,12 +367,12 @@ if (hyperopt_flag)
       }
       /* {:31} */
 
-#line 198 "literate/main.weft"
+#line 211 "literate/main.weft"
 
       /* Perhaps add an include path */
       
-#line 428 "literate/main.weft"
-      /* {29: literate/main.weft:428} */
+#line 539 "literate/main.weft"
+      /* {29: literate/main.weft:539} */
 if (includepath_flag)
       {
          struct incl * le
@@ -292,29 +390,29 @@ if (includepath_flag)
       }
       /* {:29} */
 
-#line 199 "literate/main.weft"
+#line 212 "literate/main.weft"
 
       /* Perhaps get the extract name */
       
-#line 467 "literate/main.weft"
-      /* {32: literate/main.weft:467} */
+#line 578 "literate/main.weft"
+      /* {32: literate/main.weft:578} */
 if (extract_flag) {
         extract_name = (*s != '\0') ? s : argv[arg++];
         extract_flag = FALSE;
       }/* {:32} */
 
-#line 200 "literate/main.weft"
+#line 213 "literate/main.weft"
 
       /* Perhaps get the reverse map argument */
       
-#line 473 "literate/main.weft"
-      /* {33: literate/main.weft:473} */
+#line 584 "literate/main.weft"
+      /* {33: literate/main.weft:584} */
 if (reverse_map_flag) {
         reverse_map_arg = (*s != '\0') ? s : argv[arg++];
         reverse_map_flag = FALSE;
       }/* {:33} */
 
-#line 201 "literate/main.weft"
+#line 214 "literate/main.weft"
 
     }
     else break;
@@ -324,8 +422,8 @@ if (reverse_map_flag) {
 
   /* Set locale information */
   
-#line 493 "literate/main.weft"
-/* {35: literate/main.weft:493} */
+#line 608 "literate/main.weft"
+/* {35: literate/main.weft:608} */
 
   {
     /* try to get locale information */
@@ -343,9 +441,13 @@ if (reverse_map_flag) {
 
   /* Handle reverse map mode */
   
-#line 482 "literate/main.weft"
-  /* {34: literate/main.weft:482} */
-if (reverse_map_arg) {
+#line 593 "literate/main.weft"
+  /* {34: literate/main.weft:593} */
+if (errors_flag) {
+    write_error_annotator();
+    exit(0);
+  }
+  if (reverse_map_arg) {
     write_reverse_map(reverse_map_arg);
     exit(0);
   }/* {:34} */
@@ -355,8 +457,8 @@ if (reverse_map_arg) {
   initialise_delimit_scrap_array();
   /* Process the remaining arguments (file names) */
   
-#line 512 "literate/main.weft"
-  /* {36: literate/main.weft:512} */
+#line 627 "literate/main.weft"
+  /* {36: literate/main.weft:627} */
 {
     if (arg >= argc) {
       fprintf(stderr, "%s: expected a file name.\n"
@@ -368,8 +470,8 @@ if (reverse_map_arg) {
     do {
       /* Handle the file name in \verb|argv[arg]| */
       
-#line 536 "literate/main.weft"
-      /* {37: literate/main.weft:536} */
+#line 651 "literate/main.weft"
+      /* {37: literate/main.weft:651} */
 {
         char source_name[FILENAME_MAX];
         char tex_name[FILENAME_MAX];
@@ -378,8 +480,8 @@ if (reverse_map_arg) {
         char *dot;
         /* Build \verb|source_name| and \verb|tex_name| */
         
-#line 560 "literate/main.weft"
-        /* {38: literate/main.weft:560} */
+#line 675 "literate/main.weft"
+        /* {38: literate/main.weft:675} */
 {
           char *p = argv[arg];
           char *q = source_name;
@@ -399,8 +501,8 @@ if (reverse_map_arg) {
           }
           /* Add the source path to the include path list */
           
-#line 606 "literate/main.weft"
-          /* {39: literate/main.weft:606} */
+#line 721 "literate/main.weft"
+          /* {39: literate/main.weft:721} */
 if (trim != source_name) {
              struct incl * le
                 = (struct incl *)arena_getmem(sizeof(struct incl));
@@ -417,7 +519,7 @@ if (trim != source_name) {
           }
           /* {:39} */
 
-#line 577 "literate/main.weft"
+#line 692 "literate/main.weft"
 
           *q = '\0';
           if (!dot) {
@@ -441,12 +543,12 @@ if (trim != source_name) {
           }
         }/* {:38} */
 
-#line 542 "literate/main.weft"
+#line 657 "literate/main.weft"
 
         /* Process a file */
         
-#line 638 "literate/main.weft"
-        /* {40: literate/main.weft:638} */
+#line 753 "literate/main.weft"
+        /* {40: literate/main.weft:753} */
 {
           int do_weave = FALSE;
           int effective_format = 0;
@@ -459,11 +561,17 @@ if (trim != source_name) {
           current_sector = 1;
           prev_sector = 1;
 
-          if (map_flag) {
+          if (lint_flag) {
+            write_lint(file_names, macro_names);
+            /* skip weave and tangle */
+          } else if (map_flag) {
             write_map(file_names, macro_names);
             /* skip weave and tangle */
           } else if (extract_name) {
-            write_extract(extract_name, file_names, macro_names);
+            if (callers_flag)
+              write_callers(extract_name, file_names, macro_names);
+            else
+              write_extract(extract_name, file_names, macro_names);
             /* skip weave and tangle */
           } else {
             /* Determine whether to weave and with which format */
@@ -510,11 +618,11 @@ if (trim != source_name) {
           arena_free();
         }/* {:40} */
 
-#line 543 "literate/main.weft"
+#line 658 "literate/main.weft"
 
       }/* {:37} */
 
-#line 521 "literate/main.weft"
+#line 636 "literate/main.weft"
 
       arg++;
     } while (arg < argc);

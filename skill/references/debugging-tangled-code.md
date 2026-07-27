@@ -384,3 +384,22 @@ one independently.
 - **Use `weft -m | jq`** to get a structural overview before diving
   into individual files. The JSON map shows the complete dependency
   graph.
+
+- **Use `weft --errors`** to automatically annotate compiler output
+  with `.weft` source locations. Pipe any compiler or linter output
+  through it:
+  ```bash
+  make 2>&1 | weft --errors
+  gcc src/*.c 2>&1 | weft --errors
+  eslint dist/ 2>&1 | weft --errors
+  ```
+  Each `file:line:` pattern in the output gets an indented annotation
+  showing the `.weft` source file, line, and scrap number. No `.weft`
+  files are needed — it reads section markers from the tangled output.
+
+- **Use `weft --lint`** to check for structural issues before building:
+  ```bash
+  weft --lint project.weft
+  ```
+  Reports unused fragments, undefined references, and fuzzy-match
+  suggestions for likely typos.

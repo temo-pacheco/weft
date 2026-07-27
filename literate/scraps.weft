@@ -17,11 +17,14 @@ typedef struct slab {
   struct uses *uses;
   struct uses *defs;
   int file_line;
+  int end_line;
   int page;
   char letter;
   unsigned char sector;
+  char *prose;
+  struct name *owner;
 } ScrapEntry;
-@| file_name slab uses defs file_line page letter sector ScrapEntry @}
+@| file_name slab uses defs file_line end_line page letter sector prose owner ScrapEntry @}
 
 There's some issue with reading the auxiliary file if it has more than 255 lines, so (as a workround only) increase the size of the array of \verb|ScrapEntry|s held in \verb|SCRAP[n]|.
 
@@ -116,7 +119,13 @@ without leaking the internal \verb|ScrapEntry| or \verb|Slab| types.
 @d Function pro...
 @{extern const char *scrap_file_name(int i);
 extern int scrap_file_line(int i);
+extern int scrap_end_line(int i);
+extern const char *scrap_prose(int i);
+extern Name *scrap_owner(int i);
 extern void dump_scrap_text(FILE *file, int scrap_idx);
+extern void dump_scrap_json(FILE *f, int scrap_idx);
+extern void set_scrap_prose(int i, char *p);
+extern void set_scrap_owner(int i, Name *n);
 @}
 
 @o scraps.c
@@ -126,6 +135,18 @@ extern void dump_scrap_text(FILE *file, int scrap_idx);
 @o scraps.c
 @{int scrap_file_line(int i) { return scrap_array(i).file_line; }
 @| scrap_file_line @}
+
+@o scraps.c
+@{int scrap_end_line(int i) { return scrap_array(i).end_line; }
+@| scrap_end_line @}
+
+@o scraps.c
+@{const char *scrap_prose(int i) { return scrap_array(i).prose; }
+@| scrap_prose @}
+
+@o scraps.c
+@{Name *scrap_owner(int i) { return scrap_array(i).owner; }
+@| scrap_owner @}
 
 @d Warn (only once) about needing to...
 @{{
@@ -202,6 +223,9 @@ extern void dump_scrap_text(FILE *file, int scrap_idx);
   scrap_array(scraps).uses = NULL;
   scrap_array(scraps).defs = NULL;
   scrap_array(scraps).sector = current_sector;
+  scrap_array(scraps).end_line = source_line;
+  scrap_array(scraps).prose = NULL;
+  scrap_array(scraps).owner = NULL;
   writer.scrap = scrap;
   writer.index = 0;
   current_scrap = scraps++;
@@ -251,6 +275,7 @@ extern void dump_scrap_text(FILE *file, int scrap_idx);
     case ',':
               push('\0', &writer);
               scrap_ended_with = c;
+              scrap_array(current_scrap).end_line = source_line;
               return current_scrap;
     case '<': @<Handle macro invocation in scrap@>
               break;
@@ -478,6 +503,48 @@ form; other control sequences are silently skipped.
   }
 }
 @| dump_scrap_text @}
+
+The function \verb|dump_scrap_json| is similar to \verb|dump_scrap_text|
+but wraps the output in a JSON string, escaping special characters
+inline.  It is used by \verb|--bodies| to embed scrap code in the
+\verb|-m| JSON output.
+
+@o scraps.c
+@{void dump_scrap_json(FILE *f, int scrap_idx)
+{
+  FILE *tmp = tmpfile();
+  int ch;
+  if (!tmp) { fputs("\"\"", f); return; }
+  dump_scrap_text(tmp, scrap_idx);
+  fflush(tmp);
+  fseek(tmp, 0, SEEK_SET);
+  fputc('"', f);
+  while ((ch = fgetc(tmp)) != EOF) {
+    switch (ch) {
+      case '"':  fputs("\\\"", f); break;
+      case '\\': fputs("\\\\", f); break;
+      case '\n': fputs("\\n", f);  break;
+      case '\r': fputs("\\r", f);  break;
+      case '\t': fputs("\\t", f);  break;
+      default:
+        if (ch < 0x20)
+          fprintf(f, "\\u%04x", ch);
+        else
+          fputc(ch, f);
+    }
+  }
+  fputc('"', f);
+  fclose(tmp);
+}
+@| dump_scrap_json @}
+
+@o scraps.c
+@{void set_scrap_prose(int i, char *p) { scrap_array(i).prose = p; }
+@| set_scrap_prose @}
+
+@o scraps.c
+@{void set_scrap_owner(int i, Name *n) { scrap_array(i).owner = n; }
+@| set_scrap_owner @}
 
 @o scraps.c
 @{static void backup(int n, Manager *manager)

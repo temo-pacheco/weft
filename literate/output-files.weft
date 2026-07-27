@@ -8,6 +8,9 @@
 @{extern void write_map(Name *file_names, Name *macro_names);
 extern void write_extract(char *name, Name *file_names, Name *macro_names);
 extern void write_reverse_map(const char *arg);
+extern void write_callers(char *name, Name *file_names, Name *macro_names);
+extern void write_lint(Name *file_names, Name *macro_names);
+extern void write_error_annotator(void);
 @}
 
 @o output.c
@@ -88,13 +91,44 @@ standard does {\em not} guarantee that renaming a file to an existing
 filename will overwrite the file.
 
 @d Move the temporary file to the target, if required @{@%
-if (compare_flag)
+if (diff_flag) {
+  @<Show diff of temp file vs real file@>
+} else if (compare_flag)
   @<Compare the temp file and the old file@>
 else {
   remove(real_name);
   @< Rename the temporary file to the target @>
 }
 @}
+
+@d Show diff of temp file vs real file
+@{{
+  FILE *old_file = fopen(real_name, "r");
+  if (!old_file) {
+    /* New file: show all lines with + prefix */
+    FILE *tf = fopen(temp_name, "r");
+    if (tf) {
+      char dbuf[8192];
+      printf("new file: %s\n", real_name);
+      while (fgets(dbuf, sizeof(dbuf), tf))
+        printf("+%s", dbuf);
+      fclose(tf);
+    }
+  } else {
+    char cmd[FILENAME_MAX * 2 + 32];
+    FILE *dp;
+    fclose(old_file);
+    sprintf(cmd, "diff -u \"%s\" \"%s\"", real_name, temp_name);
+    dp = popen(cmd, "r");
+    if (dp) {
+      char dbuf[8192];
+      while (fgets(dbuf, sizeof(dbuf), dp))
+        fputs(dbuf, stdout);
+      pclose(dp);
+    }
+  }
+  remove(temp_name);
+}@}
 
 Again, we use a call to \verb|remove| before \verb|rename|.
 @d Compare the temp file...

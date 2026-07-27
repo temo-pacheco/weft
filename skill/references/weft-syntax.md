@@ -787,6 +787,12 @@ Note that fences are only stripped in Markdown mode (`-w md`). In LaTeX mode, ba
 | `-h opts` | Hyperref options (LaTeX) |
 | `-r` | Enable hyperlinks (LaTeX) |
 | `-l` | Use listings package (LaTeX) |
+| `--bodies` | Include raw scrap body text in `-m` JSON |
+| `--prose` | Include preceding documentation in `-m` JSON |
+| `--diff` | Dry-run tangle: show unified diff (no files written) |
+| `--lint` | Static analysis: unused fragments, undefined refs, typo suggestions |
+| `--callers` | With `-e`, show call chain from `@o` roots to fragment |
+| `--errors` | Annotate compiler errors from stdin with `.weft` locations |
 | `--help` | Comprehensive help (options, examples, AI workflow) |
 
 

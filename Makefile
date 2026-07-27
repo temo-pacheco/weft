@@ -23,8 +23,9 @@ bootstrap: $(OBJS)
 	$(CC) -o weft $(OBJS)
 
 # Normal development: tangle .weft sources into src/, then compile.
+# Pass -V when VERSION is set so that @v bakes the version into the binary.
 weft:
-	./weft -t -p $(SRCDIR)/ weft.weft
+	./weft -t $(if $(VERSION),-V "$(VERSION)") -p $(SRCDIR)/ weft.weft
 	@$(MAKE) --no-print-directory bootstrap
 
 # ─── Compile rules ─────────────────────────────────────────────────

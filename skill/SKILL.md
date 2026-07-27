@@ -215,10 +215,12 @@ for the complete debugging guide with examples by language.
 
 ## AI-Assisted Navigation
 
-weft provides three features designed for AI-assisted workflows: **JSON maps**
-(`-m`), **fragment extraction** (`-e`), and **reverse maps** (`-R`). Together
-they enable precise, directed navigation of literate codebases in both
-directions — from `.weft` source to tangled output and back.
+weft provides a full toolkit for AI-assisted workflows: **JSON maps**
+(`-m`), **fragment extraction** (`-e`), **reverse maps** (`-R`), and
+six analysis flags (`--bodies`, `--prose`, `--diff`, `--callers`,
+`--lint`, `--errors`). Together they enable precise, directed navigation
+of literate codebases in both directions — from `.weft` source to
+tangled output and back.
 
 ### JSON Map (`-m`)
 
@@ -283,6 +285,85 @@ weft -R server.js
 Key property: operates on tangled output only — no `.weft` files needed,
 no pass1. Parses the section markers already embedded in the file.
 
+### Enriched JSON Map (`-m --bodies --prose`)
+
+The `-m` JSON map can be enriched with two optional flags:
+
+```bash
+weft -m --bodies project.weft          # include scrap source code
+weft -m --prose project.weft           # include documentation paragraphs
+weft -m --bodies --prose project.weft  # both
+```
+
+Each `defs` entry always includes `"end_line"` (the full line span).
+With `--bodies`, it adds `"body"` (JSON-escaped raw scrap text).
+With `--prose`, it adds `"prose"` (the documentation paragraph preceding
+the `@d`/`@o` directive).
+
+Use with `jq` for deep inspection:
+
+```bash
+# Get the code body of a specific fragment
+weft -m --bodies project.weft | jq '.fragments["Validate input"].defs[0].body'
+
+# Get the prose context explaining a fragment
+weft -m --prose project.weft | jq '.fragments["Validate input"].defs[0].prose'
+```
+
+### Dry-Run Diff (`--diff`)
+
+```bash
+weft --diff project.weft
+```
+
+Tangles all output files to temp files and shows a unified diff of what
+would change — without writing anything. Useful for previewing changes
+before committing, or for CI checks that verify tangle is up to date.
+
+For new files (not yet on disk), all lines are shown with a `+` prefix.
+
+### Call Chain (`--callers`)
+
+```bash
+weft -e "Validate input" --callers project.weft
+```
+
+Shows the upward call chain from `@o` roots down to the named fragment
+as an indented tree. Answers "who uses this fragment?" transitively.
+Useful for understanding how a fragment fits into the larger program.
+
+### Static Analysis (`--lint`)
+
+```bash
+weft --lint project.weft
+```
+
+Post-parse analysis that reports:
+- **Unused fragments** — defined but never referenced by any `@o` or other `@d`
+- **Undefined references** — used in a `@<Name@>` but never defined
+- **Fuzzy suggestions** — for undefined references with a close match
+  (Levenshtein distance ≤ 3), suggests the likely intended name
+
+### Error Annotation (`--errors`)
+
+```bash
+make 2>&1 | weft --errors
+```
+
+Reads compiler or linter output from stdin. For each `file:line:` pattern,
+looks up the corresponding `.weft` source location by parsing section
+markers in the tangled output file. Prints the original error line
+followed by an indented annotation:
+
+```
+src/output.c:42: error: undeclared identifier
+  [weft: literate/map-output.weft:77, scrap 204]
+```
+
+No `.weft` source files are needed — operates entirely on section markers
+already embedded in the tangled output. Works with any compiler or linter
+that uses `file:line:` format (gcc, clang, rustc, eslint, etc.).
+
 ### Built-in Help (`--help`)
 
 If you lose context during a session, run:
@@ -301,16 +382,20 @@ The map, extract, and reverse map features enable a **directed** workflow
 for AI agents:
 
 1. **Orient**: `weft --help` → understand what weft is and how to use it
-2. **Map**: `weft -m project.weft | jq` → discover the project structure
+2. **Map**: `weft -m --bodies --prose project.weft | jq` → discover structure with code and context
 3. **Identify**: find the fragment relevant to the task
 4. **Extract**: `weft -e "fragment name" project.weft` → get exactly the code needed
-5. **Edit**: modify the `.weft` source at the indicated location
-6. **Verify**: re-tangle and test
-7. **Debug**: `weft -R file:line` → translate errors back to `.weft` source
+5. **Trace callers**: `weft -e "name" --callers project.weft` → understand who uses a fragment
+6. **Edit**: modify the `.weft` source at the indicated location
+7. **Preview**: `weft --diff project.weft` → see what tangle would change
+8. **Verify**: re-tangle and test
+9. **Debug**: `make 2>&1 | weft --errors` → translate compiler errors to `.weft` source
+10. **Lint**: `weft --lint project.weft` → check for unused fragments and undefined refs
 
-The reverse map closes the loop: when a compiler or linter reports an error
-in tangled output, `-R` resolves it to the `.weft` source instantly — no
-`.weft` files need to be loaded or parsed.
+The `--errors` flag closes the loop: pipe compiler output through weft and
+every `file:line:` error is annotated with the `.weft` source location.
+No `.weft` files need to be loaded — it reads section markers from the
+tangled output. For single lookups, `weft -R file:line` works too.
 
 
 ## Markdown Output

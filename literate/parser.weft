@@ -18,6 +18,12 @@ our data structures. Next, we seach all the scraps for references to
 the user-specified index entries. Finally, we must reverse all the
 cross-reference lists accumulated while scanning the scraps.
 @o pass1.c
+@{static char prose_buf[4096];
+static int prose_len = 0;
+static char *pending_prose = NULL;
+@| prose_buf prose_len pending_prose @}
+
+@o pass1.c
 @{void pass1(char *file_name)
 {
   if (verbose_flag)
@@ -27,6 +33,8 @@ cross-reference lists accumulated while scanning the scraps.
   macro_names = NULL;
   file_names = NULL;
   user_names = NULL;
+  prose_len = 0;
+  pending_prose = NULL;
   @<Scan the source file, looking for at-sequences@>
   if (tex_flag)
     search();
@@ -43,8 +51,32 @@ sequences.  All ordinary text is skipped entirely.
   while (c != EOF) {
     if (c == nw_char)
       @<Scan at-sequence@>
+    else if (prose_flag) {
+      @<Accumulate prose character@>
+    }
     c = source_get();
   }
+}@}
+
+@d Accumulate prose character
+@{if (prose_len < (int)sizeof(prose_buf) - 1)
+  prose_buf[prose_len++] = c;
+@}
+
+@d Save pending prose
+@{if (prose_flag && prose_len > 0) {
+  /* trim trailing whitespace */
+  while (prose_len > 0 && (prose_buf[prose_len-1] == ' '
+         || prose_buf[prose_len-1] == '\n'
+         || prose_buf[prose_len-1] == '\t'
+         || prose_buf[prose_len-1] == '\r'))
+    prose_len--;
+  prose_buf[prose_len] = '\0';
+  pending_prose = save_string(prose_buf);
+  prose_len = 0;
+} else {
+  pending_prose = NULL;
+  prose_len = 0;
 }@}
 
 
@@ -199,16 +231,26 @@ There are three steps required to handle a definition:
 We go through the same steps for both file names and fragment names.
 @d Build output file definition
 @{{
-  Name *name = collect_file_name(); /* returns a pointer to the name entry */
-  int scrap = collect_scrap();      /* returns an index to the scrap */
+  Name *name;
+  int scrap;
+  @<Save pending prose@>
+  name = collect_file_name(); /* returns a pointer to the name entry */
+  scrap = collect_scrap();      /* returns an index to the scrap */
+  if (pending_prose) set_scrap_prose(scrap, pending_prose);
+  pending_prose = NULL;
   @<Add \verb|scrap| to...@>
 }@}
 
 
 @d Build fragment definition
 @{{
-  Name *name = collect_macro_name();
-  int scrap = collect_scrap();
+  Name *name;
+  int scrap;
+  @<Save pending prose@>
+  name = collect_macro_name();
+  scrap = collect_scrap();
+  if (pending_prose) set_scrap_prose(scrap, pending_prose);
+  pending_prose = NULL;
   @<Add \verb|scrap| to...@>
 }@}
 
@@ -223,6 +265,7 @@ with each new definition being added to the head of the list.
   def->quoted = quoted;
   def->next = name->defs;
   name->defs = def;
+  set_scrap_owner(scrap, name);
 }@}
 
 @d Skip over an in-text scrap

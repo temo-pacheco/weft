@@ -90,7 +90,17 @@ they invoke).
     first_inner = 0;
     fprintf(f, "{\"scrap\": %d, \"file\": ", sn->scrap);
     json_puts(f, scrap_file_name(sn->scrap));
-    fprintf(f, ", \"line\": %d}", scrap_file_line(sn->scrap));
+    fprintf(f, ", \"line\": %d, \"end_line\": %d",
+            scrap_file_line(sn->scrap), scrap_end_line(sn->scrap));
+    if (bodies_flag) {
+      fputs(", \"body\": ", f);
+      dump_scrap_json(f, sn->scrap);
+    }
+    if (prose_flag && scrap_prose(sn->scrap)) {
+      fputs(", \"prose\": ", f);
+      json_puts(f, scrap_prose(sn->scrap));
+    }
+    fputc('}', f);
   }
   fputs("]", f);
 
@@ -249,6 +259,72 @@ Clear marks after extraction so the name trees remain usable:
 }
 @| clear_marks @}
 
+\subsection{Callers (Upward Call Chain)}
+
+The \verb|--callers| feature, used with \verb|-e|, traces the upward
+call chain from a given fragment back to its \verb|@@o| file roots.
+Each scrap records its owning \verb|Name| (set in pass1 when the scrap
+is attached to a definition list), so we can walk upward through the
+\verb|uses| list to find all callers.
+
+@o output.c
+@{static int is_file_name(Name *root, Name *target)
+{
+  if (!root) return 0;
+  if (root == target) return 1;
+  if (is_file_name(root->llink, target)) return 1;
+  return is_file_name(root->rlink, target);
+}
+@| is_file_name @}
+
+@o output.c
+@{static void print_callers(Name *name, Name *file_names, int depth)
+{
+  Scrap_Node *usn;
+  int i;
+
+  if (!name || name->mark) return;
+  name->mark = TRUE;
+
+  for (i = 0; i < depth; i++) fputs("  ", stdout);
+  if (is_file_name(file_names, name))
+    printf("[file] %s\n", name->spelling);
+  else
+    printf("%s\n", name->spelling);
+
+  for (usn = name->uses; usn; usn = usn->next) {
+    Name *owner = scrap_owner(usn->scrap);
+    if (owner && !owner->mark)
+      print_callers(owner, file_names, depth + 1);
+  }
+}
+@| print_callers @}
+
+@o output.c
+@{void write_callers(char *name, Name *files, Name *macros)
+{
+  Name *found = find_name(macros, name);
+  if (!found)
+    found = find_name(files, name);
+  if (!found) {
+    fprintf(stderr, "%s: fragment \"%s\" not found\n", command_name, name);
+    exit(1);
+  }
+  printf("Callers of \"%s\":\n\n", found->spelling);
+  printf("%s\n", found->spelling);
+  {
+    Scrap_Node *usn;
+    for (usn = found->uses; usn; usn = usn->next) {
+      Name *owner = scrap_owner(usn->scrap);
+      if (owner)
+        print_callers(owner, files, 1);
+    }
+  }
+  clear_marks(files);
+  clear_marks(macros);
+}
+@| write_callers @}
+
 @o output.c
 @{void write_extract(char *name, Name *files, Name *macros)
 {
@@ -272,6 +348,127 @@ Clear marks after extraction so the name trees remain usable:
   clear_marks(macros);
 }
 @| write_extract @}
+
+
+\subsection{Lint (Static Analysis)}
+
+The \verb|--lint| flag performs a post-pass1 static analysis of the
+fragment namespace.  It reports three kinds of issues:
+
+\begin{enumerate}
+\item \textbf{Undefined references}: fragments that are used
+  (\verb|@@<Name@@>|) but never defined (\verb|@@d Name|).
+\item \textbf{Unused fragments}: fragments defined but never
+  referenced by any other scrap or output file.
+\item \textbf{Fuzzy-match suggestions}: for undefined references,
+  the closest defined name within Levenshtein distance~3.
+\end{enumerate}
+
+@o output.c
+@{static int levenshtein(const char *a, const char *b)
+{
+  int la = (int)strlen(a), lb = (int)strlen(b);
+  int prev[256], curr[256];
+  int i, j;
+  if (la > 255 || lb > 255) return 999;
+  for (j = 0; j <= lb; j++) prev[j] = j;
+  for (i = 1; i <= la; i++) {
+    curr[0] = i;
+    for (j = 1; j <= lb; j++) {
+      int cost = (a[i-1] != b[j-1]) ? 1 : 0;
+      int del = prev[j] + 1;
+      int ins = curr[j-1] + 1;
+      int sub = prev[j-1] + cost;
+      curr[j] = del < ins ? (del < sub ? del : sub) : (ins < sub ? ins : sub);
+    }
+    for (j = 0; j <= lb; j++) prev[j] = curr[j];
+  }
+  return prev[lb];
+}
+@| levenshtein @}
+
+@o output.c
+@{
+#define MAX_LINT_NAMES 4096
+static Name *lint_names[MAX_LINT_NAMES];
+static int lint_name_count;
+
+static void collect_lint_names(Name *node)
+{
+  if (!node) return;
+  collect_lint_names(node->llink);
+  if (node->defs && lint_name_count < MAX_LINT_NAMES)
+    lint_names[lint_name_count++] = node;
+  collect_lint_names(node->rlink);
+}
+
+static const char *find_closest(const char *target)
+{
+  int i, best_dist = 4;
+  const char *best = NULL;
+  for (i = 0; i < lint_name_count; i++) {
+    int d = levenshtein(target, lint_names[i]->spelling);
+    if (d < best_dist) {
+      best_dist = d;
+      best = lint_names[i]->spelling;
+    }
+  }
+  return best;
+}
+@| collect_lint_names find_closest lint_names lint_name_count MAX_LINT_NAMES @}
+
+@o output.c
+@{static int lint_name(Name *node, int check_unused, int *issues)
+{
+  if (!node) return 0;
+  lint_name(node->llink, check_unused, issues);
+
+  if (node->defs == NULL && node->uses != NULL) {
+    /* undefined reference */
+    const char *suggestion = find_closest(node->spelling);
+    fprintf(stderr, "lint: undefined fragment \"%s\"", node->spelling);
+    if (node->uses) {
+      fprintf(stderr, " (used at %s:%d)",
+              scrap_file_name(node->uses->scrap),
+              scrap_file_line(node->uses->scrap));
+    }
+    if (suggestion)
+      fprintf(stderr, " -- did you mean \"%s\"?", suggestion);
+    fputc('\n', stderr);
+    (*issues)++;
+  }
+  else if (node->defs != NULL && node->uses == NULL && check_unused) {
+    fprintf(stderr, "lint: unused fragment \"%s\" (defined at %s:%d)\n",
+            node->spelling,
+            scrap_file_name(node->defs->scrap),
+            scrap_file_line(node->defs->scrap));
+    (*issues)++;
+  }
+
+  lint_name(node->rlink, check_unused, issues);
+  return 0;
+}
+@| lint_name @}
+
+@o output.c
+@{void write_lint(Name *file_names, Name *macro_names)
+{
+  int issues = 0;
+  lint_name_count = 0;
+  collect_lint_names(file_names);
+  collect_lint_names(macro_names);
+
+  /* check files for undefined refs (not unused -- files are roots) */
+  lint_name(file_names, 0, &issues);
+  /* check macros for both undefined and unused */
+  lint_name(macro_names, 1, &issues);
+
+  if (issues)
+    fprintf(stderr, "lint: %d issue(s) found\n", issues);
+  else
+    fprintf(stderr, "lint: no issues found\n");
+}
+@| write_lint @}
 
 
 \subsection{Reverse Map Output}
@@ -511,3 +708,116 @@ emitted.
   }
 }
 @| write_reverse_map @}
+
+
+\subsection{Error Annotator}
+
+The \verb|--errors| flag reads compiler output from stdin and annotates
+lines matching \verb|file:line:| patterns with the corresponding
+\verb|.weft| source location.  It works by opening each referenced
+file, parsing its section markers, and finding which scrap region
+contains the error line.  Lines that don't match the pattern are
+passed through unchanged.
+
+@o output.c
+@{static int reverse_lookup_in_file(const char *filename, int target_line,
+                                   MarkerFrame *result)
+{
+  FILE *fp = fopen(filename, "r");
+  char buf[8192];
+  MarkerFrame stack[256];
+  int depth = 0, current_line = 0;
+
+  if (!fp) return 0;
+
+  while (fgets(buf, sizeof(buf), fp)) {
+    MarkerFrame mf;
+    int close_scrap;
+    current_line++;
+
+    if (parse_open_marker(buf, &mf)) {
+      mf.start_line = current_line;
+      if (depth < 256)
+        stack[depth++] = mf;
+      continue;
+    }
+
+    close_scrap = parse_close_marker(buf);
+    if (close_scrap >= 0) {
+      int i;
+      for (i = depth - 1; i >= 0; i--) {
+        if (stack[i].scrap == close_scrap) {
+          depth--;
+          for (; i < depth; i++)
+            stack[i] = stack[i + 1];
+          break;
+        }
+      }
+      continue;
+    }
+
+    if (current_line == target_line && depth > 0) {
+      *result = stack[depth - 1];
+      fclose(fp);
+      return 1;
+    }
+  }
+  fclose(fp);
+  return 0;
+}
+@| reverse_lookup_in_file @}
+
+@o output.c
+@{void write_error_annotator(void)
+{
+  char line[8192];
+
+  while (fgets(line, sizeof(line), stdin)) {
+    const char *p = line;
+    char err_file[FILENAME_MAX];
+    int err_line = -1;
+    int parsed = 0;
+
+    /* Try to parse file:digits: pattern */
+    /* Skip optional drive letter on Windows (e.g. C:) */
+    if (p[0] && p[1] == ':' && ((p[0] >= 'A' && p[0] <= 'Z') ||
+        (p[0] >= 'a' && p[0] <= 'z'))) {
+      p += 2;
+    }
+    {
+      const char *colon1 = strchr(p, ':');
+      if (colon1 && colon1 > p) {
+        const char *d = colon1 + 1;
+        int num = 0;
+        int has_digits = 0;
+        while (*d >= '0' && *d <= '9') {
+          num = num * 10 + (*d - '0');
+          has_digits = 1;
+          d++;
+        }
+        if (has_digits && *d == ':') {
+          size_t flen = (size_t)(colon1 - line);
+          if (flen < FILENAME_MAX) {
+            memcpy(err_file, line, flen);
+            err_file[flen] = '\0';
+            err_line = num;
+            parsed = 1;
+          }
+        }
+      }
+    }
+
+    fputs(line, stdout);
+
+    if (parsed) {
+      MarkerFrame mf;
+      if (reverse_lookup_in_file(err_file, err_line, &mf)) {
+        int offset = err_line - mf.start_line;
+        printf("  [weft: %s:%d, scrap %d",
+               mf.file, mf.line + offset, mf.scrap);
+        printf("]\n");
+      }
+    }
+  }
+}
+@| write_error_annotator @}

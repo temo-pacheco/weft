@@ -2,6 +2,39 @@
 
 All notable changes to weft are documented in this file.
 
+## [1.0.5] - 2026-07-26
+
+### Added
+
+- **`end_line` in JSON map** — every `defs` entry in `-m` JSON output now
+  includes `"end_line"`, giving AI assistants and tools the full line span
+  of each scrap definition. Always on — no flag needed.
+
+- **`--bodies` flag** — when combined with `-m`, includes the raw scrap
+  source code as a `"body"` field in each `defs` entry. JSON-escaped,
+  ready for programmatic consumption.
+
+- **`--prose` flag** — when combined with `-m`, includes the documentation
+  paragraph preceding each `@d`/`@o` directive as a `"prose"` field.
+  Gives AI assistants the narrative context for every fragment.
+
+- **`--diff` flag** — dry-run tangle that shows a unified diff of what
+  would change in each output file without writing anything. Useful for
+  previewing changes before committing.
+
+- **`--callers` flag** — when combined with `-e name`, shows the upward
+  call chain from `@o` roots down to the named fragment as an indented
+  tree. Answers "who uses this fragment?" transitively.
+
+- **`--lint` flag** — static analysis of the literate source: reports
+  unused fragments, undefined references, and fuzzy-match suggestions
+  for likely typos (Levenshtein distance ≤ 3).
+
+- **`--errors` flag** — reads compiler/linter output from stdin and
+  annotates `file:line:` patterns with `.weft` source locations by
+  parsing section markers in the tangled output. No `.weft` files needed.
+  Example: `make 2>&1 | weft --errors`
+
 ## [1.0.3] - 2026-03-07
 
 ### Added

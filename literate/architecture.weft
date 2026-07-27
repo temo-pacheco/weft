@@ -76,13 +76,19 @@ as a statement rather than a comment.  GCC~7+ and Clang recognise
 \verb|((void)0)|.  The prose surrounding each switch already explains
 why the fall-through is intended, so no inline comment is needed.
 
-Here we define the maximum length for names (of fragments etc).
+Here we define the maximum length for names (of fragments etc),
+and the version string reported by \verb|--version|.  The version
+is injected at tangle time via the \verb|-V| flag and the \verb|@@v|
+directive, so \verb|make weft VERSION=1.0.5| bakes the correct
+version into the generated C source.
 
 @d Limits @{@%
 #ifndef MAX_NAME_LEN
 #define MAX_NAME_LEN 1024
 #endif
-@| MAX_NAME_LEN @}
+
+#define WEFT_VERSION "@v"
+@| MAX_NAME_LEN WEFT_VERSION @}
 
 
 \subsection{The Main Files}

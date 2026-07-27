@@ -1,11 +1,18 @@
 
-#line 102 "literate/architecture.weft"
-/* {6: literate/architecture.weft:102} */
+#line 108 "literate/architecture.weft"
+/* {6: literate/architecture.weft:108} */
 #include "global.h"
 /* {:6} */
 
 #line 21 "literate/parser.weft"
 /* {42: literate/parser.weft:21} */
+static char prose_buf[4096];
+static int prose_len = 0;
+static char *pending_prose = NULL;
+/* {:42} */
+
+#line 27 "literate/parser.weft"
+/* {43: literate/parser.weft:27} */
 void pass1(char *file_name)
 {
   if (verbose_flag)
@@ -15,18 +22,20 @@ void pass1(char *file_name)
   macro_names = NULL;
   file_names = NULL;
   user_names = NULL;
+  prose_len = 0;
+  pending_prose = NULL;
   /* Scan the source file, looking for at-sequences */
   
-#line 41 "literate/parser.weft"
-  /* {43: literate/parser.weft:41} */
+#line 49 "literate/parser.weft"
+  /* {44: literate/parser.weft:49} */
 {
     int c = source_get();
     while (c != EOF) {
       if (c == nw_char)
         /* Scan at-sequence */
         
-#line 116 "literate/parser.weft"
-        /* {48: literate/parser.weft:116} */
+#line 148 "literate/parser.weft"
+        /* {51: literate/parser.weft:148} */
 {
           char quoted = 0;
 
@@ -39,17 +48,36 @@ void pass1(char *file_name)
                   break;
             case 'O':
             case 'o': {
-                        Name *name = collect_file_name(); /* returns a pointer to the name entry */
-                        int scrap = collect_scrap();      /* returns an index to the scrap */
+                        Name *name;
+                        int scrap;
+                        if (prose_flag && prose_len > 0) {
+                          /* trim trailing whitespace */
+                          while (prose_len > 0 && (prose_buf[prose_len-1] == ' '
+                                 || prose_buf[prose_len-1] == '\n'
+                                 || prose_buf[prose_len-1] == '\t'
+                                 || prose_buf[prose_len-1] == '\r'))
+                            prose_len--;
+                          prose_buf[prose_len] = '\0';
+                          pending_prose = save_string(prose_buf);
+                          prose_len = 0;
+                        } else {
+                          pending_prose = NULL;
+                          prose_len = 0;
+                        }
+                        name = collect_file_name(); /* returns a pointer to the name entry */
+                        scrap = collect_scrap();      /* returns an index to the scrap */
+                        if (pending_prose) set_scrap_prose(scrap, pending_prose);
+                        pending_prose = NULL;
                         {
                           Scrap_Node *def = (Scrap_Node *) arena_getmem(sizeof(Scrap_Node));
                           def->scrap = scrap;
                           def->quoted = quoted;
                           def->next = name->defs;
                           name->defs = def;
+                          set_scrap_owner(scrap, name);
                         }
                       }
-#line 127 "literate/parser.weft"
+#line 159 "literate/parser.weft"
 
                       break;
             case 'Q':
@@ -57,43 +85,62 @@ void pass1(char *file_name)
                       FALLTHROUGH;
             case 'D':
             case 'd': {
-                        Name *name = collect_macro_name();
-                        int scrap = collect_scrap();
+                        Name *name;
+                        int scrap;
+                        if (prose_flag && prose_len > 0) {
+                          /* trim trailing whitespace */
+                          while (prose_len > 0 && (prose_buf[prose_len-1] == ' '
+                                 || prose_buf[prose_len-1] == '\n'
+                                 || prose_buf[prose_len-1] == '\t'
+                                 || prose_buf[prose_len-1] == '\r'))
+                            prose_len--;
+                          prose_buf[prose_len] = '\0';
+                          pending_prose = save_string(prose_buf);
+                          prose_len = 0;
+                        } else {
+                          pending_prose = NULL;
+                          prose_len = 0;
+                        }
+                        name = collect_macro_name();
+                        scrap = collect_scrap();
+                        if (pending_prose) set_scrap_prose(scrap, pending_prose);
+                        pending_prose = NULL;
                         {
                           Scrap_Node *def = (Scrap_Node *) arena_getmem(sizeof(Scrap_Node));
                           def->scrap = scrap;
                           def->quoted = quoted;
                           def->next = name->defs;
                           name->defs = def;
+                          set_scrap_owner(scrap, name);
                         }
                       }
-#line 133 "literate/parser.weft"
+#line 165 "literate/parser.weft"
 
                       break;
             case 's':
                       /* Step to next sector */
                       
-#line 170 "literate/parser.weft"
-/* {49: literate/parser.weft:170} */
+#line 202 "literate/parser.weft"
+/* {52: literate/parser.weft:202} */
 
                       prev_sector += 1;
                       current_sector = prev_sector;
                       c = source_get();
-                      /* {:49} */
+                      /* {:52} */
 
-#line 136 "literate/parser.weft"
+#line 168 "literate/parser.weft"
 
                       break;
             case 'S':
                       /* Close the current sector */
                       
-#line 177 "literate/parser.weft"
-                      /* {50: literate/parser.weft:177} */
+#line 209 "literate/parser.weft"
+                      /* {53: literate/parser.weft:209} */
 current_sector = 1;
                       c = source_get();
-                      /* {:50} */
+                      /* {:53} */
 
-#line 139 "literate/parser.weft"
+#line 171 "literate/parser.weft"
 
                       break;
             case '<':
@@ -141,7 +188,7 @@ current_sector = 1;
                       skipped:  ;
                       }
                       
-#line 144 "literate/parser.weft"
+#line 176 "literate/parser.weft"
 
                       break;
             case 'c': {
@@ -227,7 +274,7 @@ current_sector = 1;
                          *p = '\000';
                       }
                       
-#line 146 "literate/parser.weft"
+#line 178 "literate/parser.weft"
 
                       break;
             case 'l': {
@@ -252,15 +299,15 @@ current_sector = 1;
                         while (lc != EOF && lc != '\n')
                           lc = source_get();
                       }
-#line 148 "literate/parser.weft"
+#line 180 "literate/parser.weft"
 
                       break;
             case 'L': collect_lang_def();
-#line 150 "literate/parser.weft"
+#line 182 "literate/parser.weft"
 
                       break;
             case 'W': collect_weave_format();
-#line 152 "literate/parser.weft"
+#line 184 "literate/parser.weft"
 
                       break;
             case 'x':
@@ -276,29 +323,41 @@ current_sector = 1;
                               command_name, nw_char, source_name, source_line);
                       break;
           }
-        }/* {:48} */
+        }/* {:51} */
 
-#line 45 "literate/parser.weft"
+#line 53 "literate/parser.weft"
 
+      else if (prose_flag) {
+        /* Accumulate prose character */
+        
+#line 62 "literate/parser.weft"
+        /* {45: literate/parser.weft:62} */
+if (prose_len < (int)sizeof(prose_buf) - 1)
+          prose_buf[prose_len++] = c;
+        /* {:45} */
+
+#line 55 "literate/parser.weft"
+
+      }
       c = source_get();
     }
-  }/* {:43} */
+  }/* {:44} */
 
-#line 30 "literate/parser.weft"
+#line 38 "literate/parser.weft"
 
   if (tex_flag)
     search();
   /* Reverse cross-reference lists */
   
-#line 479 "literate/parser.weft"
-  /* {74: literate/parser.weft:479} */
+#line 522 "literate/parser.weft"
+  /* {77: literate/parser.weft:522} */
 {
     reverse_lists(file_names);
     reverse_lists(macro_names);
     reverse_lists(user_names);
-  }/* {:74} */
+  }/* {:77} */
 
-#line 33 "literate/parser.weft"
+#line 41 "literate/parser.weft"
 
 }
-/* {:42} */
+/* {:43} */
