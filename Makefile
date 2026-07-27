@@ -23,7 +23,9 @@ bootstrap: $(OBJS)
 	$(CC) -o weft $(OBJS)
 
 # Normal development: tangle .weft sources into src/, then compile.
-# Pass -V when VERSION is set so that @v bakes the version into the binary.
+# The binary's own version is a hard-coded literal (WEFT_VERSION in
+# literate/architecture.weft), so it is baked in on every build, with
+# or without VERSION.  VERSION / -V only stamps @v in woven documents.
 weft:
 	./weft -t $(if $(VERSION),-V "$(VERSION)") -p $(SRCDIR)/ weft.weft
 	@$(MAKE) --no-print-directory bootstrap
@@ -93,6 +95,14 @@ user-guide:
 dist:
 	@if [ -z "$(VERSION)" ]; then \
 	  echo "Error: VERSION is required.  Usage: make dist VERSION=1.0.2"; \
+	  exit 1; \
+	fi
+	@src_ver=`sed -n 's/.*#define WEFT_VERSION "\([^"]*\)".*/\1/p' \
+	  literate/architecture.weft`; \
+	if [ "$$src_ver" != "$(VERSION)" ]; then \
+	  echo "Error: VERSION=$(VERSION) does not match the hard-coded weft"; \
+	  echo "version \"$$src_ver\" in literate/architecture.weft."; \
+	  echo "Edit that #define WEFT_VERSION line first, then re-run."; \
 	  exit 1; \
 	fi
 	@if [ ! -x ./weft ]; then \

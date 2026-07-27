@@ -77,17 +77,22 @@ as a statement rather than a comment.  GCC~7+ and Clang recognise
 why the fall-through is intended, so no inline comment is needed.
 
 Here we define the maximum length for names (of fragments etc),
-and the version string reported by \verb|--version|.  The version
-is injected at tangle time via the \verb|-V| flag and the \verb|@@v|
-directive, so \verb|make weft VERSION=1.0.5| bakes the correct
-version into the generated C source.
+and the version string reported by \verb|--version|.  The version is
+a hard-coded literal --- the single source of truth for weft's own
+version --- so that \emph{any} build from a fresh checkout carries the
+correct version, whether it is compiled with \verb|make bootstrap|,
+re-tangled with plain \verb|make|, or released with \verb|make dist|.
+Cutting a release is therefore a one-line edit here.  (The \verb|-V|
+flag and the \verb|@@v| directive remain a separate, user-facing
+feature for stamping a version into \emph{other} documents woven by
+weft; they no longer drive weft's own version.)
 
 @d Limits @{@%
 #ifndef MAX_NAME_LEN
 #define MAX_NAME_LEN 1024
 #endif
 
-#define WEFT_VERSION "@v"
+#define WEFT_VERSION "1.1.0"
 @| MAX_NAME_LEN WEFT_VERSION @}
 
 

@@ -123,8 +123,8 @@ typedef struct l_node
 
 /* Limits */
 
-#line 85 "literate/architecture.weft"
-/* {4: literate/architecture.weft:85} */
+#line 90 "literate/architecture.weft"
+/* {4: literate/architecture.weft:90} */
 
 #ifndef MAX_NAME_LEN
 #define MAX_NAME_LEN 1024

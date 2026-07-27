@@ -1,6 +1,6 @@
 
-#line 141 "literate/architecture.weft"
-/* {10: literate/architecture.weft:141} */
+#line 146 "literate/architecture.weft"
+/* {10: literate/architecture.weft:146} */
 #include "global.h"
 /* {:10} */
 

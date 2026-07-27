@@ -1,6 +1,6 @@
 
-#line 123 "literate/architecture.weft"
-/* {8: literate/architecture.weft:123} */
+#line 128 "literate/architecture.weft"
+/* {8: literate/architecture.weft:128} */
 #include "global.h"
 static int scraps = 1;
 /* {:8} */

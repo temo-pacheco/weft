@@ -1,6 +1,6 @@
 
-#line 166 "literate/architecture.weft"
-/* {14: literate/architecture.weft:166} */
+#line 171 "literate/architecture.weft"
+/* {14: literate/architecture.weft:171} */
 #include "global.h"
 /* Operating System Dependencies */
 
@@ -22,7 +22,7 @@
 #endif
 /* {:16} */
 
-#line 167 "literate/architecture.weft"
+#line 172 "literate/architecture.weft"
 
 /* Global variable definitions */
 
@@ -113,7 +113,7 @@ int scrap_ended_with;
 char pending_lang[64] = "";
 /* {:327} */
 
-#line 168 "literate/architecture.weft"
+#line 173 "literate/architecture.weft"
 
 /* {:14} */
 
