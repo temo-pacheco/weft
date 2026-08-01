@@ -99,155 +99,144 @@ End of third fragment.@}
 EOF
 
 cat > test.expected.tex <<"EOF"
-\newcommand{\NWtarget}[2]{#2}
-\newcommand{\NWlink}[2]{#2}
-\newcommand{\NWtxtMacroDefBy}{Fragment defined by}
-\newcommand{\NWtxtMacroRefIn}{Fragment referenced in}
-\newcommand{\NWtxtMacroNoRef}{Fragment never referenced}
-\newcommand{\NWtxtDefBy}{Defined by}
-\newcommand{\NWtxtRefIn}{Referenced in}
-\newcommand{\NWtxtNoRef}{Not referenced}
-\newcommand{\NWtxtFileDefBy}{File defined by}
-\newcommand{\NWtxtIdentsUsed}{Uses:}
-\newcommand{\NWtxtIdentsNotUsed}{Never used}
-\newcommand{\NWtxtIdentsDefed}{Defines:}
-\newcommand{\NWsep}{${\diamond}$}
-\newcommand{\NWnotglobal}{(not defined globally)}
-\newcommand{\NWuseHyperlinks}{}
+\newcommand{\WEFTtarget}[2]{#2}
+\newcommand{\WEFTlink}[2]{#2}
+\newcommand{\WEFTtxtMacroDefBy}{Fragment defined by}
+\newcommand{\WEFTtxtMacroRefIn}{Fragment referenced in}
+\newcommand{\WEFTtxtMacroNoRef}{Fragment never referenced}
+\newcommand{\WEFTtxtDefBy}{Defined by}
+\newcommand{\WEFTtxtRefIn}{Referenced in}
+\newcommand{\WEFTtxtNoRef}{Not referenced}
+\newcommand{\WEFTtxtFileDefBy}{File defined by}
+\newcommand{\WEFTtxtIdentsUsed}{Uses:}
+\newcommand{\WEFTtxtIdentsNotUsed}{Never used}
+\newcommand{\WEFTtxtIdentsDefed}{Defines:}
+\newcommand{\WEFTsep}{${\diamond}$}
+\newcommand{\WEFTnotglobal}{(not defined globally)}
+\newcommand{\WEFTbreakpenalty}{500}
+\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
+\newcommand{\WEFTbrk}{\discretionary{}{}{}}
+\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
+\newlength{\WEFThang}\setlength{\WEFThang}{2em}
+\newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
+\newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
+\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
+\newcommand{\WEFTendcode}{\par\endgroup}
+\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \begin{document}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap1}\raggedright\small
-\NWtarget{weft1a}{} \verb@"test.c"@\nobreak\ {\footnotesize {1a}}$\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Test of quoted fragments.@\\
-\mbox{}\verb@   @\hbox{$\langle\,${\itshape Insert first fragment}\nobreak\ {\footnotesize \NWlink{weft1b}{1b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@   @\hbox{$\langle\,${\itshape Insert second fragment}\nobreak\ {\footnotesize \NWlink{weft1c}{1c}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@   @\hbox{$\langle\,${\itshape Insert third fragment}\nobreak\ {\footnotesize \NWlink{weft1d}{1d}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@   @\hbox{$\langle\,${\itshape Insert parameter \verb@whatsit@ fragment}\nobreak\ {\footnotesize \NWlink{weft2b}{2b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@End of test.@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTbegin
+\label{scrap1}
+\WEFTtarget{weft1a}{} \verb@"test.c"@\nobreak\ {\footnotesize {1a}}$\equiv$
+\WEFTcode
+\mbox{\strut}Test\WEFTsp of\WEFTsp quoted\WEFTsp fragments.\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert first fragment}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}}$\,\rangle$}\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert second fragment}\nobreak\ {\footnotesize \WEFTlink{weft1c}{1c}}$\,\rangle$}\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert third fragment}\nobreak\ {\footnotesize \WEFTlink{weft1d}{1d}}$\,\rangle$}\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert parameter whatsit fragment}\nobreak\ {\footnotesize \WEFTlink{weft1g}{1g}}$\,\rangle$}\WEFTeol
+\mbox{\strut}End\WEFTsp of\WEFTsp test.\WEFTbrk \WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap2}\raggedright\small
-\NWtarget{weft1b}{} $\langle\,${\itshape Insert first fragment}\nobreak\ {\footnotesize {1b}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@This fragment is not quoted.@\\
-\mbox{}\verb@   @\hbox{$\langle\,${\itshape Insert unquoted fragment}\nobreak\ {\footnotesize \NWlink{weft1e}{1e}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@   @\hbox{$\langle\,${\itshape Insert quoted fragment}\nobreak\ {\footnotesize \NWlink{weft2a}{2a}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@   @\hbox{$\langle\,${\itshape Insert parameter \verb@1@ fragment}\nobreak\ {\footnotesize \NWlink{weft2b}{2b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@   @\hbox{$\langle\,${\itshape Insert parameter \verb@thing@ fragment}\nobreak\ {\footnotesize \NWlink{weft2b}{2b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@End of first fragment.@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap2}
+\WEFTtarget{weft1b}{} $\langle\,${\itshape Insert first fragment}\nobreak\ {\footnotesize {1b}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}This\WEFTsp fragment\WEFTsp is\WEFTsp not\WEFTsp quoted.\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert unquoted fragment}\nobreak\ {\footnotesize \WEFTlink{weft1e}{1e}}$\,\rangle$}\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert quoted fragment}\nobreak\ {\footnotesize \WEFTlink{weft1f}{1f}}$\,\rangle$}\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert parameter 1 fragment}\nobreak\ {\footnotesize \WEFTlink{weft1g}{1g}}$\,\rangle$}\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert parameter thing fragment}\nobreak\ {\footnotesize \WEFTlink{weft1g}{1g}}$\,\rangle$}\WEFTeol
+\mbox{\strut}End\WEFTsp of\WEFTsp first\WEFTsp fragment.\WEFTbrk {\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{weft1a}{1a}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap3}\raggedright\small
-\NWtarget{weft1c}{} $\langle\,${\itshape Insert second fragment}\nobreak\ {\footnotesize {1c}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@This fragment is quoted.@\\
-\mbox{}\verb@   @\hbox{$\langle\,${\itshape Insert unquoted fragment}\nobreak\ {\footnotesize \NWlink{weft1e}{1e}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@   @\hbox{$\langle\,${\itshape Insert quoted fragment}\nobreak\ {\footnotesize \NWlink{weft2a}{2a}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@   @\hbox{$\langle\,${\itshape Insert parameter \verb@2@ fragment}\nobreak\ {\footnotesize \NWlink{weft2b}{2b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@   @\hbox{$\langle\,${\itshape Insert parameter \verb@thing@ fragment}\nobreak\ {\footnotesize \NWlink{weft2b}{2b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@End of second fragment.@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap3}
+\WEFTtarget{weft1c}{} $\langle\,${\itshape Insert second fragment}\nobreak\ {\footnotesize {1c}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}This\WEFTsp fragment\WEFTsp is\WEFTsp quoted.\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert unquoted fragment}\nobreak\ {\footnotesize \WEFTlink{weft1e}{1e}}$\,\rangle$}\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert quoted fragment}\nobreak\ {\footnotesize \WEFTlink{weft1f}{1f}}$\,\rangle$}\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert parameter 2 fragment}\nobreak\ {\footnotesize \WEFTlink{weft1g}{1g}}$\,\rangle$}\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert parameter thing fragment}\nobreak\ {\footnotesize \WEFTlink{weft1g}{1g}}$\,\rangle$}\WEFTeol
+\mbox{\strut}End\WEFTsp of\WEFTsp second\WEFTsp fragment.\WEFTbrk {\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{weft1a}{1a}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap4}\raggedright\small
-\NWtarget{weft1d}{} $\langle\,${\itshape Insert third fragment}\nobreak\ {\footnotesize {1d}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@This fragment is not quoted.@\\
-\mbox{}\verb@   @\hbox{$\langle\,${\itshape Insert unquoted fragment}\nobreak\ {\footnotesize \NWlink{weft1e}{1e}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@   @\hbox{$\langle\,${\itshape Insert quoted fragment}\nobreak\ {\footnotesize \NWlink{weft2a}{2a}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@   @\hbox{$\langle\,${\itshape Insert parameter \verb@3@ fragment}\nobreak\ {\footnotesize \NWlink{weft2b}{2b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@   @\hbox{$\langle\,${\itshape Insert parameter \verb@thing@ fragment}\nobreak\ {\footnotesize \NWlink{weft2b}{2b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@End of third fragment.@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap4}
+\WEFTtarget{weft1d}{} $\langle\,${\itshape Insert third fragment}\nobreak\ {\footnotesize {1d}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}This\WEFTsp fragment\WEFTsp is\WEFTsp not\WEFTsp quoted.\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert unquoted fragment}\nobreak\ {\footnotesize \WEFTlink{weft1e}{1e}}$\,\rangle$}\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert quoted fragment}\nobreak\ {\footnotesize \WEFTlink{weft1f}{1f}}$\,\rangle$}\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert parameter 3 fragment}\nobreak\ {\footnotesize \WEFTlink{weft1g}{1g}}$\,\rangle$}\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert parameter thing fragment}\nobreak\ {\footnotesize \WEFTlink{weft1g}{1g}}$\,\rangle$}\WEFTeol
+\mbox{\strut}End\WEFTsp of\WEFTsp third\WEFTsp fragment.\WEFTbrk {\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{weft1a}{1a}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap5}\raggedright\small
-\NWtarget{weft1e}{} $\langle\,${\itshape Insert unquoted fragment}\nobreak\ {\footnotesize {1e}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@This fragment in file @\hbox{\sffamily\slshape file name}\verb@ is not quoted@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap5}
+\WEFTtarget{weft1e}{} $\langle\,${\itshape Insert unquoted fragment}\nobreak\ {\footnotesize {1e}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}This\WEFTsp fragment\WEFTsp in\WEFTsp file\WEFTsp \hbox{\sffamily\slshape file name}\WEFTsp is\WEFTsp not\WEFTsp quoted{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{weft1b}{1b}\NWlink{weft1c}{c}\NWlink{weft1d}{d}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1c}{c}\WEFTlink{weft1d}{d}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap6}\raggedright\small
-\NWtarget{weft2a}{} $\langle\,${\itshape Insert quoted fragment}\nobreak\ {\footnotesize {2a}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@This fragment in file @\hbox{\sffamily\slshape file name}\verb@ is quoted@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap6}
+\WEFTtarget{weft1f}{} $\langle\,${\itshape Insert quoted fragment}\nobreak\ {\footnotesize {1f}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}This\WEFTsp fragment\WEFTsp in\WEFTsp file\WEFTsp \hbox{\sffamily\slshape file name}\WEFTsp is\WEFTsp quoted{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{weft1b}{1b}\NWlink{weft1c}{c}\NWlink{weft1d}{d}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1c}{c}\WEFTlink{weft1d}{d}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap7}\raggedright\small
-\NWtarget{weft2b}{} $\langle\,${\itshape Insert parameter \hbox{\slshape\sffamily thing\/} fragment}\nobreak\ {\footnotesize {2b}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Here >>@\hbox{\slshape\sffamily thing\/}\verb@<< is the parameter@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap7}
+\WEFTtarget{weft1g}{} $\langle\,${\itshape Insert parameter \hbox{\slshape\sffamily thing\/} fragment}\nobreak\ {\footnotesize {1g}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}Here\WEFTsp >\WEFTbrk >\WEFTbrk \hbox{\slshape\sffamily thing\/}<\WEFTbrk <\WEFTbrk \WEFTsp is\WEFTsp the\WEFTsp parameter{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{weft1a}{1a}\NWlink{weft1b}{b}\NWlink{weft1c}{c}\NWlink{weft1d}{d}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1b}{b}\WEFTlink{weft1c}{c}\WEFTlink{weft1d}{d}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
+\WEFTend
 \end{document}
 EOF
 

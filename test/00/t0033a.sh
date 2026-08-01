@@ -87,122 +87,117 @@ cross-reference entry.
 EOF
 
 cat > test.expected.tex <<"EOF"
-\newcommand{\NWtarget}[2]{#2}
-\newcommand{\NWlink}[2]{#2}
-\newcommand{\NWtxtMacroDefBy}{Fragment defined by}
-\newcommand{\NWtxtMacroRefIn}{Fragment referenced in}
-\newcommand{\NWtxtMacroNoRef}{Fragment never referenced}
-\newcommand{\NWtxtDefBy}{Defined by}
-\newcommand{\NWtxtRefIn}{Referenced in}
-\newcommand{\NWtxtNoRef}{Not referenced}
-\newcommand{\NWtxtFileDefBy}{File defined by}
-\newcommand{\NWtxtIdentsUsed}{Uses:}
-\newcommand{\NWtxtIdentsNotUsed}{Never used}
-\newcommand{\NWtxtIdentsDefed}{Defines:}
-\newcommand{\NWsep}{${\diamond}$}
-\newcommand{\NWnotglobal}{(not defined globally)}
-\newcommand{\NWuseHyperlinks}{}
+\newcommand{\WEFTtarget}[2]{#2}
+\newcommand{\WEFTlink}[2]{#2}
+\newcommand{\WEFTtxtMacroDefBy}{Fragment defined by}
+\newcommand{\WEFTtxtMacroRefIn}{Fragment referenced in}
+\newcommand{\WEFTtxtMacroNoRef}{Fragment never referenced}
+\newcommand{\WEFTtxtDefBy}{Defined by}
+\newcommand{\WEFTtxtRefIn}{Referenced in}
+\newcommand{\WEFTtxtNoRef}{Not referenced}
+\newcommand{\WEFTtxtFileDefBy}{File defined by}
+\newcommand{\WEFTtxtIdentsUsed}{Uses:}
+\newcommand{\WEFTtxtIdentsNotUsed}{Never used}
+\newcommand{\WEFTtxtIdentsDefed}{Defines:}
+\newcommand{\WEFTsep}{${\diamond}$}
+\newcommand{\WEFTnotglobal}{(not defined globally)}
+\newcommand{\WEFTbreakpenalty}{500}
+\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
+\newcommand{\WEFTbrk}{\discretionary{}{}{}}
+\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
+\newlength{\WEFThang}\setlength{\WEFThang}{2em}
+\newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
+\newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
+\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
+\newcommand{\WEFTendcode}{\par\endgroup}
+\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \begin{document}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap1}\raggedright\small
-\NWtarget{weft1a}{} \verb@"test.c"@\nobreak\ {\footnotesize {1a}}$\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Begin@\\
-\mbox{}\verb@Define abc cba@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Outer \verb@abc@ and \verb@def@ retuO}\nobreak\ {\footnotesize \NWlink{weft1b}{1b}, \ldots\ }$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Outer \verb@cba@ and \verb@fed@ retuO}\nobreak\ {\footnotesize \NWlink{weft1b}{1b}, \ldots\ }$\,\rangle$}\verb@@\\
-\mbox{}\verb@End@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTbegin
+\label{scrap1}
+\WEFTtarget{weft1a}{} \verb@"test.c"@\nobreak\ {\footnotesize {1a}}$\equiv$
+\WEFTcode
+\mbox{\strut}Begin\WEFTeol
+\mbox{\strut}Define\WEFTsp abc\WEFTsp cba\WEFTeol
+\mbox{\strut}\hbox{$\langle\,${\itshape Outer abc and def retuO}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}, \ldots\ }$\,\rangle$}\WEFTeol
+\mbox{\strut}\hbox{$\langle\,${\itshape Outer cba and fed retuO}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}, \ldots\ }$\,\rangle$}\WEFTeol
+\mbox{\strut}End\WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{weft1a}{1a}\NWlink{weft1d}{d}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@abc@\nobreak\ \NWlink{weft1b}{1b}, \verb@cba@\nobreak\ \NWlink{weft1b}{1b}.\item \NWtxtIdentsUsed\nobreak\  \verb@def@\nobreak\ \NWlink{weft1b}{1b}, \verb@fed@\nobreak\ \NWlink{weft1b}{1b}.
+\item \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}.
+\item \WEFTtxtIdentsDefed\nobreak\  \verb@abc@\nobreak\ \WEFTlink{weft1b}{1b}, \verb@cba@\nobreak\ \WEFTlink{weft1b}{1b}.\item \WEFTtxtIdentsUsed\nobreak\  \verb@def@\nobreak\ \WEFTlink{weft1b}{1b}, \verb@fed@\nobreak\ \WEFTlink{weft1b}{1b}.
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap2}\raggedright\small
-\NWtarget{weft1b}{} $\langle\,${\itshape Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO}\nobreak\ {\footnotesize {1b}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Start@\\
-\mbox{}\verb@Define def fed@\\
-\mbox{}\verb@Use abc cba@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Inner \verb@xArg1yArg2z@ rennI}\nobreak\ {\footnotesize \NWlink{weft1c}{1c}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@Finish@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap2}
+\WEFTtarget{weft1b}{} $\langle\,${\itshape Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO}\nobreak\ {\footnotesize {1b}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}Start\WEFTeol
+\mbox{\strut}Define\WEFTsp def\WEFTsp fed\WEFTeol
+\mbox{\strut}Use\WEFTsp abc\WEFTsp cba\WEFTeol
+\mbox{\strut}\hbox{$\langle\,${\itshape Inner xArg1yArg2z rennI}\nobreak\ {\footnotesize \WEFTlink{weft1c}{1c}}$\,\rangle$}\WEFTeol
+\mbox{\strut}Finish\WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{weft1b}{1b}\NWlink{weft1e}{e}.
-\item \NWtxtMacroRefIn\ \NWlink{weft1a}{1a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@def@\nobreak\ \NWlink{weft1a}{1a}, \verb@fed@\nobreak\ \NWlink{weft1a}{1a}.\item \NWtxtIdentsUsed\nobreak\  \verb@abc@\nobreak\ \NWlink{weft1a}{1a}, \verb@cba@\nobreak\ \NWlink{weft1a}{1a}.
+\item \WEFTtxtMacroDefBy\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1e}{e}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}.
+\item \WEFTtxtIdentsDefed\nobreak\  \verb@def@\nobreak\ \WEFTlink{weft1a}{1a}, \verb@fed@\nobreak\ \WEFTlink{weft1a}{1a}.\item \WEFTtxtIdentsUsed\nobreak\  \verb@abc@\nobreak\ \WEFTlink{weft1a}{1a}, \verb@cba@\nobreak\ \WEFTlink{weft1a}{1a}.
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap4}\raggedright\small
-\NWtarget{weft1c}{} $\langle\,${\itshape Inner \hbox{\slshape\sffamily Stuff\/} rennI}\nobreak\ {\footnotesize {1c}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@XX>>@\hbox{\slshape\sffamily Stuff\/}\verb@<<YY@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap4}
+\WEFTtarget{weft1c}{} $\langle\,${\itshape Inner \hbox{\slshape\sffamily Stuff\/} rennI}\nobreak\ {\footnotesize {1c}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}XX>\WEFTbrk >\WEFTbrk \hbox{\slshape\sffamily Stuff\/}<\WEFTbrk <\WEFTbrk YY{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{weft1b}{1b}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1b}{1b}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap5}\raggedright\small
-\NWtarget{weft1d}{} \verb@"test.c"@\nobreak\ {\footnotesize {1d}}$\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@More stuff@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap5}
+\WEFTtarget{weft1d}{} \verb@"test.c"@\nobreak\ {\footnotesize {1d}}$\equiv$
+\WEFTcode
+\mbox{\strut}More\WEFTsp stuff\WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{weft1a}{1a}\NWlink{weft1d}{d}.
+\item \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap6}\raggedright\small
-\NWtarget{weft1e}{} $\langle\,${\itshape Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO}\nobreak\ {\footnotesize {1e}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Added stuff to force fragment defined@\\
-\mbox{}\verb@cross-reference entry.@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap6}
+\WEFTtarget{weft1e}{} $\langle\,${\itshape Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO}\nobreak\ {\footnotesize {1e}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}Added\WEFTsp stuff\WEFTsp to\WEFTsp force\WEFTsp fragment\WEFTsp defined\WEFTeol
+\mbox{\strut}cross-\WEFTbrk reference\WEFTsp entry.\WEFTbrk \WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{weft1b}{1b}\NWlink{weft1e}{e}.
-\item \NWtxtMacroRefIn\ \NWlink{weft1a}{1a}.
+\item \WEFTtxtMacroDefBy\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1e}{e}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
+\WEFTend
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item $\langle\,$Inner \hbox{\slshape\sffamily Stuff\/} rennI\nobreak\ {\footnotesize \NWlink{weft1c}{1c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{weft1b}{1b}.}
-\item $\langle\,$Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO\nobreak\ {\footnotesize \NWlink{weft1b}{1b}\NWlink{weft1e}{e}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{weft1a}{1a}.}
+\item $\langle\,$Inner \hbox{\slshape\sffamily Stuff\/} rennI\nobreak\ {\footnotesize \WEFTlink{weft1c}{1c}}$\,\rangle$ {\footnotesize {\WEFTtxtRefIn} \WEFTlink{weft1b}{1b}.}
+\item $\langle\,$Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}\WEFTlink{weft1e}{e}}$\,\rangle$ {\footnotesize {\WEFTtxtRefIn} \WEFTlink{weft1a}{1a}.}
 \end{list}}
 
 \end{document}

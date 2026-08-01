@@ -86,90 +86,91 @@ printf("\n");@}
 EOF
 
 cat > test.expected.tex <<"EOF"
-\newcommand{\NWtarget}[2]{#2}
-\newcommand{\NWlink}[2]{#2}
-\newcommand{\NWtxtMacroDefBy}{Fragment defined by}
-\newcommand{\NWtxtMacroRefIn}{Fragment referenced in}
-\newcommand{\NWtxtMacroNoRef}{Fragment never referenced}
-\newcommand{\NWtxtDefBy}{Defined by}
-\newcommand{\NWtxtRefIn}{Referenced in}
-\newcommand{\NWtxtNoRef}{Not referenced}
-\newcommand{\NWtxtFileDefBy}{File defined by}
-\newcommand{\NWtxtIdentsUsed}{Uses:}
-\newcommand{\NWtxtIdentsNotUsed}{Never used}
-\newcommand{\NWtxtIdentsDefed}{Defines:}
-\newcommand{\NWsep}{${\diamond}$}
-\newcommand{\NWnotglobal}{(not defined globally)}
-\newcommand{\NWuseHyperlinks}{}
+\newcommand{\WEFTtarget}[2]{#2}
+\newcommand{\WEFTlink}[2]{#2}
+\newcommand{\WEFTtxtMacroDefBy}{Fragment defined by}
+\newcommand{\WEFTtxtMacroRefIn}{Fragment referenced in}
+\newcommand{\WEFTtxtMacroNoRef}{Fragment never referenced}
+\newcommand{\WEFTtxtDefBy}{Defined by}
+\newcommand{\WEFTtxtRefIn}{Referenced in}
+\newcommand{\WEFTtxtNoRef}{Not referenced}
+\newcommand{\WEFTtxtFileDefBy}{File defined by}
+\newcommand{\WEFTtxtIdentsUsed}{Uses:}
+\newcommand{\WEFTtxtIdentsNotUsed}{Never used}
+\newcommand{\WEFTtxtIdentsDefed}{Defines:}
+\newcommand{\WEFTsep}{${\diamond}$}
+\newcommand{\WEFTnotglobal}{(not defined globally)}
+\newcommand{\WEFTbreakpenalty}{500}
+\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
+\newcommand{\WEFTbrk}{\discretionary{}{}{}}
+\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
+\newlength{\WEFThang}\setlength{\WEFThang}{2em}
+\newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
+\newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
+\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
+\newcommand{\WEFTendcode}{\par\endgroup}
+\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \usepackage{listings}
 \begin{document}
 
 \lstset{extendedchars=true,keepspaces=true,language=C}
 
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap1}\raggedright\small
-\NWtarget{weft?}{} \verb@"test.c"@\nobreak\ {\footnotesize {?}}$\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\lstinline@int@\\
-\mbox{}\lstinline@main(int argc, char ** argv)@\\
-\mbox{}\lstinline@{@\\
-\mbox{}\lstinline@   @\hbox{$\langle\,${\itshape Body of main}\nobreak\ {\footnotesize \NWlink{weft?}{?}}$\,\rangle$}\lstinline@@\\
-\mbox{}\lstinline@}@\\
-\mbox{}\lstinline@@{\NWsep}
-\end{list}
+\WEFTbegin
+\label{scrap1}
+\WEFTtarget{weft?}{} \verb@"test.c"@\nobreak\ {\footnotesize {?}}$\equiv$
+\WEFTcode
+\mbox{\strut}int\WEFTeol
+\mbox{\strut}main(\WEFTbrk int\WEFTsp argc,\WEFTbrk \WEFTsp char\WEFTsp **\WEFTsp argv)\WEFTbrk \WEFTeol
+\mbox{\strut}\{\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Body of main}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
+\mbox{\strut}\}\WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap2}\raggedright\small
-\NWtarget{weft?}{} $\langle\,${\itshape Body of main}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\lstinline@int in;@\\
-\mbox{}\lstinline@unsigned char out[20];@\\
-\mbox{}\lstinline@@\\
-\mbox{}\lstinline@while (scanf("%x", &in) == 1)@\\
-\mbox{}\lstinline@{@\\
-\mbox{}\lstinline@   @\hbox{$\langle\,${\itshape Do one item}\nobreak\ {\footnotesize \NWlink{weft?}{?}}$\,\rangle$}\lstinline@@\\
-\mbox{}\lstinline@}@\\
-\mbox{}\lstinline@return 0;@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap2}
+\WEFTtarget{weft?}{} $\langle\,${\itshape Body of main}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}int\WEFTsp in;\WEFTbrk \WEFTeol
+\mbox{\strut}unsigned\WEFTsp char\WEFTsp out[\WEFTbrk 20]\WEFTbrk ;\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTeol
+\mbox{\strut}while\WEFTsp (\WEFTbrk scanf(\WEFTbrk "\%x",\WEFTbrk \WEFTsp \&in)\WEFTbrk \WEFTsp =\WEFTbrk =\WEFTbrk \WEFTsp 1)\WEFTbrk \WEFTeol
+\mbox{\strut}\{\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Do one item}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
+\mbox{\strut}\}\WEFTeol
+\mbox{\strut}return\WEFTsp 0;\WEFTbrk {\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{weft?}{?}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap3}\raggedright\small
-\NWtarget{weft?}{} $\langle\,${\itshape Do one item}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\lstinline@int n = mangle(in, out);@\\
-\mbox{}\lstinline@@\\
-\mbox{}\lstinline@for (int i = 0; i < n; i++)@\\
-\mbox{}\lstinline@   printf("%02x", out[i]);@\\
-\mbox{}\lstinline@printf("\n");@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap3}
+\WEFTtarget{weft?}{} $\langle\,${\itshape Do one item}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}int\WEFTsp n\WEFTsp =\WEFTbrk \WEFTsp mangle(\WEFTbrk in,\WEFTbrk \WEFTsp out)\WEFTbrk ;\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTeol
+\mbox{\strut}for\WEFTsp (\WEFTbrk int\WEFTsp i\WEFTsp =\WEFTbrk \WEFTsp 0;\WEFTbrk \WEFTsp i\WEFTsp <\WEFTbrk \WEFTsp n;\WEFTbrk \WEFTsp i+\WEFTbrk +\WEFTbrk )\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp printf(\WEFTbrk "\%02x",\WEFTbrk \WEFTsp out[\WEFTbrk i]\WEFTbrk )\WEFTbrk ;\WEFTbrk \WEFTeol
+\mbox{\strut}printf(\WEFTbrk "\textbackslash{}n")\WEFTbrk ;\WEFTbrk {\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{weft?}{?}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
+\WEFTend
 \end{document}
 EOF
 

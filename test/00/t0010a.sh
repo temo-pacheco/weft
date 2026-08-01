@@ -62,41 +62,48 @@ Here is a cross-reference: @xref@x
 EOF
 
 cat > test.expected.tex <<"EOF"
-\newcommand{\NWtarget}[2]{#2}
-\newcommand{\NWlink}[2]{#2}
-\newcommand{\NWtxtMacroDefBy}{Fragment defined by}
-\newcommand{\NWtxtMacroRefIn}{Fragment referenced in}
-\newcommand{\NWtxtMacroNoRef}{Fragment never referenced}
-\newcommand{\NWtxtDefBy}{Defined by}
-\newcommand{\NWtxtRefIn}{Referenced in}
-\newcommand{\NWtxtNoRef}{Not referenced}
-\newcommand{\NWtxtFileDefBy}{File defined by}
-\newcommand{\NWtxtIdentsUsed}{Uses:}
-\newcommand{\NWtxtIdentsNotUsed}{Never used}
-\newcommand{\NWtxtIdentsDefed}{Defines:}
-\newcommand{\NWsep}{${\diamond}$}
-\newcommand{\NWnotglobal}{(not defined globally)}
-\newcommand{\NWuseHyperlinks}{}
+\newcommand{\WEFTtarget}[2]{#2}
+\newcommand{\WEFTlink}[2]{#2}
+\newcommand{\WEFTtxtMacroDefBy}{Fragment defined by}
+\newcommand{\WEFTtxtMacroRefIn}{Fragment referenced in}
+\newcommand{\WEFTtxtMacroNoRef}{Fragment never referenced}
+\newcommand{\WEFTtxtDefBy}{Defined by}
+\newcommand{\WEFTtxtRefIn}{Referenced in}
+\newcommand{\WEFTtxtNoRef}{Not referenced}
+\newcommand{\WEFTtxtFileDefBy}{File defined by}
+\newcommand{\WEFTtxtIdentsUsed}{Uses:}
+\newcommand{\WEFTtxtIdentsNotUsed}{Never used}
+\newcommand{\WEFTtxtIdentsDefed}{Defines:}
+\newcommand{\WEFTsep}{${\diamond}$}
+\newcommand{\WEFTnotglobal}{(not defined globally)}
+\newcommand{\WEFTbreakpenalty}{500}
+\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
+\newcommand{\WEFTbrk}{\discretionary{}{}{}}
+\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
+\newlength{\WEFThang}\setlength{\WEFThang}{2em}
+\newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
+\newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
+\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
+\newcommand{\WEFTendcode}{\par\endgroup}
+\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \begin{document}
 Here is a cross-reference: 1-01
 
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap1}\raggedright\small
-\NWtarget{weft1}{} \verb@"test.c"@\nobreak\ {\footnotesize {1}}$\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@This (1-01) is where it is referencing.@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTbegin
+\label{scrap1}
+\WEFTtarget{weft1}{} \verb@"test.c"@\nobreak\ {\footnotesize {1}}$\equiv$
+\WEFTcode
+\mbox{\strut}This\WEFTsp (\WEFTbrk 1-01)\WEFTbrk \WEFTsp is\WEFTsp where\WEFTsp it\WEFTsp is\WEFTsp referencing.\WEFTbrk \WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
+\WEFTend
 \end{document}
 EOF
 

@@ -52,7 +52,7 @@ if test $? -ne 0 ; then no_result; fi
 
 cat > test.w <<"EOF"
 \documentclass{article}
-\NWuseHyperlinks
+\WEFTuseHyperlinks
 \begin{document}
 @o test.c -cc
 @{@<Use a fragment@>
@@ -64,57 +64,61 @@ cat > test.w <<"EOF"
 EOF
 
 cat > test.expected.tex <<"EOF"
-\newcommand{\NWtarget}[2]{\hypertarget{#1}{#2}}
-\newcommand{\NWlink}[2]{\hyperlink{#1}{#2}}
-\newcommand{\NWtxtMacroDefBy}{Fragment defined by}
-\newcommand{\NWtxtMacroRefIn}{Fragment referenced in}
-\newcommand{\NWtxtMacroNoRef}{Fragment never referenced}
-\newcommand{\NWtxtDefBy}{Defined by}
-\newcommand{\NWtxtRefIn}{Referenced in}
-\newcommand{\NWtxtNoRef}{Not referenced}
-\newcommand{\NWtxtFileDefBy}{File defined by}
-\newcommand{\NWtxtIdentsUsed}{Uses:}
-\newcommand{\NWtxtIdentsNotUsed}{Never used}
-\newcommand{\NWtxtIdentsDefed}{Defines:}
-\newcommand{\NWsep}{${\diamond}$}
-\newcommand{\NWnotglobal}{(not defined globally)}
-\newcommand{\NWuseHyperlinks}{\usepackage[pdftex,colorlinks=true]{hyperref}}
+\newcommand{\WEFTtarget}[2]{\hypertarget{#1}{#2}}
+\newcommand{\WEFTlink}[2]{\hyperlink{#1}{#2}}
+\newcommand{\WEFTtxtMacroDefBy}{Fragment defined by}
+\newcommand{\WEFTtxtMacroRefIn}{Fragment referenced in}
+\newcommand{\WEFTtxtMacroNoRef}{Fragment never referenced}
+\newcommand{\WEFTtxtDefBy}{Defined by}
+\newcommand{\WEFTtxtRefIn}{Referenced in}
+\newcommand{\WEFTtxtNoRef}{Not referenced}
+\newcommand{\WEFTtxtFileDefBy}{File defined by}
+\newcommand{\WEFTtxtIdentsUsed}{Uses:}
+\newcommand{\WEFTtxtIdentsNotUsed}{Never used}
+\newcommand{\WEFTtxtIdentsDefed}{Defines:}
+\newcommand{\WEFTsep}{${\diamond}$}
+\newcommand{\WEFTnotglobal}{(not defined globally)}
+\newcommand{\WEFTbreakpenalty}{500}
+\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
+\newcommand{\WEFTbrk}{\discretionary{}{}{}}
+\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
+\newlength{\WEFThang}\setlength{\WEFThang}{2em}
+\newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
+\newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
+\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
+\newcommand{\WEFTendcode}{\par\endgroup}
+\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\newcommand{\WEFTuseHyperlinks}{\usepackage[pdftex,colorlinks=true]{hyperref}}
 \documentclass{article}
-\NWuseHyperlinks
+\WEFTuseHyperlinks
 \begin{document}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap1}\raggedright\small
-\NWtarget{weft1a}{} \verb@"test.c"@\nobreak\ {\footnotesize {1a}}$\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Use a fragment}\nobreak\ {\footnotesize \NWlink{weft1b}{1b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTbegin
+\label{scrap1}
+\WEFTtarget{weft1a}{} \verb@"test.c"@\nobreak\ {\footnotesize {1a}}$\equiv$
+\WEFTcode
+\mbox{\strut}\hbox{$\langle\,${\itshape Use a fragment}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}}$\,\rangle$}\WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap2}\raggedright\small
-\NWtarget{weft1b}{} $\langle\,${\itshape Use a fragment}\nobreak\ {\footnotesize {1b}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Here is a fragment.@\\
-\mbox{}\verb@   Make sure it is referenced properly.@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap2}
+\WEFTtarget{weft1b}{} $\langle\,${\itshape Use a fragment}\nobreak\ {\footnotesize {1b}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}Here\WEFTsp is\WEFTsp a\WEFTsp fragment.\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp Make\WEFTsp sure\WEFTsp it\WEFTsp is\WEFTsp referenced\WEFTsp properly.\WEFTbrk {\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{weft1a}{1a}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
+\WEFTend
 \end{document}
 EOF
 

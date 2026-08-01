@@ -71,63 +71,67 @@ Here we use another fragment.
 EOF
 
 cat > test.expected.tex <<"EOF"
-\newcommand{\NWtarget}[2]{#2}
-\newcommand{\NWlink}[2]{#2}
-\newcommand{\NWtxtMacroDefBy}{Fragment defined by}
-\newcommand{\NWtxtMacroRefIn}{Fragment referenced in}
-\newcommand{\NWtxtMacroNoRef}{Fragment never referenced}
-\newcommand{\NWtxtDefBy}{Defined by}
-\newcommand{\NWtxtRefIn}{Referenced in}
-\newcommand{\NWtxtNoRef}{Not referenced}
-\newcommand{\NWtxtFileDefBy}{File defined by}
-\newcommand{\NWtxtIdentsUsed}{Uses:}
-\newcommand{\NWtxtIdentsNotUsed}{Never used}
-\newcommand{\NWtxtIdentsDefed}{Defines:}
-\newcommand{\NWsep}{${\diamond}$}
-\newcommand{\NWnotglobal}{(not defined globally)}
-\newcommand{\NWuseHyperlinks}{}
+\newcommand{\WEFTtarget}[2]{#2}
+\newcommand{\WEFTlink}[2]{#2}
+\newcommand{\WEFTtxtMacroDefBy}{Fragment defined by}
+\newcommand{\WEFTtxtMacroRefIn}{Fragment referenced in}
+\newcommand{\WEFTtxtMacroNoRef}{Fragment never referenced}
+\newcommand{\WEFTtxtDefBy}{Defined by}
+\newcommand{\WEFTtxtRefIn}{Referenced in}
+\newcommand{\WEFTtxtNoRef}{Not referenced}
+\newcommand{\WEFTtxtFileDefBy}{File defined by}
+\newcommand{\WEFTtxtIdentsUsed}{Uses:}
+\newcommand{\WEFTtxtIdentsNotUsed}{Never used}
+\newcommand{\WEFTtxtIdentsDefed}{Defines:}
+\newcommand{\WEFTsep}{${\diamond}$}
+\newcommand{\WEFTnotglobal}{(not defined globally)}
+\newcommand{\WEFTbreakpenalty}{500}
+\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
+\newcommand{\WEFTbrk}{\discretionary{}{}{}}
+\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
+\newlength{\WEFThang}\setlength{\WEFThang}{2em}
+\newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
+\newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
+\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
+\newcommand{\WEFTendcode}{\par\endgroup}
+\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \begin{document}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}
+\WEFTbegin
+
 Here is a block comment which contains the word 'target'.
 \par\vspace{\baselineskip}
-\label{scrap1}\raggedright\small
-\NWtarget{weft1a}{} \verb@"test.c"@\nobreak\ {\footnotesize {1a}}$\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Here is a fragment which contains the block comment@\\
-\mbox{}\verb@@\hbox{\sffamily\slshape (Comment)}\verb@@\\
-\mbox{}\verb@That was the block comment.@\\
-\mbox{}\verb@Here we use another fragment.@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Define our target}\nobreak\ {\footnotesize \NWlink{weft1b}{1b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\label{scrap1}
+\WEFTtarget{weft1a}{} \verb@"test.c"@\nobreak\ {\footnotesize {1a}}$\equiv$
+\WEFTcode
+\mbox{\strut}Here\WEFTsp is\WEFTsp a\WEFTsp fragment\WEFTsp which\WEFTsp contains\WEFTsp the\WEFTsp block\WEFTsp comment\WEFTeol
+\mbox{\strut}\hbox{\sffamily\slshape (Comment)}\WEFTeol
+\mbox{\strut}That\WEFTsp was\WEFTsp the\WEFTsp block\WEFTsp comment.\WEFTbrk \WEFTeol
+\mbox{\strut}Here\WEFTsp we\WEFTsp use\WEFTsp another\WEFTsp fragment.\WEFTbrk \WEFTeol
+\mbox{\strut}\hbox{$\langle\,${\itshape Define our target}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}}$\,\rangle$}\WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap2}\raggedright\small
-\NWtarget{weft1b}{} $\langle\,${\itshape Define our target}\nobreak\ {\footnotesize {1b}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@This fragment defines 'target'.@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap2}
+\WEFTtarget{weft1b}{} $\langle\,${\itshape Define our target}\nobreak\ {\footnotesize {1b}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}This\WEFTsp fragment\WEFTsp defines\WEFTsp 'target'.\WEFTbrk \WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{weft1a}{1a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@target@\nobreak\ \NWtxtIdentsNotUsed.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}.
+\item \WEFTtxtIdentsDefed\nobreak\  \verb@target@\nobreak\ \WEFTtxtIdentsNotUsed.
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
+\WEFTend
 \end{document}
 EOF
 

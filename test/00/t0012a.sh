@@ -81,25 +81,35 @@ newline. (So long as its length is right.
 EOF
 
 cat > test.expected.tex <<"EOF"
-\newcommand{\NWtarget}[2]{#2}
-\newcommand{\NWlink}[2]{#2}
-\newcommand{\NWtxtMacroDefBy}{Fragment defined by}
-\newcommand{\NWtxtMacroRefIn}{Fragment referenced in}
-\newcommand{\NWtxtMacroNoRef}{Fragment never referenced}
-\newcommand{\NWtxtDefBy}{Defined by}
-\newcommand{\NWtxtRefIn}{Referenced in}
-\newcommand{\NWtxtNoRef}{Not referenced}
-\newcommand{\NWtxtFileDefBy}{File defined by}
-\newcommand{\NWtxtIdentsUsed}{Uses:}
-\newcommand{\NWtxtIdentsNotUsed}{Never used}
-\newcommand{\NWtxtIdentsDefed}{Defines:}
-\newcommand{\NWsep}{${\diamond}$}
-\newcommand{\NWnotglobal}{(not defined globally)}
-\newcommand{\NWuseHyperlinks}{}
+\newcommand{\WEFTtarget}[2]{#2}
+\newcommand{\WEFTlink}[2]{#2}
+\newcommand{\WEFTtxtMacroDefBy}{Fragment defined by}
+\newcommand{\WEFTtxtMacroRefIn}{Fragment referenced in}
+\newcommand{\WEFTtxtMacroNoRef}{Fragment never referenced}
+\newcommand{\WEFTtxtDefBy}{Defined by}
+\newcommand{\WEFTtxtRefIn}{Referenced in}
+\newcommand{\WEFTtxtNoRef}{Not referenced}
+\newcommand{\WEFTtxtFileDefBy}{File defined by}
+\newcommand{\WEFTtxtIdentsUsed}{Uses:}
+\newcommand{\WEFTtxtIdentsNotUsed}{Never used}
+\newcommand{\WEFTtxtIdentsDefed}{Defines:}
+\newcommand{\WEFTsep}{${\diamond}$}
+\newcommand{\WEFTnotglobal}{(not defined globally)}
+\newcommand{\WEFTbreakpenalty}{500}
+\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
+\newcommand{\WEFTbrk}{\discretionary{}{}{}}
+\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
+\newlength{\WEFThang}\setlength{\WEFThang}{2em}
+\newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
+\newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
+\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
+\newcommand{\WEFTendcode}{\par\endgroup}
+\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \begin{document}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth} Here is a block comment which is long enough to need line
+\WEFTbegin
+ Here is a block comment which is long enough to need line
 breaking. (And a bit extra.)
 Here is a block comment which is long enough to need line
 breaking.
@@ -112,45 +122,39 @@ Here is more of the block comment. It is also long enough to
 need line-breaking.
 
 \par\vspace{\baselineskip}
-\label{scrap1}\raggedright\small
-\NWtarget{weft?}{} \verb@"test.c"@\nobreak\ {\footnotesize {?}}$\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Here is some stuff.@\\
-\mbox{}\verb@   @\hbox{\sffamily\slshape (Comment)}\verb@@\\
-\mbox{}\verb@Here is the end of the stuff.@\\
-\mbox{}\verb@Here (@\hbox{\sffamily\slshape (Comment)}\verb@) is a block comment in code.@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\label{scrap1}
+\WEFTtarget{weft?}{} \verb@"test.c"@\nobreak\ {\footnotesize {?}}$\equiv$
+\WEFTcode
+\mbox{\strut}Here\WEFTsp is\WEFTsp some\WEFTsp stuff.\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{\sffamily\slshape (Comment)}\WEFTeol
+\mbox{\strut}Here\WEFTsp is\WEFTsp the\WEFTsp end\WEFTsp of\WEFTsp the\WEFTsp stuff.\WEFTbrk \WEFTeol
+\mbox{\strut}Here\WEFTsp (\WEFTbrk \hbox{\sffamily\slshape (Comment)})\WEFTbrk \WEFTsp is\WEFTsp a\WEFTsp block\WEFTsp comment\WEFTsp in\WEFTsp code.\WEFTbrk \WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{weft?}{?}\NWlink{weft?}{, ?}.
+\item \WEFTtxtFileDefBy\ \WEFTlink{weft?}{?}\WEFTlink{weft?}{, ?}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth} This is another block comment that shouldn't end in a
+\WEFTend
+\WEFTbegin
+ This is another block comment that shouldn't end in a
 newline. (So long as its length is right.
 \par\vspace{\baselineskip}
-\label{scrap2}\raggedright\small
-\NWtarget{weft?}{} \verb@"test.c"@\nobreak\ {\footnotesize {?}}$\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@This --@\hbox{\sffamily\slshape (Comment)}\verb@-- is where it is used.@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\label{scrap2}
+\WEFTtarget{weft?}{} \verb@"test.c"@\nobreak\ {\footnotesize {?}}$\equiv$
+\WEFTcode
+\mbox{\strut}This\WEFTsp -\WEFTbrk -\WEFTbrk \hbox{\sffamily\slshape (Comment)}-\WEFTbrk -\WEFTbrk \WEFTsp is\WEFTsp where\WEFTsp it\WEFTsp is\WEFTsp used.\WEFTbrk \WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{weft?}{?}\NWlink{weft?}{, ?}.
+\item \WEFTtxtFileDefBy\ \WEFTlink{weft?}{?}\WEFTlink{weft?}{, ?}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
+\WEFTend
 \end{document}
 EOF
 

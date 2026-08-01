@@ -78,109 +78,104 @@ And this is the end of the second frag@}
 EOF
 
 cat > test.expected.tex <<"EOF"
-\newcommand{\NWtarget}[2]{#2}
-\newcommand{\NWlink}[2]{#2}
-\newcommand{\NWtxtMacroDefBy}{Fragment defined by}
-\newcommand{\NWtxtMacroRefIn}{Fragment referenced in}
-\newcommand{\NWtxtMacroNoRef}{Fragment never referenced}
-\newcommand{\NWtxtDefBy}{Defined by}
-\newcommand{\NWtxtRefIn}{Referenced in}
-\newcommand{\NWtxtNoRef}{Not referenced}
-\newcommand{\NWtxtFileDefBy}{File defined by}
-\newcommand{\NWtxtIdentsUsed}{Uses:}
-\newcommand{\NWtxtIdentsNotUsed}{Never used}
-\newcommand{\NWtxtIdentsDefed}{Defines:}
-\newcommand{\NWsep}{${\diamond}$}
-\newcommand{\NWnotglobal}{(not defined globally)}
-\newcommand{\NWuseHyperlinks}{}
+\newcommand{\WEFTtarget}[2]{#2}
+\newcommand{\WEFTlink}[2]{#2}
+\newcommand{\WEFTtxtMacroDefBy}{Fragment defined by}
+\newcommand{\WEFTtxtMacroRefIn}{Fragment referenced in}
+\newcommand{\WEFTtxtMacroNoRef}{Fragment never referenced}
+\newcommand{\WEFTtxtDefBy}{Defined by}
+\newcommand{\WEFTtxtRefIn}{Referenced in}
+\newcommand{\WEFTtxtNoRef}{Not referenced}
+\newcommand{\WEFTtxtFileDefBy}{File defined by}
+\newcommand{\WEFTtxtIdentsUsed}{Uses:}
+\newcommand{\WEFTtxtIdentsNotUsed}{Never used}
+\newcommand{\WEFTtxtIdentsDefed}{Defines:}
+\newcommand{\WEFTsep}{${\diamond}$}
+\newcommand{\WEFTnotglobal}{(not defined globally)}
+\newcommand{\WEFTbreakpenalty}{500}
+\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
+\newcommand{\WEFTbrk}{\discretionary{}{}{}}
+\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
+\newlength{\WEFThang}\setlength{\WEFThang}{2em}
+\newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
+\newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
+\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
+\newcommand{\WEFTendcode}{\par\endgroup}
+\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \begin{document}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap1}\raggedright\small
-\NWtarget{weft?}{} \verb@"test.c"@\nobreak\ {\footnotesize {?}}$\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Call the macro@\\
-\mbox{}\verb@   @\hbox{$\langle\,${\itshape Fragment with $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize \NWlink{weft?}{?}}$\,\rangle$ as parameter}\nobreak\ {\footnotesize \NWlink{weft?}{?}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@   @\hbox{$\langle\,${\itshape Second frag with $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize \NWlink{weft?}{?}}$\,\rangle$ as parameter}\nobreak\ {\footnotesize \NWlink{weft?}{?}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@   @\hbox{$\langle\,${\itshape Third frag with $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize \NWlink{weft?}{?}}$\,\rangle$ as parameter}\nobreak\ {\footnotesize \NWlink{weft?}{?}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTbegin
+\label{scrap1}
+\WEFTtarget{weft?}{} \verb@"test.c"@\nobreak\ {\footnotesize {?}}$\equiv$
+\WEFTcode
+\mbox{\strut}Call\WEFTsp the\WEFTsp macro\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Fragment with $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$ as parameter}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Second frag with $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$ as parameter}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Third frag with $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$ as parameter}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap2}\raggedright\small
-\NWtarget{weft?}{} $\langle\,${\itshape Fragment with \hbox{\slshape\sffamily Begin macro\/} as parameter}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@@\hbox{\slshape\sffamily Begin macro\/}\verb@<<<Here 'tis.@\\
-\mbox{}\verb@That argument was at the beginning of the fragment@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap2}
+\WEFTtarget{weft?}{} $\langle\,${\itshape Fragment with \hbox{\slshape\sffamily Begin macro\/} as parameter}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}\hbox{\slshape\sffamily Begin macro\/}<\WEFTbrk <\WEFTbrk <\WEFTbrk Here\WEFTsp 'tis.\WEFTbrk \WEFTeol
+\mbox{\strut}That\WEFTsp argument\WEFTsp was\WEFTsp at\WEFTsp the\WEFTsp beginning\WEFTsp of\WEFTsp the\WEFTsp fragment{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{weft?}{?}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap3}\raggedright\small
-\NWtarget{weft?}{} $\langle\,${\itshape Second frag with \hbox{\slshape\sffamily Begin line\/} as parameter}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Here is the beginning of the second macro@\\
-\mbox{}\verb@@\hbox{\slshape\sffamily Begin line\/}\verb@<<<That is the argument@\\
-\mbox{}\verb@And this is the end of the second frag@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap3}
+\WEFTtarget{weft?}{} $\langle\,${\itshape Second frag with \hbox{\slshape\sffamily Begin line\/} as parameter}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}Here\WEFTsp is\WEFTsp the\WEFTsp beginning\WEFTsp of\WEFTsp the\WEFTsp second\WEFTsp macro\WEFTeol
+\mbox{\strut}\hbox{\slshape\sffamily Begin line\/}<\WEFTbrk <\WEFTbrk <\WEFTbrk That\WEFTsp is\WEFTsp the\WEFTsp argument\WEFTeol
+\mbox{\strut}And\WEFTsp this\WEFTsp is\WEFTsp the\WEFTsp end\WEFTsp of\WEFTsp the\WEFTsp second\WEFTsp frag{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{weft?}{?}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap4}\raggedright\small
-\NWtarget{weft?}{} $\langle\,${\itshape Third frag with \hbox{\slshape\sffamily Embedded\/} as parameter}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Here is the argument>>>@\hbox{\slshape\sffamily Embedded\/}\verb@<<<That was it.@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap4}
+\WEFTtarget{weft?}{} $\langle\,${\itshape Third frag with \hbox{\slshape\sffamily Embedded\/} as parameter}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}Here\WEFTsp is\WEFTsp the\WEFTsp argument>\WEFTbrk >\WEFTbrk >\WEFTbrk \hbox{\slshape\sffamily Embedded\/}<\WEFTbrk <\WEFTbrk <\WEFTbrk That\WEFTsp was\WEFTsp it.\WEFTbrk {\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{weft?}{?}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap5}\raggedright\small
-\NWtarget{weft?}{} $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Hello folks@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap5}
+\WEFTtarget{weft?}{} $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}Hello\WEFTsp folks{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{weft?}{?}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
+\WEFTend
 \end{document}
 EOF
 

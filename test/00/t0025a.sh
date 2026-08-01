@@ -109,261 +109,235 @@ cat > test.w <<"EOF"
 EOF
 
 cat > test.expected.tex <<"EOF"
-\newcommand{\NWtarget}[2]{#2}
-\newcommand{\NWlink}[2]{#2}
-\newcommand{\NWtxtMacroDefBy}{Fragment defined by}
-\newcommand{\NWtxtMacroRefIn}{Fragment referenced in}
-\newcommand{\NWtxtMacroNoRef}{Fragment never referenced}
-\newcommand{\NWtxtDefBy}{Defined by}
-\newcommand{\NWtxtRefIn}{Referenced in}
-\newcommand{\NWtxtNoRef}{Not referenced}
-\newcommand{\NWtxtFileDefBy}{File defined by}
-\newcommand{\NWtxtIdentsUsed}{Uses:}
-\newcommand{\NWtxtIdentsNotUsed}{Never used}
-\newcommand{\NWtxtIdentsDefed}{Defines:}
-\newcommand{\NWsep}{${\diamond}$}
-\newcommand{\NWnotglobal}{(not defined globally)}
-\newcommand{\NWuseHyperlinks}{}
+\newcommand{\WEFTtarget}[2]{#2}
+\newcommand{\WEFTlink}[2]{#2}
+\newcommand{\WEFTtxtMacroDefBy}{Fragment defined by}
+\newcommand{\WEFTtxtMacroRefIn}{Fragment referenced in}
+\newcommand{\WEFTtxtMacroNoRef}{Fragment never referenced}
+\newcommand{\WEFTtxtDefBy}{Defined by}
+\newcommand{\WEFTtxtRefIn}{Referenced in}
+\newcommand{\WEFTtxtNoRef}{Not referenced}
+\newcommand{\WEFTtxtFileDefBy}{File defined by}
+\newcommand{\WEFTtxtIdentsUsed}{Uses:}
+\newcommand{\WEFTtxtIdentsNotUsed}{Never used}
+\newcommand{\WEFTtxtIdentsDefed}{Defines:}
+\newcommand{\WEFTsep}{${\diamond}$}
+\newcommand{\WEFTnotglobal}{(not defined globally)}
+\newcommand{\WEFTbreakpenalty}{500}
+\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
+\newcommand{\WEFTbrk}{\discretionary{}{}{}}
+\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
+\newlength{\WEFThang}\setlength{\WEFThang}{2em}
+\newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
+\newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
+\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
+\newcommand{\WEFTendcode}{\par\endgroup}
+\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \begin{document}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap1}\raggedright\small
-\NWtarget{weft1a}{} \verb@"test.actual.c"@\nobreak\ {\footnotesize {1a}}$\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@ First use in global@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \NWlink{weft1b}{1b}, \ldots\ }$\,\rangle$}\verb@@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTbegin
+\label{scrap1}
+\WEFTtarget{weft1a}{} \verb@"test.actual.c"@\nobreak\ {\footnotesize {1a}}$\equiv$
+\WEFTcode
+\mbox{\strut}\WEFTsp First\WEFTsp use\WEFTsp in\WEFTsp global\WEFTeol
+\mbox{\strut}\hbox{$\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}, \ldots\ }$\,\rangle$}\WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{weft1a}{1a}\NWlink{weft1d}{d}\NWlink{weft1e}{e}\NWlink{weft2c}{, 2c}\NWlink{weft2e}{e}.
+\item \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft2a}{, 2a}\WEFTlink{weft2c}{c}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap2}\raggedright\small
-\NWtarget{weft1b}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {1b}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Base sector line one.@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap2}
+\WEFTtarget{weft1b}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {1b}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}Base\WEFTsp sector\WEFTsp line\WEFTsp one.\WEFTbrk \WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{weft1b}{1b}\NWlink{weft2a}{, 2a}\NWlink{weft2d}{d}.
-\item \NWtxtMacroRefIn\ \NWlink{weft1a}{1a}\NWlink{weft2e}{, 2e}.
+\item \WEFTtxtMacroDefBy\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1g}{g}\WEFTlink{weft2b}{, 2b}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTlink{weft2c}{, 2c}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
+\WEFTend
 
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap3}\raggedright\small
-\NWtarget{weft1c}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {1c}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@First sector line one.@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTbegin
+\label{scrap3}
+\WEFTtarget{weft1c}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {1c}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}First\WEFTsp sector\WEFTsp line\WEFTsp one.\WEFTbrk \WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{weft1d}{1d}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1d}{1d}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap4}\raggedright\small
-\NWtarget{weft1d}{} \verb@"test.actual.c"@\nobreak\ {\footnotesize {1d}}$\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Use first local@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \NWlink{weft1c}{1c}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Frag 2}\nobreak\ {\footnotesize \NWlink{weft2f}{2f}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap4}
+\WEFTtarget{weft1d}{} \verb@"test.actual.c"@\nobreak\ {\footnotesize {1d}}$\equiv$
+\WEFTcode
+\mbox{\strut}Use\WEFTsp first\WEFTsp local\WEFTeol
+\mbox{\strut}\hbox{$\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \WEFTlink{weft1c}{1c}}$\,\rangle$}\WEFTeol
+\mbox{\strut}\hbox{$\langle\,${\itshape Frag 2}\nobreak\ {\footnotesize \WEFTlink{weft2d}{2d}}$\,\rangle$}\WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{weft1a}{1a}\NWlink{weft1d}{d}\NWlink{weft1e}{e}\NWlink{weft2c}{, 2c}\NWlink{weft2e}{e}.
+\item \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft2a}{, 2a}\WEFTlink{weft2c}{c}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
+\WEFTend
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item $\langle\,$Frag 1\nobreak\ {\footnotesize \NWlink{weft1c}{1c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{weft1d}{1d}.}
+\item $\langle\,$Frag 1\nobreak\ {\footnotesize \WEFTlink{weft1c}{1c}}$\,\rangle$ {\footnotesize {\WEFTtxtRefIn} \WEFTlink{weft1d}{1d}.}
 \end{list}}
 
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap5}\raggedright\small
-\NWtarget{weft1e}{} \verb@"test.actual.c"@\nobreak\ {\footnotesize {1e}}$\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Use second local@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \NWlink{weft1f}{1f}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTbegin
+\label{scrap5}
+\WEFTtarget{weft1e}{} \verb@"test.actual.c"@\nobreak\ {\footnotesize {1e}}$\equiv$
+\WEFTcode
+\mbox{\strut}Use\WEFTsp second\WEFTsp local\WEFTeol
+\mbox{\strut}\hbox{$\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \WEFTlink{weft1f}{1f}}$\,\rangle$}\WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{weft1a}{1a}\NWlink{weft1d}{d}\NWlink{weft1e}{e}\NWlink{weft2c}{, 2c}\NWlink{weft2e}{e}.
+\item \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft2a}{, 2a}\WEFTlink{weft2c}{c}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap6}\raggedright\small
-\NWtarget{weft1f}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {1f}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Second sector line one.@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap6}
+\WEFTtarget{weft1f}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {1f}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}Second\WEFTsp sector\WEFTsp line\WEFTsp one.\WEFTbrk \WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{weft1e}{1e}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1e}{1e}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
+\WEFTend
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item $\langle\,$Frag 1\nobreak\ {\footnotesize \NWlink{weft1f}{1f}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{weft1e}{1e}.}
+\item $\langle\,$Frag 1\nobreak\ {\footnotesize \WEFTlink{weft1f}{1f}}$\,\rangle$ {\footnotesize {\WEFTtxtRefIn} \WEFTlink{weft1e}{1e}.}
 \end{list}}
 
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap7}\raggedright\small
-\NWtarget{weft2a}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {2a}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Base sector line two.@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTbegin
+\label{scrap7}
+\WEFTtarget{weft1g}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {1g}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}Base\WEFTsp sector\WEFTsp line\WEFTsp two.\WEFTbrk \WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{weft1b}{1b}\NWlink{weft2a}{, 2a}\NWlink{weft2d}{d}.
-\item \NWtxtMacroRefIn\ \NWlink{weft1a}{1a}\NWlink{weft2e}{, 2e}.
+\item \WEFTtxtMacroDefBy\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1g}{g}\WEFTlink{weft2b}{, 2b}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTlink{weft2c}{, 2c}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
+\WEFTend
 
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap8}\raggedright\small
-\NWtarget{weft2b}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {2b}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Third sector line one.@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTbegin
+\label{scrap8}
+\WEFTtarget{weft1h}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {1h}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}Third\WEFTsp sector\WEFTsp line\WEFTsp one.\WEFTbrk \WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{weft2c}{2c}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft2a}{2a}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap9}\raggedright\small
-\NWtarget{weft2c}{} \verb@"test.actual.c"@\nobreak\ {\footnotesize {2c}}$\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Use second local@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \NWlink{weft2b}{2b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap9}
+\WEFTtarget{weft2a}{} \verb@"test.actual.c"@\nobreak\ {\footnotesize {2a}}$\equiv$
+\WEFTcode
+\mbox{\strut}Use\WEFTsp second\WEFTsp local\WEFTeol
+\mbox{\strut}\hbox{$\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \WEFTlink{weft1h}{1h}}$\,\rangle$}\WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{weft1a}{1a}\NWlink{weft1d}{d}\NWlink{weft1e}{e}\NWlink{weft2c}{, 2c}\NWlink{weft2e}{e}.
+\item \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft2a}{, 2a}\WEFTlink{weft2c}{c}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
+\WEFTend
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item $\langle\,$Frag 1\nobreak\ {\footnotesize \NWlink{weft2b}{2b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{weft2c}{2c}.}
+\item $\langle\,$Frag 1\nobreak\ {\footnotesize \WEFTlink{weft1h}{1h}}$\,\rangle$ {\footnotesize {\WEFTtxtRefIn} \WEFTlink{weft2a}{2a}.}
 \end{list}}
 
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap10}\raggedright\small
-\NWtarget{weft2d}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {2d}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Base sector line three.@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTbegin
+\label{scrap10}
+\WEFTtarget{weft2b}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {2b}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}Base\WEFTsp sector\WEFTsp line\WEFTsp three.\WEFTbrk \WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{weft1b}{1b}\NWlink{weft2a}{, 2a}\NWlink{weft2d}{d}.
-\item \NWtxtMacroRefIn\ \NWlink{weft1a}{1a}\NWlink{weft2e}{, 2e}.
+\item \WEFTtxtMacroDefBy\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1g}{g}\WEFTlink{weft2b}{, 2b}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTlink{weft2c}{, 2c}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap11}\raggedright\small
-\NWtarget{weft2e}{} \verb@"test.actual.c"@\nobreak\ {\footnotesize {2e}}$\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@ Last use in global@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \NWlink{weft1b}{1b}, \ldots\ }$\,\rangle$}\verb@@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap11}
+\WEFTtarget{weft2c}{} \verb@"test.actual.c"@\nobreak\ {\footnotesize {2c}}$\equiv$
+\WEFTcode
+\mbox{\strut}\WEFTsp Last\WEFTsp use\WEFTsp in\WEFTsp global\WEFTeol
+\mbox{\strut}\hbox{$\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}, \ldots\ }$\,\rangle$}\WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{weft1a}{1a}\NWlink{weft1d}{d}\NWlink{weft1e}{e}\NWlink{weft2c}{, 2c}\NWlink{weft2e}{e}.
+\item \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft2a}{, 2a}\WEFTlink{weft2c}{c}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap12}\raggedright\small
-\NWtarget{weft2f}{} $\langle\,${\itshape Frag 2}\nobreak\ {\footnotesize {2f}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@Here is frag 2@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTend
+\WEFTbegin
+\label{scrap12}
+\WEFTtarget{weft2d}{} $\langle\,${\itshape Frag 2}\nobreak\ {\footnotesize {2d}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}Here\WEFTsp is\WEFTsp frag\WEFTsp 2\WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{weft1d}{1d}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1d}{1d}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
+\WEFTend
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item $\langle\,$Frag 1\nobreak\ {\footnotesize \NWlink{weft1b}{1b}\NWlink{weft2a}{, 2a}\NWlink{weft2d}{d}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{weft1a}{1a}\NWlink{weft2e}{, 2e}.
+\item $\langle\,$Frag 1\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}\WEFTlink{weft1g}{g}\WEFTlink{weft2b}{, 2b}}$\,\rangle$ {\footnotesize {\WEFTtxtRefIn} \WEFTlink{weft1a}{1a}\WEFTlink{weft2c}{, 2c}.
 }
 \end{list}}
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item $\langle\,$Frag 2\nobreak\ {\footnotesize \NWlink{weft2f}{2f}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{weft1d}{1d}.}
+\item $\langle\,$Frag 2\nobreak\ {\footnotesize \WEFTlink{weft2d}{2d}}$\,\rangle$ {\footnotesize {\WEFTtxtRefIn} \WEFTlink{weft1d}{1d}.}
 \end{list}}
 \end{document}
 EOF

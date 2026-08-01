@@ -454,7 +454,7 @@ format_uses_refs(FILE * tex_file, int scrap)
 @d Write uses ...
 @{{
   char join = ' ';
-  fputs("\\item \\NWtxtIdentsUsed\\nobreak\\", tex_file);
+  fputs("\\item \\WEFTtxtIdentsUsed\\nobreak\\", tex_file);
   do {
     @<Write one use reference@>
     join = ',';
@@ -480,12 +480,12 @@ if (defs)
 }
 else
 {
-  fputs("\\NWnotglobal", tex_file);
+  fputs("\\WEFTnotglobal", tex_file);
 }
 @}
 
 @d Write one referenced scrap
-@{fputs("\\NWlink{weft", tex_file);
+@{fputs("\\WEFTlink{weft", tex_file);
 write_scrap_ref(tex_file, defs->scrap, -1, &page);
 fputs("}{", tex_file);
 write_scrap_ref(tex_file, defs->scrap, first, &page);
@@ -509,7 +509,7 @@ format_defs_refs(FILE * tex_file, int scrap)
 @d Write defs ...
 @{{
   char join = ' ';
-  fputs("\\item \\NWtxtIdentsDefed\\nobreak\\", tex_file);
+  fputs("\\item \\WEFTtxtIdentsDefed\\nobreak\\", tex_file);
   do {
     @<Write one def reference@>
     join = ',';
@@ -527,7 +527,7 @@ fprintf(tex_file,
         join, nw_char, name->spelling, nw_char);
 if (defs == NULL
     || (defs->scrap == scrap && defs->next == NULL)) {
-  fputs("\\NWtxtIdentsNotUsed", tex_file);
+  fputs("\\WEFTtxtIdentsNotUsed", tex_file);
 }
 else {
   do {

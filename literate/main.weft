@@ -79,7 +79,7 @@ a valid option for the \texttt{hyperref} package. For example,
 information about these options, see the \texttt{hyperref}\
 documentation.
 
-Then in your document you put the command \verb|\NWuseHyperlinks|
+Then in your document you put the command \verb|\WEFTuseHyperlinks|
 immediately after your \verb|usepackage| commands. If you do both
 of these you will get hyperlinks. If you miss out either then
 nothing interesting happens.

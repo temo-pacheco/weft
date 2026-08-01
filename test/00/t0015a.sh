@@ -77,56 +77,63 @@ Test in-text @{@<Sort @'key@'...@>@} usage.
 EOF
 
 cat > test.expected.tex <<"EOF"
-\newcommand{\NWtarget}[2]{#2}
-\newcommand{\NWlink}[2]{#2}
-\newcommand{\NWtxtMacroDefBy}{Fragment defined by}
-\newcommand{\NWtxtMacroRefIn}{Fragment referenced in}
-\newcommand{\NWtxtMacroNoRef}{Fragment never referenced}
-\newcommand{\NWtxtDefBy}{Defined by}
-\newcommand{\NWtxtRefIn}{Referenced in}
-\newcommand{\NWtxtNoRef}{Not referenced}
-\newcommand{\NWtxtFileDefBy}{File defined by}
-\newcommand{\NWtxtIdentsUsed}{Uses:}
-\newcommand{\NWtxtIdentsNotUsed}{Never used}
-\newcommand{\NWtxtIdentsDefed}{Defines:}
-\newcommand{\NWsep}{${\diamond}$}
-\newcommand{\NWnotglobal}{(not defined globally)}
-\newcommand{\NWuseHyperlinks}{}
+\newcommand{\WEFTtarget}[2]{#2}
+\newcommand{\WEFTlink}[2]{#2}
+\newcommand{\WEFTtxtMacroDefBy}{Fragment defined by}
+\newcommand{\WEFTtxtMacroRefIn}{Fragment referenced in}
+\newcommand{\WEFTtxtMacroNoRef}{Fragment never referenced}
+\newcommand{\WEFTtxtDefBy}{Defined by}
+\newcommand{\WEFTtxtRefIn}{Referenced in}
+\newcommand{\WEFTtxtNoRef}{Not referenced}
+\newcommand{\WEFTtxtFileDefBy}{File defined by}
+\newcommand{\WEFTtxtIdentsUsed}{Uses:}
+\newcommand{\WEFTtxtIdentsNotUsed}{Never used}
+\newcommand{\WEFTtxtIdentsDefed}{Defines:}
+\newcommand{\WEFTsep}{${\diamond}$}
+\newcommand{\WEFTnotglobal}{(not defined globally)}
+\newcommand{\WEFTbreakpenalty}{500}
+\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
+\newcommand{\WEFTbrk}{\discretionary{}{}{}}
+\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
+\newlength{\WEFThang}\setlength{\WEFThang}{2em}
+\newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
+\newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
+\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
+\newcommand{\WEFTendcode}{\par\endgroup}
+\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \begin{document}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap1}\raggedright\small
-\NWtarget{weft?}{} $\langle\,${\itshape Sort \hbox{\slshape\sffamily key\/} of size \hbox{\slshape\sffamily n\/} for \hbox{\slshape\sffamily ordering\/}}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@for (int j = 1; j < @\hbox{\slshape\sffamily n\/}\verb@; j++)@\\
-\mbox{}\verb@{@\\
-\mbox{}\verb@   int i = j - 1;@\\
-\mbox{}\verb@   int kj = @\hbox{\slshape\sffamily key\/}\verb@[j];@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@   do@\\
-\mbox{}\verb@   {@\\
-\mbox{}\verb@      int ki = @\hbox{\slshape\sffamily key\/}\verb@[i];@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@      if (@\hbox{\slshape\sffamily ordering\/}\verb@)@\\
-\mbox{}\verb@         break;@\\
-\mbox{}\verb@      @\hbox{\slshape\sffamily key\/}\verb@[i + 1] = ki;@\\
-\mbox{}\verb@      i -= 1;@\\
-\mbox{}\verb@   } while (i >= 0);@\\
-\mbox{}\verb@   @\hbox{\slshape\sffamily key\/}\verb@[i + 1] = kj;@\\
-\mbox{}\verb@}@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\WEFTbegin
+\label{scrap1}
+\WEFTtarget{weft?}{} $\langle\,${\itshape Sort \hbox{\slshape\sffamily key\/} of size \hbox{\slshape\sffamily n\/} for \hbox{\slshape\sffamily ordering\/}}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}for\WEFTsp (\WEFTbrk int\WEFTsp j\WEFTsp =\WEFTbrk \WEFTsp 1;\WEFTbrk \WEFTsp j\WEFTsp <\WEFTbrk \WEFTsp \hbox{\slshape\sffamily n\/};\WEFTbrk \WEFTsp j+\WEFTbrk +\WEFTbrk )\WEFTbrk \WEFTeol
+\mbox{\strut}\{\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp int\WEFTsp i\WEFTsp =\WEFTbrk \WEFTsp j\WEFTsp -\WEFTbrk \WEFTsp 1;\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp int\WEFTsp kj\WEFTsp =\WEFTbrk \WEFTsp \hbox{\slshape\sffamily key\/}[\WEFTbrk j]\WEFTbrk ;\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp do\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \{\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp int\WEFTsp ki\WEFTsp =\WEFTbrk \WEFTsp \hbox{\slshape\sffamily key\/}[\WEFTbrk i]\WEFTbrk ;\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp if\WEFTsp (\WEFTbrk \hbox{\slshape\sffamily ordering\/})\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp break;\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp \hbox{\slshape\sffamily key\/}[\WEFTbrk i\WEFTsp +\WEFTbrk \WEFTsp 1]\WEFTbrk \WEFTsp =\WEFTbrk \WEFTsp ki;\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp i\WEFTsp -\WEFTbrk =\WEFTbrk \WEFTsp 1;\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \}\WEFTsp while\WEFTsp (\WEFTbrk i\WEFTsp >\WEFTbrk =\WEFTbrk \WEFTsp 0)\WEFTbrk ;\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{\slshape\sffamily key\/}[\WEFTbrk i\WEFTsp +\WEFTbrk \WEFTsp 1]\WEFTbrk \WEFTsp =\WEFTbrk \WEFTsp kj;\WEFTbrk \WEFTeol
+\mbox{\strut}\}\WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item {\NWtxtMacroNoRef}.
+\item {\WEFTtxtMacroNoRef}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-Test in-text \verb@@$\langle\,${\itshape Sort \verb@key@ of size \verb@n@ for \verb@ordering@}\nobreak\ {\footnotesize \NWlink{weft?}{?}}$\,\rangle$\verb@@ usage.
+\WEFTend
+Test in-text $\langle\,${\itshape Sort key of size n for ordering}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$ usage.
 \end{document}
 EOF
 

@@ -134,21 +134,31 @@ Ad infinitum.
 EOF
 
 cat > test.expected.tex <<"EOF"
-\newcommand{\NWtarget}[2]{#2}
-\newcommand{\NWlink}[2]{#2}
-\newcommand{\NWtxtMacroDefBy}{Fragment defined by}
-\newcommand{\NWtxtMacroRefIn}{Fragment referenced in}
-\newcommand{\NWtxtMacroNoRef}{Fragment never referenced}
-\newcommand{\NWtxtDefBy}{Defined by}
-\newcommand{\NWtxtRefIn}{Referenced in}
-\newcommand{\NWtxtNoRef}{Not referenced}
-\newcommand{\NWtxtFileDefBy}{File defined by}
-\newcommand{\NWtxtIdentsUsed}{Uses:}
-\newcommand{\NWtxtIdentsNotUsed}{Never used}
-\newcommand{\NWtxtIdentsDefed}{Defines:}
-\newcommand{\NWsep}{${\diamond}$}
-\newcommand{\NWnotglobal}{(not defined globally)}
-\newcommand{\NWuseHyperlinks}{}
+\newcommand{\WEFTtarget}[2]{#2}
+\newcommand{\WEFTlink}[2]{#2}
+\newcommand{\WEFTtxtMacroDefBy}{Fragment defined by}
+\newcommand{\WEFTtxtMacroRefIn}{Fragment referenced in}
+\newcommand{\WEFTtxtMacroNoRef}{Fragment never referenced}
+\newcommand{\WEFTtxtDefBy}{Defined by}
+\newcommand{\WEFTtxtRefIn}{Referenced in}
+\newcommand{\WEFTtxtNoRef}{Not referenced}
+\newcommand{\WEFTtxtFileDefBy}{File defined by}
+\newcommand{\WEFTtxtIdentsUsed}{Uses:}
+\newcommand{\WEFTtxtIdentsNotUsed}{Never used}
+\newcommand{\WEFTtxtIdentsDefed}{Defines:}
+\newcommand{\WEFTsep}{${\diamond}$}
+\newcommand{\WEFTnotglobal}{(not defined globally)}
+\newcommand{\WEFTbreakpenalty}{500}
+\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
+\newcommand{\WEFTbrk}{\discretionary{}{}{}}
+\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
+\newlength{\WEFThang}\setlength{\WEFThang}{2em}
+\newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
+\newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
+\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
+\newcommand{\WEFTendcode}{\par\endgroup}
+\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \begin{document}
 This is a song without and end. It goes on and on my friend. Some
@@ -207,8 +217,8 @@ This is a song without and end. It goes on and on my friend. Some
 people started singing it, not knowing what it was, and they'll
 go on forever just because:
 
-\begin{flushleft} \small
-\begin{minipage}{\linewidth} Here comes a block comment just before a scrap and we don't
+\WEFTbegin
+ Here comes a block comment just before a scrap and we don't
 want this separated from it. (Thinks:
 This is a song without and end. It goes on and on my friend. Some
 people started singing it, not knowing what it was, and they'll
@@ -218,30 +228,27 @@ people started singing it, not knowing what it was, and they'll
 go on forever just because:)
 
 \par\vspace{\baselineskip}
-\label{scrap1}\raggedright\small
-\NWtarget{weft?}{} $\langle\,${\itshape Here is a scrap.}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@This is the contents of the scrap.@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@More stuff, not related to songs without ends.@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@"This is a song that will get on your nerves,@\\
-\mbox{}\verb@   Get on your nerves,@\\
-\mbox{}\verb@   Get on your nerves,"@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@Ad infinitum.@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
+\label{scrap1}
+\WEFTtarget{weft?}{} $\langle\,${\itshape Here is a scrap.}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}This\WEFTsp is\WEFTsp the\WEFTsp contents\WEFTsp of\WEFTsp the\WEFTsp scrap.\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTeol
+\mbox{\strut}More\WEFTsp stuff,\WEFTbrk \WEFTsp not\WEFTsp related\WEFTsp to\WEFTsp songs\WEFTsp without\WEFTsp ends.\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTeol
+\mbox{\strut}"This\WEFTsp is\WEFTsp a\WEFTsp song\WEFTsp that\WEFTsp will\WEFTsp get\WEFTsp on\WEFTsp your\WEFTsp nerves,\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp Get\WEFTsp on\WEFTsp your\WEFTsp nerves,\WEFTbrk \WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp Get\WEFTsp on\WEFTsp your\WEFTsp nerves,\WEFTbrk "\WEFTeol
+\mbox{\strut}\WEFTeol
+\mbox{\strut}Ad\WEFTsp infinitum.\WEFTbrk \WEFTeol
+\mbox{\strut}{\WEFTsep}\WEFTendcode
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item {\NWtxtMacroNoRef}.
+\item {\WEFTtxtMacroNoRef}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
+\WEFTend
 \end{document}
 EOF
 

@@ -20,6 +20,7 @@ of \verb|write_tex|.
 
 @o latex.c
 @{static void copy_scrap(FILE *file, int prefix, Name *name);             /* formats the body of a scrap */
+static void latex_code_putc(FILE *file, int c);                          /* escapes one code character for LaTeX */
 static void print_scrap_numbers(FILE *tex_file, Scrap_Node *scraps);      /* formats a list of scrap numbers */
 static void format_entry(Name *name, FILE *tex_file, unsigned char sector);             /* formats an index entry */
 static void format_file_entry(Name *name, FILE *tex_file);        /* formats a file index entry */
@@ -51,38 +52,83 @@ name of the web source file and the name of the \verb|.tex| output file.
 @| write_tex @}
 
 
-Now that the \verb|\NW...| macros are used, it seems convenient
-to write default definitions for those macros so that source files
-need not define anything new. If a user wants to change any of
-the macros (to use hyperref or to write in some language other than
-english) he or she can redefine the commands.
+Weft's woven output relies on a family of \verb|\WEFT...| macros.  We
+write default definitions for all of them into the document's limbo so
+that source files need not define anything new.  If a user wants to
+change any of the macros (to use hyperref, to write in some language
+other than english, or to tune the code layout) he or she can redefine
+the commands \emph{after} the point where weft's definitions are read,
+or (better) redefine them in the preamble with \verb|\renewcommand|.
+
+Two groups of macros are written.  The first group are the textual and
+cross-reference macros (\verb|\WEFTtarget|, \verb|\WEFTlink|, the
+\verb|\WEFTtxt...| labels, and so on).  The second group, written by the
+scrap-formatting fragment below, are the layout macros that typeset a
+scrap's body.  These replace the old \verb|minipage|/\verb|verb|
+machinery with plain \LaTeX\ that neither overflows the bottom of the
+page (scraps may break across pages) nor the right margin (long lines
+wrap with a hanging indent).
 
 @d Write LaTeX limbo definitions
 @{if (hyperref_flag) {
-   fputs("\\newcommand{\\NWtarget}[2]{\\hypertarget{#1}{#2}}\n", tex_file);
-   fputs("\\newcommand{\\NWlink}[2]{\\hyperlink{#1}{#2}}\n", tex_file);
+   fputs("\\newcommand{\\WEFTtarget}[2]{\\hypertarget{#1}{#2}}\n", tex_file);
+   fputs("\\newcommand{\\WEFTlink}[2]{\\hyperlink{#1}{#2}}\n", tex_file);
 } else {
-   fputs("\\newcommand{\\NWtarget}[2]{#2}\n", tex_file);
-   fputs("\\newcommand{\\NWlink}[2]{#2}\n", tex_file);
+   fputs("\\newcommand{\\WEFTtarget}[2]{#2}\n", tex_file);
+   fputs("\\newcommand{\\WEFTlink}[2]{#2}\n", tex_file);
 }
-fputs("\\newcommand{\\NWtxtMacroDefBy}{Fragment defined by}\n", tex_file);
-fputs("\\newcommand{\\NWtxtMacroRefIn}{Fragment referenced in}\n", tex_file);
-fputs("\\newcommand{\\NWtxtMacroNoRef}{Fragment never referenced}\n", tex_file);
-fputs("\\newcommand{\\NWtxtDefBy}{Defined by}\n", tex_file);
-fputs("\\newcommand{\\NWtxtRefIn}{Referenced in}\n", tex_file);
-fputs("\\newcommand{\\NWtxtNoRef}{Not referenced}\n", tex_file);
-fputs("\\newcommand{\\NWtxtFileDefBy}{File defined by}\n", tex_file);
-fputs("\\newcommand{\\NWtxtIdentsUsed}{Uses:}\n", tex_file);
-fputs("\\newcommand{\\NWtxtIdentsNotUsed}{Never used}\n", tex_file);
-fputs("\\newcommand{\\NWtxtIdentsDefed}{Defines:}\n", tex_file);
-fputs("\\newcommand{\\NWsep}{${\\diamond}$}\n", tex_file);
-fputs("\\newcommand{\\NWnotglobal}{(not defined globally)}\n", tex_file);
-fputs("\\newcommand{\\NWuseHyperlinks}{", tex_file);
+fputs("\\newcommand{\\WEFTtxtMacroDefBy}{Fragment defined by}\n", tex_file);
+fputs("\\newcommand{\\WEFTtxtMacroRefIn}{Fragment referenced in}\n", tex_file);
+fputs("\\newcommand{\\WEFTtxtMacroNoRef}{Fragment never referenced}\n", tex_file);
+fputs("\\newcommand{\\WEFTtxtDefBy}{Defined by}\n", tex_file);
+fputs("\\newcommand{\\WEFTtxtRefIn}{Referenced in}\n", tex_file);
+fputs("\\newcommand{\\WEFTtxtNoRef}{Not referenced}\n", tex_file);
+fputs("\\newcommand{\\WEFTtxtFileDefBy}{File defined by}\n", tex_file);
+fputs("\\newcommand{\\WEFTtxtIdentsUsed}{Uses:}\n", tex_file);
+fputs("\\newcommand{\\WEFTtxtIdentsNotUsed}{Never used}\n", tex_file);
+fputs("\\newcommand{\\WEFTtxtIdentsDefed}{Defines:}\n", tex_file);
+fputs("\\newcommand{\\WEFTsep}{${\\diamond}$}\n", tex_file);
+fputs("\\newcommand{\\WEFTnotglobal}{(not defined globally)}\n", tex_file);
+@<Write the scrap formatting macros@>
+fputs("\\newcommand{\\WEFTuseHyperlinks}{", tex_file);
 if (hyperoptions[0] != '\0')
 {
    @<Write the hyperlink usage macro@>
 }
 fputs("}\n", tex_file);
+@}
+
+The layout macros.  \verb|\WEFTbegin|/\verb|\WEFTend| open and close a
+scrap as an ordinary vertical block (a group, not a \verb|minipage|), so
+the page breaker is free to split a tall scrap across pages.
+\verb|\WEFTcode|/\verb|\WEFTendcode| open and close the code body in
+\verb|\ttfamily|, ragged right, with a hanging indent so that a wrapped
+continuation line is visibly offset from the source lines.  A code line
+is ended by \verb|\WEFTeol|, which inserts a mild penalty
+(\verb|\WEFTbreakpenalty|, default 500) so that TeX prefers to keep a
+scrap together but will break it when it must.  \verb|\WEFTsp| is a
+breakable, fixed-width space used to reproduce (and preserve) code
+indentation; \verb|\WEFTbrk| is a zero-width break opportunity inserted
+after punctuation so that long unbroken tokens can still wrap.  Every
+length and penalty is exposed so a document may tune the appearance.
+
+@d Write the scrap formatting macros
+@{fputs("\\newcommand{\\WEFTbreakpenalty}{500}\n", tex_file);
+fputs("\\newcommand{\\WEFTsp}{\\hskip\\fontdimen2\\font\\relax}\n", tex_file);
+fputs("\\newcommand{\\WEFTbrk}{\\discretionary{}{}{}}\n", tex_file);
+fputs("\\newlength{\\WEFTindent}\\setlength{\\WEFTindent}{1.5em}\n", tex_file);
+fputs("\\newlength{\\WEFThang}\\setlength{\\WEFThang}{2em}\n", tex_file);
+fputs("\\newcommand{\\WEFTbegin}{\\par\\addvspace{2.3ex plus .6ex}"
+      "\\begingroup\\small\\raggedright}\n", tex_file);
+fputs("\\newcommand{\\WEFTend}{\\par\\endgroup"
+      "\\addvspace{2.3ex plus .6ex}}\n", tex_file);
+fputs("\\newcommand{\\WEFTcode}{\\par\\nobreak\\vspace{-.5ex}\\begingroup"
+      "\\ttfamily\\small\\parindent0pt\\parskip0pt\\raggedright"
+      "\\leftskip\\WEFTindent\\hangindent\\WEFThang\\hangafter1\\relax"
+      "\\everypar{\\hangindent\\WEFThang\\hangafter1\\relax}}\n", tex_file);
+fputs("\\newcommand{\\WEFTendcode}{\\par\\endgroup}\n", tex_file);
+fputs("\\newcommand{\\WEFTeol}{\\par\\penalty\\WEFTbreakpenalty\\relax}\n",
+      tex_file);
 @}
 
 @d Write the hyperlink usage macro
@@ -193,48 +239,43 @@ c = source_get();
 
 \subsection{Formatting Definitions}
 
-We go through a fair amount of effort to format a file definition.
-I've derived most of the \LaTeX\ commands experimentally; it's quite
-likely that an expert could do a better job. The \LaTeX\ for
-the previous fragment definition should look like this (perhaps modulo
-the scrap references):
+We go through a fair amount of effort to format a fragment definition.
+The \LaTeX\ for the previous fragment definition should look like this
+(perhaps modulo the scrap references):
 {\small
 \begin{verbatim}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap70}\raggedright\small
-$\langle$Interpret at-sequence {\footnotesize 18}$\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@@{@@\\
-\mbox{}\verb@@  int big_definition = FALSE;@@\\
-\mbox{}\verb@@  c = source_get();@@\\
-\mbox{}\verb@@  switch (c) {@@\\
-\mbox{}\verb@@    case 'O': big_definition = TRUE;@@\\
-\mbox{}\verb@@    case 'o': @@$\langle$Write output file definition {\footnotesize 19a}$\rangle$\verb@@@@\\
-\end{verbatim}
-\vdots
-\begin{verbatim}
-\mbox{}\verb@@    case '@@{\tt @@}\verb@@': putc(c, tex_file);@@\\
-\mbox{}\verb@@    default:  c = source_get();@@\\
-\mbox{}\verb@@              break;@@\\
-\mbox{}\verb@@  }@@\\
-\mbox{}\verb@@}@@$\diamond$
-\end{list}
-\vspace{-1ex}
-\footnotesize\addtolength{\baselineskip}{-1ex}
+\WEFTbegin
+\label{scrap70}
+\WEFTtarget{weft70}{} $\langle\,${\itshape Interpret at-sequence}%
+  \nobreak\ {\footnotesize {70}}$\,\rangle\equiv$
+\WEFTcode
+\mbox{\strut}{\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp int\WEFTsp big\_definition\WEFTbrk\WEFTsp =\WEFTsp FALSE;\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp c\WEFTsp =\WEFTsp source\_get();\WEFTbrk\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp switch\WEFTsp (c)\WEFTsp \{\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \WEFTsp case\WEFTsp 'o':\WEFTsp \hbox{$\langle\,${\itshape %
+  Write output file definition}\nobreak\ {\footnotesize \WEFTlink{weft19a}{19a}}$\,\rangle$}\WEFTeol
+\mbox{\strut}\WEFTsp \WEFTsp \}{\WEFTsep}\WEFTendcode
+\vspace{-1.5ex}
+\footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item Fragment referenced in scrap 17b.
+\item Fragment referenced in \WEFTlink{weft17b}{17b}.
+\item{}
 \end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
+\WEFTend
 \end{verbatim}}
 
 \noindent
-The {\em flushleft\/} environment is used to avoid \LaTeX\ warnings
-about underful lines. The {\em minipage\/} environment is used to
-avoid page breaks in the middle of scraps. The {\em verb\/} command
-allows arbitrary characters to be printed (however, note the special
-handling of the \verb|@@| case in the switch statement).
+There is no \verb|minipage| any more, so the page breaker may split a
+tall scrap across a page boundary; \verb|\WEFTeol| discourages (but does
+not forbid) those breaks.  Because the body is set in ordinary
+\verb|\ttfamily| text rather than inside \verb|\verb|, long lines wrap
+with a hanging indent instead of running off the right margin.  The
+price is that the special \LaTeX\ characters must be escaped as the code
+is copied out; that is what \verb|latex_code_putc| does.
+\verb|\WEFTsp| reproduces each source space as a breakable,
+fixed-width space (so indentation survives) and \verb|\WEFTbrk| marks a
+harmless place to break a long token.
 
 Fragment and file definitions are formatted nearly identically.
 I've factored the common parts out into separate scraps.
@@ -243,7 +284,7 @@ I've factored the common parts out into separate scraps.
 @{{
   Name *name = collect_file_name();
   @<Begin the scrap environment@>
-  fputs("\\NWtarget{weft", tex_file);
+  fputs("\\WEFTtarget{weft", tex_file);
   write_single_scrap_ref(tex_file, scraps);
   fputs("}{} ", tex_file);
   fprintf(tex_file, "\\verb%c\"%s\"%c\\nobreak\\ {\\footnotesize {", nw_char, name->spelling, nw_char);
@@ -269,7 +310,7 @@ might want to use italics or bold face in the midst of the name.
   Name *name = collect_macro_name();
 
   @<Begin the scrap environment@>
-  fputs("\\NWtarget{weft", tex_file);
+  fputs("\\WEFTtarget{weft", tex_file);
   write_single_scrap_ref(tex_file, scraps);
   fputs("}{} $\\langle\\,${\\itshape ", tex_file);
   @<Write the macro's name@>
@@ -326,6 +367,12 @@ might want to use italics or bold face in the midst of the name.
 }
 @| write_arg @}
 
+A scrap is opened with \verb|\WEFTbegin| and closed with \verb|\WEFTend|
+(both defined among the scrap-formatting macros above).  Both big
+(\verb|@@O|, \verb|@@D|) and small (\verb|@@o|, \verb|@@d|) definitions use the same
+breakable block; the \verb|inBlock| bookkeeping lets a run of small
+definitions share one open group, separated by a little vertical space.
+
 @d Begin the scrap environment
 @{{
   if (big_definition)
@@ -334,7 +381,7 @@ might want to use italics or bold face in the midst of the name.
     {
        @<End block@>
     }
-    fputs("\\begin{flushleft} \\small", tex_file);
+    fputs("\\WEFTbegin", tex_file);
   }
   else
   {
@@ -347,32 +394,31 @@ might want to use italics or bold face in the midst of the name.
        @<Start block@>
     }
   }
-  fprintf(tex_file, "\\label{scrap%d}\\raggedright\\small\n", scraps);
+  fprintf(tex_file, "\\label{scrap%d}\n", scraps);
 }@}
 
 @d Start block
-@{fputs("\\begin{flushleft} \\small\n\\begin{minipage}{\\linewidth}", tex_file);
+@{fputs("\\WEFTbegin\n", tex_file);
 inBlock = TRUE;@}
 
 @d Switch block
 @{fputs("\\par\\vspace{\\baselineskip}\n",  tex_file);@}
 
 @d End block
-@{fputs("\\end{minipage}\\vspace{4ex}\n",  tex_file);
-fputs("\\end{flushleft}\n", tex_file);
+@{fputs("\\WEFTend\n", tex_file);
 inBlock = FALSE;@}
 
 The interesting things here are the $\diamond$ inserted at the end of
-each scrap and the various spacing commands. The diamond helps to
-clearly indicate the end of a scrap. The spacing commands were derived
-empirically; they may be adjusted to taste.
+each scrap (\verb|\WEFTsep|) and the code group opened by
+\verb|\WEFTcode|.  The diamond helps to clearly indicate the end of a
+scrap.
 
 @d Fill in the middle of the scrap environment
 @{{
-  fputs("\\vspace{-1ex}\n\\begin{list}{}{} \\item\n", tex_file);
+  fputs("\\WEFTcode\n", tex_file);
   extra_scraps = 0;
   copy_scrap(tex_file, TRUE, name);
-  fputs("{\\NWsep}\n\\end{list}\n", tex_file);
+  fputs("{\\WEFTsep}\\WEFTendcode\n", tex_file);
 }@}
 
 \newpage
@@ -388,7 +434,7 @@ a scrap will not be indented. Again, this is a matter of personal taste.
 @{{
   scraps += extra_scraps;
   if (big_definition)
-    fputs("\\vspace{4ex}\n\\end{flushleft}\n", tex_file);
+    fputs("\\WEFTend\n", tex_file);
   else
   {
      @<End block@>
@@ -436,7 +482,7 @@ list.
 @{{
   if (name->defs) {
     if (name->defs->next) {
-      fputs("\\item \\NWtxtFileDefBy\\ ", tex_file);
+      fputs("\\item \\WEFTtxtFileDefBy\\ ", tex_file);
       print_scrap_numbers(tex_file, name->defs);
     }
   } else {
@@ -449,7 +495,7 @@ list.
 @d Write macro defs
 @{{
   if (name->defs->next) {
-    fputs("\\item \\NWtxtMacroDefBy\\ ", tex_file);
+    fputs("\\item \\WEFTtxtMacroDefBy\\ ", tex_file);
     print_scrap_numbers(tex_file, name->defs);
   }
 }@}
@@ -458,12 +504,12 @@ list.
 @{{
   if (name->uses) {
     if (name->uses->next) {
-      fputs("\\item \\NWtxtMacroRefIn\\ ", tex_file);
+      fputs("\\item \\WEFTtxtMacroRefIn\\ ", tex_file);
       print_scrap_numbers(tex_file, name->uses);
     }
     else {
-      fputs("\\item \\NWtxtMacroRefIn\\ ", tex_file);
-      fputs("\\NWlink{weft", tex_file);
+      fputs("\\item \\WEFTtxtMacroRefIn\\ ", tex_file);
+      fputs("\\WEFTlink{weft", tex_file);
       write_single_scrap_ref(tex_file, name->uses->scrap);
       fputs("}{", tex_file);
       write_single_scrap_ref(tex_file, name->uses->scrap);
@@ -472,7 +518,7 @@ list.
     }
   }
   else {
-    fputs("\\item {\\NWtxtMacroNoRef}.\n", tex_file);
+    fputs("\\item {\\WEFTtxtMacroNoRef}.\n", tex_file);
     fprintf(stderr, "%s: <%s> never referenced.\n",
             command_name, name->spelling);
   }
@@ -482,14 +528,14 @@ list.
 @{static void print_scrap_numbers(FILE *tex_file, Scrap_Node *scraps)
 {
   int page;
-  fputs("\\NWlink{weft", tex_file);
+  fputs("\\WEFTlink{weft", tex_file);
   write_scrap_ref(tex_file, scraps->scrap, -1, &page);
   fputs("}{", tex_file);
   write_scrap_ref(tex_file, scraps->scrap, TRUE, &page);
   fputs("}", tex_file);
   scraps = scraps->next;
   while (scraps) {
-    fputs("\\NWlink{weft", tex_file);
+    fputs("\\WEFTlink{weft", tex_file);
     write_scrap_ref(tex_file, scraps->scrap, -1, &page);
     fputs("}{", tex_file);
     write_scrap_ref(tex_file, scraps->scrap, FALSE, &page);
@@ -502,23 +548,29 @@ list.
 
 \subsubsection{Formatting a Scrap}
 
-We add a \verb|\mbox{}| at the beginning of each line to avoid
-problems with older versions of \TeX.
+Each source line begins with \verb|\mbox{\strut}|: the \verb|\mbox|
+anchors horizontal mode so leading spaces are kept, and the
+\verb|\strut| gives blank lines a full line height.
 This is the only place we really care whether a scrap is
 delimited with \verb|@@{...@@}|, \verb|@@[...@@]|, or \verb|@@(...@@)|,
 and we base our output sequences on that.
 
 We have an array \texttt{delimit\_scrap} where we store our strings
-that perform the formatting for one line of a scrap. Upon
+that perform the formatting for one line of a scrap.  For the code
+(\verb|@@{...@@}|) mode the \emph{begin} and \emph{end} strings are now
+empty: the body is set as ordinary \verb|\ttfamily| text rather than
+inside \verb|\verb|, so the special \LaTeX\ characters must instead be
+escaped one at a time (see \verb|latex_code_putc| below).  The
+\emph{prefix} opens each line and the \emph{suffix} ends it.  Upon
 initialisation we copy our strings from the source
 \texttt{orig\_delimit\_scrap} to it to have the strings writeable.  We
-might change the strings later when we encounter the command to change
-the `weft character'.
+might change the \emph{insert nw\_char} string later when we encounter
+the command to change the `weft character'.
 
 @o latex.c
 @{static char *orig_delimit_scrap[3][5] = {
-  /* {} mode: begin, end, insert nw_char, prefix, suffix */
-  { "\\verb@@", "@@", "@@{\\tt @@}\\verb@@", "\\mbox{}", "\\\\" },
+  /* {} mode (code): begin, end, insert nw_char, prefix, suffix */
+  { "", "", "@@", "\\mbox{\\strut}", "\\WEFTeol" },
   /* [] mode: begin, end, insert nw_char, prefix, suffix */
   { "", "", "@@", "", "" },
   /* () mode: begin, end, insert nw_char, prefix, suffix */
@@ -528,11 +580,8 @@ the `weft character'.
 static char *delimit_scrap[3][5];
 @}
 
-The function \texttt{initialise\_delimit\_scrap\_array} does the
-copying. If we want to have the listings package \index{listings package}
-do the formatting we have to replace only two of those strings: the
-\texttt{verb} command has to be replaced by the package's \texttt{lstinline}
-command.
+The function \texttt{initialise\_delimit\_scrap\_array} just copies the
+originals into a writeable array.
 
 @o latex.c
 @{void initialise_delimit_scrap_array(void) {
@@ -545,22 +594,44 @@ command.
       }
     }
   }
-
-  /* replace verb by lstinline */
-  if (listings_flag) {
-    free(delimit_scrap[0][0]);
-    if((delimit_scrap[0][0]=strdup("\\lstinline@@")) == NULL) {
-      fprintf(stderr, "Not enough memory for string allocation\n");
-      exit(EXIT_FAILURE);
-    }
-    free(delimit_scrap[0][2]);
-    if((delimit_scrap[0][2]=strdup("@@{\\tt @@}\\lstinline@@")) == NULL) {
-      fprintf(stderr, "Not enough memory for string allocation\n");
-      exit(EXIT_FAILURE);
-    }
-  }
 }
 @}
+
+Copying one code character to the \verb|.tex| file.  Because the code is
+no longer wrapped in \verb|\verb|, every character that is special to
+\LaTeX\ has to be turned into something harmless in \verb|\ttfamily|
+text.  A literal space becomes \verb|\WEFTsp| (a breakable, fixed-width
+space) so that indentation is both preserved and a legal place to wrap.
+After an underscore and after common code punctuation we emit a
+\verb|\WEFTbrk|, a zero-width break opportunity, so that a long
+unbroken token can still be wrapped rather than overrunning the margin.
+
+@o latex.c
+@{static void latex_code_putc(FILE *file, int c)
+{
+  switch (c) {
+    case ' ':  fputs("\\WEFTsp ", file);          break;
+    case '\\': fputs("\\textbackslash{}", file);  break;
+    case '{':  fputs("\\{", file);                break;
+    case '}':  fputs("\\}", file);                break;
+    case '$':  fputs("\\$", file);                break;
+    case '&':  fputs("\\&", file);                break;
+    case '#':  fputs("\\#", file);                break;
+    case '%':  fputs("\\%", file);                break;
+    case '^':  fputs("\\textasciicircum{}", file);break;
+    case '~':  fputs("\\textasciitilde{}", file); break;
+    case '_':  fputs("\\_\\WEFTbrk ", file);      break;
+    /* escape-free punctuation that is a good place to break a long line */
+    case ',': case ';': case ':': case '.':
+    case '(': case ')': case '[': case ']':
+    case '/': case '|': case '=': case '<': case '>':
+    case '+': case '-':
+      putc(c, file); fputs("\\WEFTbrk ", file);   break;
+    default:
+      putc(c, file);                              break;
+  }
+}
+@| latex_code_putc @}
 
 @d Function prototypes
 @{void initialise_delimit_scrap_array(void);
@@ -577,6 +648,8 @@ command.
    while (*p!= '\000') {
      if (*p == nw_char)
        fputs(delimit_scrap[mode][2], tex_file);
+     else if (mode == 0)
+       latex_code_putc(tex_file, (unsigned char)*p);
      else
        fputc(*p, tex_file);
      p++;
@@ -606,7 +679,7 @@ command.
                  fputs(delimit_scrap[scrap_type][0], file);
                  indent = 0;
                  break;
-      case '\t': @<Expand tab into spaces@>
+      case '\t': @<Widen a code tab into spaces@>
                  break;
       default:
          if (c==nw_char)
@@ -614,7 +687,10 @@ command.
              @<Check at-sequence for end-of-scrap@>
              break;
            }
-         putc(c, file);
+         if (scrap_type == 0)
+           latex_code_putc(file, c);
+         else
+           putc(c, file);
                  indent++;
                  break;
     }
@@ -629,29 +705,11 @@ this function. It updates the scrap formatting directives accordingly.
 @o latex.c
 @{void update_delimit_scrap(void)
 {
-  /* {}-mode begin */
-  if (listings_flag) {
-    delimit_scrap[0][0][10] = nw_char;
-  } else {
-    delimit_scrap[0][0][5] = nw_char;
-  }
-  /* {}-mode end */
-  delimit_scrap[0][1][0] = nw_char;
-  /* {}-mode insert nw_char */
-
+  /* Every mode's "insert nw_char" string is the single character that
+     stands in for the weft character inside a scrap; keep them in sync
+     with the (possibly changed) weft character. */
   delimit_scrap[0][2][0] = nw_char;
-  delimit_scrap[0][2][6] = nw_char;
-
-  if (listings_flag) {
-    delimit_scrap[0][2][18] = nw_char;
-  } else {
-    delimit_scrap[0][2][13] = nw_char;
-  }
-
-  /* []-mode insert nw_char */
   delimit_scrap[1][2][0] = nw_char;
-
-  /* ()-mode insert nw_char */
   delimit_scrap[2][2][0] = nw_char;
 }
 @| update_delimit_scrap @}
@@ -666,6 +724,24 @@ this function. It updates the scrap formatting directives accordingly.
   indent += delta;
   while (delta > 0) {
     putc(' ', file);
+    delta--;
+  }
+}@}
+
+The tab handling inside \verb|copy_scrap| is separate from the shared
+tab expander above because in code (\verb|@@{...@@}|) mode each space
+must be written as a \verb|\WEFTsp| so that the indentation survives and
+stays breakable.
+
+@d Widen a code tab into spaces
+@{{
+  int delta = 8 - (indent % 8);
+  indent += delta;
+  while (delta > 0) {
+    if (scrap_type == 0)
+      latex_code_putc(file, ' ');
+    else
+      putc(' ', file);
     delta--;
   }
 }@}
@@ -828,7 +904,7 @@ This scrap helps deal with bold keywords:
 @d Write abbreviated definition list
 @{{
   Scrap_Node *p = name->defs;
-  fputs("\\NWlink{weft", file);
+  fputs("\\WEFTlink{weft", file);
   write_single_scrap_ref(file, p->scrap);
   fputs("}{", file);
   write_single_scrap_ref(file, p->scrap);
@@ -928,7 +1004,7 @@ putc('\n', tex_file);@}
 @d Write file's defining scrap numbers
 @{{
   Scrap_Node *p = name->defs;
-  fputs("{\\footnotesize {\\NWtxtDefBy}", tex_file);
+  fputs("{\\footnotesize {\\WEFTtxtDefBy}", tex_file);
   if (p->next) {
     /* fputs("s ", tex_file); */
       putc(' ', tex_file);
@@ -936,7 +1012,7 @@ putc('\n', tex_file);@}
   }
   else {
     putc(' ', tex_file);
-    fputs("\\NWlink{weft", tex_file);
+    fputs("\\WEFTlink{weft", tex_file);
     write_single_scrap_ref(tex_file, p->scrap);
     fputs("}{", tex_file);
     write_single_scrap_ref(tex_file, p->scrap);
@@ -1036,14 +1112,14 @@ for (j = 1; j < @2; j++)
   Scrap_Node *p = name->defs;
   if (p) {
     int page;
-    fputs("\\NWlink{weft", tex_file);
+    fputs("\\WEFTlink{weft", tex_file);
     write_scrap_ref(tex_file, p->scrap, -1, &page);
     fputs("}{", tex_file);
     write_scrap_ref(tex_file, p->scrap, TRUE, &page);
     fputs("}", tex_file);
     p = p->next;
     while (p) {
-      fputs("\\NWlink{weft", tex_file);
+      fputs("\\WEFTlink{weft", tex_file);
       write_scrap_ref(tex_file, p->scrap, -1, &page);
       fputs("}{", tex_file);
       write_scrap_ref(tex_file, p->scrap, FALSE, &page);
@@ -1060,7 +1136,7 @@ for (j = 1; j < @2; j++)
   Scrap_Node *p = name->uses;
   fputs("{\\footnotesize ", tex_file);
   if (p) {
-    fputs("{\\NWtxtRefIn}", tex_file);
+    fputs("{\\WEFTtxtRefIn}", tex_file);
     if (p->next) {
       /* fputs("s ", tex_file); */
       putc(' ', tex_file);
@@ -1068,7 +1144,7 @@ for (j = 1; j < @2; j++)
     }
     else {
       putc(' ', tex_file);
-      fputs("\\NWlink{weft", tex_file);
+      fputs("\\WEFTlink{weft", tex_file);
       write_single_scrap_ref(tex_file, p->scrap);
       fputs("}{", tex_file);
       write_single_scrap_ref(tex_file, p->scrap);
@@ -1077,7 +1153,7 @@ for (j = 1; j < @2; j++)
     }
   }
   else
-    fputs("{\\NWtxtNoRef}.", tex_file);
+    fputs("{\\WEFTtxtNoRef}.", tex_file);
   putc('}', tex_file);
 }@}
 
@@ -1138,7 +1214,7 @@ for (j = 1; j < @2; j++)
     fprintf(tex_file, "\\item \\verb%c%s%c: ", nw_char,name->spelling,nw_char);
     if (!uses) {
         fputs("(\\underline{", tex_file);
-        fputs("\\NWlink{weft", tex_file);
+        fputs("\\WEFTlink{weft", tex_file);
         write_single_scrap_ref(tex_file, defs->scrap);
         fputs("}{", tex_file);
         write_single_scrap_ref(tex_file, defs->scrap);
@@ -1148,7 +1224,7 @@ for (j = 1; j < @2; j++)
     }
     else
       if (!defs || uses->scrap < defs->scrap) {
-      fputs("\\NWlink{weft", tex_file);
+      fputs("\\WEFTlink{weft", tex_file);
       write_scrap_ref(tex_file, uses->scrap, -1, &page);
       fputs("}{", tex_file);
       write_scrap_ref(tex_file, uses->scrap, TRUE, &page);
@@ -1160,7 +1236,7 @@ for (j = 1; j < @2; j++)
         uses = uses->next;
       fputs("\\underline{", tex_file);
 
-      fputs("\\NWlink{weft", tex_file);
+      fputs("\\WEFTlink{weft", tex_file);
       write_single_scrap_ref(tex_file, defs->scrap);
       fputs("}{", tex_file);
       write_single_scrap_ref(tex_file, defs->scrap);
@@ -1170,7 +1246,7 @@ for (j = 1; j < @2; j++)
     }
     while (uses || defs) {
       if (uses && (!defs || uses->scrap < defs->scrap)) {
-        fputs("\\NWlink{weft", tex_file);
+        fputs("\\WEFTlink{weft", tex_file);
         write_scrap_ref(tex_file, uses->scrap, -1, &page);
         fputs("}{", tex_file);
         write_scrap_ref(tex_file, uses->scrap, FALSE, &page);
@@ -1182,7 +1258,7 @@ for (j = 1; j < @2; j++)
           uses = uses->next;
         fputs(", \\underline{", tex_file);
 
-        fputs("\\NWlink{weft", tex_file);
+        fputs("\\WEFTlink{weft", tex_file);
         write_single_scrap_ref(tex_file, defs->scrap);
         fputs("}{", tex_file);
         write_single_scrap_ref(tex_file, defs->scrap);

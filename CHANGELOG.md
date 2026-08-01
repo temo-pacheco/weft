@@ -2,6 +2,35 @@
 
 All notable changes to weft are documented in this file.
 
+## [1.1.0] - 2026-07-31
+
+### Changed
+
+- **LaTeX output rewritten** — the woven `.tex` no longer wraps each scrap
+  in a `minipage` typeset with per-line `\verb`. Scraps are now plain
+  `\ttfamily` blocks that **break across pages** (no more scraps overrunning
+  the bottom margin) and whose long lines **wrap with a hanging indent**
+  (no more code running off the right margin). Special LaTeX characters in
+  code are escaped as the body is copied out; spaces become `\WEFTsp`
+  (breakable, fixed-width) and a `\WEFTbrk` break opportunity is emitted
+  after underscores and common punctuation so long tokens can still wrap.
+
+- **Macros renamed `\NW...` → `\WEFT...`** — every default definition weft
+  writes into the document limbo (`\WEFTtarget`, `\WEFTlink`, the
+  `\WEFTtxt...` labels, `\WEFTsep`, `\WEFTnotglobal`, `\WEFTuseHyperlinks`)
+  now uses the `WEFT` prefix. Documents that redefined the old `\NW...`
+  commands (for hyperref or localisation) must rename their overrides.
+  The hypertarget anchor prefix (`weftN`) is unchanged.
+
+- **New layout macros** are written to the limbo and may be redefined to
+  tune the appearance: `\WEFTbegin`/`\WEFTend`, `\WEFTcode`/`\WEFTendcode`,
+  `\WEFTeol`, `\WEFTsp`, `\WEFTbrk`, the lengths `\WEFTindent` and
+  `\WEFThang`, and the penalty `\WEFTbreakpenalty` (default 500, controlling
+  how strongly a scrap resists being split across a page).
+
+- The `-l` (listings) flag is now a no-op: the block layout no longer uses
+  `\verb`, so the old `\lstinline` substitution it performed is gone.
+
 ## [1.0.5] - 2026-07-26
 
 ### Added
