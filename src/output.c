@@ -834,8 +834,10 @@ void write_files(Name *files)
 /* {232: literate/output-files.weft:157} */
 
               if (0 != rename(temp_name, real_name)) {
-                fprintf(stderr, "%s: can't rename output file to %s\n",
+                fprintf(stderr, "%s: can't rename output file to %s (ensure parent directories exist)\n",
                         command_name, real_name);
+                remove(temp_name);
+                exit(1);
               }
               /* {:232} */
 
@@ -850,8 +852,10 @@ void write_files(Name *files)
 /* {232: literate/output-files.weft:157} */
 
             if (0 != rename(temp_name, real_name)) {
-              fprintf(stderr, "%s: can't rename output file to %s\n",
+              fprintf(stderr, "%s: can't rename output file to %s (ensure parent directories exist)\n",
                       command_name, real_name);
+              remove(temp_name);
+              exit(1);
             }
             /* {:232} */
 
@@ -869,8 +873,10 @@ void write_files(Name *files)
 /* {232: literate/output-files.weft:157} */
 
         if (0 != rename(temp_name, real_name)) {
-          fprintf(stderr, "%s: can't rename output file to %s\n",
+          fprintf(stderr, "%s: can't rename output file to %s (ensure parent directories exist)\n",
                   command_name, real_name);
+          remove(temp_name);
+          exit(1);
         }
         /* {:232} */
 
