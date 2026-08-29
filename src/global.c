@@ -87,37 +87,37 @@ unsigned char prev_sector = 1;
 char blockBuff[6400];
 /* {:69} */
 
-#line 486 "literate/latex-output.weft"
-/* {105: literate/latex-output.weft:486} */
+#line 603 "literate/latex-output.weft"
+/* {107: literate/latex-output.weft:603} */
 int extra_scraps = 0;
- /* {:105} */
+ /* {:107} */
 
 #line 24 "literate/source-io.weft"
-/* {241: literate/source-io.weft:24} */
+/* {243: literate/source-io.weft:24} */
 char *source_name = NULL;
 int source_line = 0;
-/* {:241} */
+/* {:243} */
 
 #line 165 "literate/scraps.weft"
-/* {269: literate/scraps.weft:165} */
+/* {271: literate/scraps.weft:165} */
 int already_warned = 0;
-/* {:269} */
+/* {:271} */
 
 #line 69 "literate/names.weft"
-/* {333: literate/names.weft:69} */
+/* {335: literate/names.weft:69} */
 Name *file_names = NULL;
 Name *macro_names = NULL;
 Name *user_names = NULL;
 int scrap_name_has_parameters;
 int scrap_ended_with;
 char pending_lang[64] = "";
-/* {:333} */
+/* {:335} */
 
 #line 173 "literate/architecture.weft"
 
 /* {:14} */
 
 #line 2 "literate/arena.weft"
-/* {423: literate/arena.weft:2} */
+/* {425: literate/arena.weft:2} */
 label_node * label_tab = NULL;
-/* {:423} */
+/* {:425} */

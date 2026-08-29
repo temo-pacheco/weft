@@ -454,13 +454,12 @@ format_uses_refs(FILE * tex_file, int scrap)
 @d Write uses ...
 @{{
   char join = ' ';
-  fputs("\\item \\WEFTtxtIdentsUsed\\nobreak\\", tex_file);
+  fputs("\\WEFTdot \\WEFTtxtIdentsUsed\\nobreak\\", tex_file);
   do {
     @<Write one use reference@>
     join = ',';
     p = p->next;
   }while (p != NULL);
-  fputs(".", tex_file);
 }@}
 
 @d Write one use reference
@@ -468,7 +467,7 @@ format_uses_refs(FILE * tex_file, int scrap)
 Scrap_Node *defs = name->defs;
 int first = TRUE, page = -1;
 fprintf(tex_file,
-        "%c \\verb%c%s%c\\nobreak\\ ",
+        "%c {\\WEFTtint{weftkw}\\verb%c%s%c}\\nobreak\\ ",
         join, nw_char, name->spelling, nw_char);
 if (defs)
 {
@@ -509,13 +508,12 @@ format_defs_refs(FILE * tex_file, int scrap)
 @d Write defs ...
 @{{
   char join = ' ';
-  fputs("\\item \\WEFTtxtIdentsDefed\\nobreak\\", tex_file);
+  fputs("\\WEFTdot \\WEFTtxtIdentsDefed\\nobreak\\", tex_file);
   do {
     @<Write one def reference@>
     join = ',';
     p = p->next;
   }while (p != NULL);
-  fputs(".", tex_file);
 }@}
 
 @d Write one def reference
@@ -523,7 +521,7 @@ format_defs_refs(FILE * tex_file, int scrap)
 Scrap_Node *defs = name->uses;
 int first = TRUE, page = -1;
 fprintf(tex_file,
-        "%c \\verb%c%s%c\\nobreak\\ ",
+        "%c {\\WEFTtint{weftkw}\\verb%c%s%c}\\nobreak\\ ",
         join, nw_char, name->spelling, nw_char);
 if (defs == NULL
     || (defs->scrap == scrap && defs->next == NULL)) {

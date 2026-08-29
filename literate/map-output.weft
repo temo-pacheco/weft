@@ -683,7 +683,7 @@ emitted.
       continue;
     }
 
-    /* Regular line — check for line mode match */
+    /* Regular line -- check for line mode match */
     if (target_line > 0 && current_line == target_line) {
       if (depth > 0) {
         MarkerFrame *inner = &stack[depth - 1];

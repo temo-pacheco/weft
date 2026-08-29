@@ -61,11 +61,15 @@ other than english, or to tune the code layout) he or she can redefine
 the commands \emph{after} the point where weft's definitions are read,
 or (better) redefine them in the preamble with \verb|\renewcommand|.
 
-Two groups of macros are written.  The first group are the textual and
+Three groups of macros are written.  The first group are the textual and
 cross-reference macros (\verb|\WEFTtarget|, \verb|\WEFTlink|, the
-\verb|\WEFTtxt...| labels, and so on).  The second group, written by the
-scrap-formatting fragment below, are the layout macros that frame a
-scrap.
+\verb|\WEFTtxt...| labels, and so on).  The second group, the
+\emph{modern decoration macros} of \S\ref{modern-decoration}, give a
+scrap its visual identity (fragment name, scrap number, the
+\(\equiv\)/\(+\!\equiv\) marker, the one-line footer) and route all
+colour through the degradable \verb|\WEFTtint| indirection.  The third
+group, written by the scrap-formatting fragment below, are the layout
+macros that frame a scrap.
 
 Code bodies are typeset with the \texttt{listings} package: every scrap
 becomes an \verb|lstlisting| environment.  This gives syntax
@@ -73,7 +77,10 @@ highlighting (driven by the scrap's language, see \verb|latex_language|),
 automatic line wrapping (\verb|breaklines|), and page breaking for free.
 The document \emph{must} therefore load \verb|\usepackage{listings}| in
 its preamble --- weft cannot inject it, because the limbo is written
-before \verb|\documentclass|.  Fragment references that appear in the
+before \verb|\documentclass| (a colour package, \verb|color| or
+\verb|xcolor|, is likewise the user's to load, and enables the accent and
+syntax colours; without it the output still compiles in black and
+white).  Fragment references that appear in the
 middle of code are typeset by briefly escaping out of the listing back
 to \LaTeX; see \S\ref{latex-file} and the \verb|escapeinside| option.
 
@@ -85,18 +92,19 @@ to \LaTeX; see \S\ref{latex-file} and the \verb|escapeinside| option.
    fputs("\\newcommand{\\WEFTtarget}[2]{#2}\n", tex_file);
    fputs("\\newcommand{\\WEFTlink}[2]{#2}\n", tex_file);
 }
-fputs("\\newcommand{\\WEFTtxtMacroDefBy}{Fragment defined by}\n", tex_file);
-fputs("\\newcommand{\\WEFTtxtMacroRefIn}{Fragment referenced in}\n", tex_file);
-fputs("\\newcommand{\\WEFTtxtMacroNoRef}{Fragment never referenced}\n", tex_file);
-fputs("\\newcommand{\\WEFTtxtDefBy}{Defined by}\n", tex_file);
-fputs("\\newcommand{\\WEFTtxtRefIn}{Referenced in}\n", tex_file);
-fputs("\\newcommand{\\WEFTtxtNoRef}{Not referenced}\n", tex_file);
-fputs("\\newcommand{\\WEFTtxtFileDefBy}{File defined by}\n", tex_file);
-fputs("\\newcommand{\\WEFTtxtIdentsUsed}{Uses:}\n", tex_file);
-fputs("\\newcommand{\\WEFTtxtIdentsNotUsed}{Never used}\n", tex_file);
-fputs("\\newcommand{\\WEFTtxtIdentsDefed}{Defines:}\n", tex_file);
-fputs("\\newcommand{\\WEFTsep}{${\\diamond}$}\n", tex_file);
+fputs("\\newcommand{\\WEFTtxtMacroDefBy}{defined at}\n", tex_file);
+fputs("\\newcommand{\\WEFTtxtMacroRefIn}{used in}\n", tex_file);
+fputs("\\newcommand{\\WEFTtxtMacroNoRef}{unreferenced}\n", tex_file);
+fputs("\\newcommand{\\WEFTtxtDefBy}{defined at}\n", tex_file);
+fputs("\\newcommand{\\WEFTtxtRefIn}{used in}\n", tex_file);
+fputs("\\newcommand{\\WEFTtxtNoRef}{unreferenced}\n", tex_file);
+fputs("\\newcommand{\\WEFTtxtFileDefBy}{defined at}\n", tex_file);
+fputs("\\newcommand{\\WEFTtxtIdentsUsed}{uses}\n", tex_file);
+fputs("\\newcommand{\\WEFTtxtIdentsNotUsed}{never used}\n", tex_file);
+fputs("\\newcommand{\\WEFTtxtIdentsDefed}{defines}\n", tex_file);
+fputs("\\newcommand{\\WEFTsep}{}\n", tex_file);
 fputs("\\newcommand{\\WEFTnotglobal}{(not defined globally)}\n", tex_file);
+@<Write the modern decoration macros@>
 @<Write the scrap formatting macros@>
 fputs("\\newcommand{\\WEFTuseHyperlinks}{", tex_file);
 if (hyperoptions[0] != '\0')
@@ -104,38 +112,122 @@ if (hyperoptions[0] != '\0')
    @<Write the hyperlink usage macro@>
 }
 fputs("}\n", tex_file);
+@<Write the AtBeginDocument setup@>
 @}
 
 The layout macros.  \verb|\WEFTbegin|/\verb|\WEFTend| open and close the
 vertical block that holds a scrap's header line, its \verb|lstlisting|
-body, and its cross-reference list.  A fragment reference appearing in
+body, and its one-line metadata footer.  \verb|\WEFTbegin| sets the block
+ragged-right at the document's ordinary size (the old \verb|\small| is
+gone: the header now reads at full size, and the code carries its own,
+tighter, listings size).  A fragment reference appearing in
 the middle of code is assembled inline and wrapped in an \verb|\hbox| so
 that \verb|listings|' line-breaker never splits it while it sits inside
 an escape.  (We use \verb|\hbox| rather than \verb|\mbox| because a
 fragment name may legitimately contain \verb|\verb|, which is illegal in
 a macro argument such as \verb|\mbox|'s but fine inside a primitive
-\verb|\hbox|.)  \verb|\WEFTlstsetup| is a convenience the user may call once,
-after \verb|\usepackage{listings}|, to apply weft's recommended
-\verb|\lstset| defaults (monospace, line breaking, keyword/comment
-styles).  It is optional: the \verb|escapeinside| and \verb|language|
-options that make the output \emph{correct} are written on every
-\verb|lstlisting| itself, so references and highlighting work even
-without it.
+\verb|\hbox|.)  \verb|\WEFTlstsetup| now carries weft's \emph{modern}
+\verb|\lstset| defaults: a compact monospace with tightened leading,
+coloured keywords/strings/comments (through \verb|\WEFTtint|, so colour
+is optional), line breaking, and \emph{no} frame, background, or left
+indent.  The user need not call it --- the \verb|\AtBeginDocument| hook
+of \S\ref{modern-decoration} applies it automatically once
+\verb|listings| is loaded --- but an explicit call, or a
+\verb|\renewcommand|, still lets the user override the house style.
 
 @d Write the scrap formatting macros
 @{fputs("\\newcommand{\\WEFTbegin}{\\par\\addvspace{2.3ex plus .6ex}"
-      "\\begingroup\\small\\raggedright}\n", tex_file);
+      "\\begingroup\\raggedright}\n", tex_file);
 fputs("\\newcommand{\\WEFTend}{\\par\\endgroup"
       "\\addvspace{2.3ex plus .6ex}}\n", tex_file);
 fputs("\\providecommand{\\WEFTlstsetup}{\\lstset{basicstyle=\\ttfamily"
-      "\\small,breaklines=true,breakatwhitespace=false,"
+      "\\fontsize{10pt}{10.8pt}\\selectfont,"
+      "keywordstyle={\\WEFTtint{weftkw}\\bfseries},"
+      "commentstyle={\\WEFTtint{weftcom}\\itshape},"
+      "stringstyle={\\WEFTtint{weftstr}},"
+      "breaklines=true,breakatwhitespace=false,"
       "columns=fullflexible,keepspaces=true,showstringspaces=false,"
-      "keywordstyle=\\bfseries,commentstyle=\\itshape,tabsize=8,"
-      "xleftmargin=1.5em}}\n", tex_file);
+      "tabsize=8,frame=none,xleftmargin=0pt,"
+      "aboveskip=0pt,belowskip=0pt}}\n", tex_file);
 @}
 
 @d Write the hyperlink usage macro
 @{fprintf(tex_file, "\\usepackage[%s]{hyperref}", hyperoptions);@}
+
+\subsubsection{The modern decoration macros}
+\label{modern-decoration}
+
+The visual identity of a woven scrap --- the way a fragment name reads,
+the little scrap number beside it, the definition/continuation marker,
+the one-line metadata footer --- is factored into a handful of small
+macros written here.  Emitting them once, as named commands, keeps the
+per-scrap output that follows compact and lets a reader (or the user)
+re-style the whole document by redefining a single command.
+
+The design is \emph{sober and self-contained}: a fragment name is set in
+the document's ordinary italic tinted with one accent colour, its scrap
+number in a small grey, the enclosing \(\langle\ \rangle\) in the same
+grey, and the modern layout carries \emph{no} rules, boxes, or shaded
+backgrounds --- highlighting alone distinguishes the code.
+
+Colour is applied through one level of indirection, \verb|\WEFTtint|.
+By default it is a no-op: \verb|\WEFTtint{weftaccent}| expands to nothing,
+so a document that loads \emph{no} colour package still compiles, merely
+in black and white.  When a colour package \emph{is} present, the
+\verb|\AtBeginDocument| hook below swaps in \verb|\WEFTtintOn|, and the
+same call becomes \verb|\color{weftaccent}|.  This is why every colour
+site is written \verb|{\WEFTtint{name}...}| rather than \verb|\color|
+directly: it degrades gracefully.
+
+\verb|\WEFTlangle|/\verb|\WEFTrangle| are the grey angle brackets;
+\verb|\WEFTeq| and \verb|\WEFTpluseq| are the definition (\(\equiv\)) and
+additive-continuation (\(+\!\equiv\)) markers; \verb|\WEFTdot| is the
+mid-dot that separates footer items; and \verb|\WEFTmetabegin|/%
+\verb|\WEFTmetaend| open and close the small grey metadata line, which
+opens with the scrap's own number.
+
+@d Write the modern decoration macros
+@{fputs("\\newcommand{\\WEFTtint}[1]{}\n", tex_file);
+fputs("\\newcommand{\\WEFTtintOn}[1]{\\color{#1}}\n", tex_file);
+fputs("\\newcommand{\\WEFTlangle}{{\\WEFTtint{weftcom}$\\langle$}\\,}\n",
+      tex_file);
+fputs("\\newcommand{\\WEFTrangle}{\\,{\\WEFTtint{weftcom}$\\rangle$}}\n",
+      tex_file);
+fputs("\\newcommand{\\WEFTeq}{\\ {\\WEFTtint{weftcom}$\\equiv$}}\n",
+      tex_file);
+fputs("\\newcommand{\\WEFTpluseq}{\\ {\\WEFTtint{weftcom}"
+      "$\\mathord{+}\\equiv$}}\n", tex_file);
+fputs("\\newcommand{\\WEFTdot}{\\ {\\WEFTtint{weftcom}"
+      "\\textperiodcentered}\\ }\n", tex_file);
+fputs("\\newcommand{\\WEFTmetabegin}[1]{\\par\\vspace{3pt}\\begingroup"
+      "\\footnotesize\\WEFTtint{weftcom}#1}\n", tex_file);
+fputs("\\newcommand{\\WEFTmetaend}{\\endgroup\\par}\n", tex_file);
+@}
+
+The colours themselves, and the automatic application of
+\verb|\WEFTlstsetup|, are deferred to \verb|\AtBeginDocument|.  This is
+essential: the limbo we are writing precedes \verb|\documentclass|, where
+\verb|\definecolor| and \verb|\lstset| cannot run (no colour or listings
+package is loaded yet, and loading one there fails outright).  The kernel
+hook \verb|\AtBeginDocument| runs its body at \verb|\begin{document}|, by
+which time the user's preamble has loaded its packages.  We guard each
+half with \(\varepsilon\)-\TeX's \verb|\ifdefined| so the output still
+compiles when a colour package or \verb|listings| is absent.  The palette
+uses the \verb|rgb| model, understood by both \verb|color| and
+\verb|xcolor|, so no specific colour package is mandated.
+
+@d Write the AtBeginDocument setup
+@{fputs("\\AtBeginDocument{%\n", tex_file);
+fputs("\\ifdefined\\definecolor\n", tex_file);
+fputs("\\definecolor{weftaccent}{rgb}{0.184,0.435,0.922}%\n", tex_file);
+fputs("\\definecolor{weftkw}{rgb}{0.020,0.314,0.682}%\n", tex_file);
+fputs("\\definecolor{weftstr}{rgb}{0.067,0.388,0.161}%\n", tex_file);
+fputs("\\definecolor{weftcom}{rgb}{0.431,0.467,0.506}%\n", tex_file);
+fputs("\\let\\WEFTtint\\WEFTtintOn\n", tex_file);
+fputs("\\fi\n", tex_file);
+fputs("\\ifdefined\\lstset\\WEFTlstsetup\\fi\n", tex_file);
+fputs("}\n", tex_file);
+@}
 
 We make our second (and final) pass through the source web, this time
 copying characters straight into the \verb|.tex| file. However, we keep
@@ -244,29 +336,30 @@ c = source_get();
 
 We go through a fair amount of effort to format a fragment definition.
 The \LaTeX\ for the previous fragment definition should look like this
-(perhaps modulo the scrap references):
+(perhaps modulo the scrap references).  Note the shape of a modern
+header: the grey \verb|\WEFTlangle|/\verb|\WEFTrangle| brackets, the
+accent-tinted italic name, the small grey scrap number, and the
+\verb|\WEFTeq| (\(\equiv\)) kind marker; then a hair of space before the
+listing; and, after it, the one-line \verb|\WEFTmetabegin|\ldots
+\verb|\WEFTmetaend| footer instead of the old bulleted list.
 {\small
 \begin{verbatim}
 \WEFTbegin
 \label{scrap70}
-\WEFTtarget{weft70}{} $\langle\,${\itshape Interpret at-sequence}%
-  \nobreak\ {\footnotesize {70}}$\,\rangle\equiv$
+\WEFTtarget{weft70}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape %
+  Interpret at-sequence}\nobreak\,{\footnotesize\WEFTtint{weftcom}70}%
+  \WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
 {
   int big_definition = FALSE;
   c = source_get();
   switch (c) {
-    case 'o': (*<\hbox{\normalfont $\langle\,${\itshape Write output file definition}%
-  \nobreak\ {\footnotesize \WEFTlink{weft19a}{19a}}$\,\rangle$}>*)
+    case 'o': (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}%
+  \itshape Write output file definition}\nobreak\,{\footnotesize%
+  \WEFTtint{weftcom}\WEFTlink{weft19a}{19a}}\WEFTrangle}>*)
   }
 \end{lstlisting}
-{\WEFTsep}
-\vspace{-1ex}
-\footnotesize
-\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item Fragment referenced in \WEFTlink{weft17b}{17b}.
-\item{}
-\end{list}
+\WEFTmetabegin{70}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft17b}{17b}\WEFTmetaend
 \WEFTend
 \end{verbatim}}
 
@@ -286,16 +379,33 @@ scrap's language tag --- syntax highlighting.
 Fragment and file definitions are formatted nearly identically.
 I've factored the common parts out into separate scraps.
 
+Both headers now carry a \emph{kind marker} after the closing angle
+bracket: \verb|\WEFTeq| (\(\equiv\)) for a definition, or
+\verb|\WEFTpluseq| (\(+\!\equiv\)) for an \emph{additive continuation}
+--- a scrap that appends to a fragment (or file) already begun elsewhere.
+We know which is which because \verb|name->defs| is, after pass~one's
+\verb|reverse_lists|, in source order: its head is the \emph{first}
+scrap that defines the name.  So the current scrap is a continuation
+exactly when \verb|name->defs->scrap| differs from the scrap we are
+emitting.  The file header sets the file name in monospace (it \emph{is}
+a filename); the fragment header sets its name in the document's italic.
+Both are tinted with the accent colour and followed, on the next line
+after a hair of vertical space, by the code.
+
 @d Write output file definition
 @{{
   Name *name = collect_file_name();
+  int additive = (name->defs && name->defs->scrap != scraps);
   @<Begin the scrap environment@>
   fputs("\\WEFTtarget{weft", tex_file);
   write_single_scrap_ref(tex_file, scraps);
-  fputs("}{} ", tex_file);
-  fprintf(tex_file, "\\verb%c\"%s\"%c\\nobreak\\ {\\footnotesize {", nw_char, name->spelling, nw_char);
+  fputs("}{}", tex_file);
+  fprintf(tex_file, "\\WEFTlangle{\\WEFTtint{weftaccent}\\verb%c%s%c}\\nobreak"
+          "\\,{\\footnotesize\\WEFTtint{weftcom}", nw_char, name->spelling, nw_char);
   write_single_scrap_ref(tex_file, scraps);
-  fputs("}}$\\equiv$\n", tex_file);
+  fputs("}\\WEFTrangle", tex_file);
+  fputs(additive ? "\\WEFTpluseq" : "\\WEFTeq", tex_file);
+  fputs("\\par\\nobreak\\vspace{0.6ex}\\nobreak\n", tex_file);
   @<Fill in the middle of the scrap environment@>
   @<Begin the cross-reference environment@>
   if ( scrap_flag ) {
@@ -308,21 +418,26 @@ I've factored the common parts out into separate scraps.
 }@}
 
 
-I don't format a fragment name at all specially, figuring the programmer
-might want to use italics or bold face in the midst of the name.
+The fragment name's \emph{content} is still emitted verbatim by the
+\emph{Write the macro's name} fragment, so a programmer may put italics
+or bold face in the midst of the name; the surrounding \verb|\itshape|
+and accent tint are only the default dress.
 
 @d Write macro definition
 @{{
   Name *name = collect_macro_name();
+  int additive = (name->defs && name->defs->scrap != scraps);
 
   @<Begin the scrap environment@>
   fputs("\\WEFTtarget{weft", tex_file);
   write_single_scrap_ref(tex_file, scraps);
-  fputs("}{} $\\langle\\,${\\itshape ", tex_file);
+  fputs("}{}\\WEFTlangle{\\WEFTtint{weftaccent}\\itshape ", tex_file);
   @<Write the macro's name@>
-  fputs("}\\nobreak\\ {\\footnotesize {", tex_file);
+  fputs("}\\nobreak\\,{\\footnotesize\\WEFTtint{weftcom}", tex_file);
   write_single_scrap_ref(tex_file, scraps);
-  fputs("}}$\\,\\rangle\\equiv$\n", tex_file);
+  fputs("}\\WEFTrangle", tex_file);
+  fputs(additive ? "\\WEFTpluseq" : "\\WEFTeq", tex_file);
+  fputs("\\par\\nobreak\\vspace{0.6ex}\\nobreak\n", tex_file);
   @<Fill in the middle of the scrap environment@>
   @<Begin the cross-reference environment@>
   @<Write macro defs@>
@@ -426,10 +541,12 @@ starts fresh; without it a scrap beginning with \verb|#| (a C
 \verb|listings| reads that \verb|#| as a macro parameter and aborts with
 \emph{Illegal parameter number}.  Symmetrically, \verb|\end{lstlisting}|
 must start its own line, so we emit a newline before it even when the scrap
-body did not end in one.  The diamond (\verb|\WEFTsep|) that marks the end
-of a scrap goes just after the listing.  A non-code block scrap (the unusual
-\verb|@@d name @@[...@@]| or \verb|@@(...@@)| forms) is emitted as before,
-without a listing.
+body did not end in one.  The modern layout draws no end-of-scrap glyph:
+the old diamond (\verb|\WEFTsep|) is retired --- its macro is still
+defined, but empty, for backward compatibility --- and the metadata
+footer that follows delimits the scrap on its own.  A non-code block
+scrap (the unusual \verb|@@d name @@[...@@]| or \verb|@@(...@@)| forms) is
+emitted as before, without a listing.
 
 @d Fill in the middle of the scrap environment
 @{{
@@ -449,10 +566,10 @@ without a listing.
   copy_scrap(tex_file, TRUE, name);
   if (is_code)
     /* the closing tag is split across two literals so that this very
-       line does not end a listing when weft typesets its own source;
-       the leading newline keeps \end{lstlisting} on its own line */
+       line does not end a listing when weft typesets its own source
+       (the same reason this comment says "the closing tag" rather than
+       spelling it out); the leading newline keeps it on its own line */
     fputs("\n\\end{ls" "tlisting}\n", tex_file);
-  fputs("{\\WEFTsep}\n", tex_file);
 }@}
 
 \newpage
@@ -495,28 +612,26 @@ c = source_get();
 
 @d Begin the cross-reference environment
 @{{
-  fputs("\\vspace{1.0ex}\n", tex_file);
-  fputs("\\footnotesize\n", tex_file);
-  fputs("\\begin{list}{}{\\setlength{\\itemsep}{-\\parsep}",
-    tex_file);
-  fputs("\\setlength{\\itemindent}{-\\leftmargin}}\n", tex_file);}
+  fputs("\\WEFTmetabegin{", tex_file);
+  write_single_scrap_ref(tex_file, scraps);
+  fputs("}", tex_file);}
 @}
 
-There may (unusually) be nothing to output in the cross-reference
-section, so output an empty list item anyway to avoid having an empty
-list.
+The footer is one horizontal line, opened above with the scrap's own
+number.  Every subsequent item is introduced by \verb|\WEFTdot|, the grey
+separator, so there is never a leading or trailing dot to special-case;
+an item that has nothing to say simply emits nothing.
 
 @d Finish the cross-reference environment
 @{{
-  fputs("\n\\item{}", tex_file);
-  fputs("\n\\end{list}\n", tex_file);
+  fputs("\\WEFTmetaend\n", tex_file);
 }@}
 
 @d Write file defs
 @{{
   if (name->defs) {
     if (name->defs->next) {
-      fputs("\\item \\WEFTtxtFileDefBy\\ ", tex_file);
+      fputs("\\WEFTdot \\WEFTtxtFileDefBy\\ ", tex_file);
       print_scrap_numbers(tex_file, name->defs);
     }
   } else {
@@ -529,7 +644,7 @@ list.
 @d Write macro defs
 @{{
   if (name->defs->next) {
-    fputs("\\item \\WEFTtxtMacroDefBy\\ ", tex_file);
+    fputs("\\WEFTdot \\WEFTtxtMacroDefBy\\ ", tex_file);
     print_scrap_numbers(tex_file, name->defs);
   }
 }@}
@@ -538,21 +653,20 @@ list.
 @{{
   if (name->uses) {
     if (name->uses->next) {
-      fputs("\\item \\WEFTtxtMacroRefIn\\ ", tex_file);
+      fputs("\\WEFTdot \\WEFTtxtMacroRefIn\\ ", tex_file);
       print_scrap_numbers(tex_file, name->uses);
     }
     else {
-      fputs("\\item \\WEFTtxtMacroRefIn\\ ", tex_file);
+      fputs("\\WEFTdot \\WEFTtxtMacroRefIn\\ ", tex_file);
       fputs("\\WEFTlink{weft", tex_file);
       write_single_scrap_ref(tex_file, name->uses->scrap);
       fputs("}{", tex_file);
       write_single_scrap_ref(tex_file, name->uses->scrap);
       fputs("}", tex_file);
-      fputs(".\n", tex_file);
     }
   }
   else {
-    fputs("\\item {\\WEFTtxtMacroNoRef}.\n", tex_file);
+    fputs("\\WEFTdot {\\WEFTtxtMacroNoRef}", tex_file);
     fprintf(stderr, "%s: <%s> never referenced.\n",
             command_name, name->spelling);
   }
@@ -576,7 +690,6 @@ list.
     scraps = scraps->next;
     fputs("}", tex_file);
   }
-  fputs(".\n", tex_file);
 }
 @| print_scrap_numbers @}
 
@@ -984,7 +1097,7 @@ This scrap helps deal with bold keywords:
        fragment name is set in the ordinary document font (roman italic)
        rather than as italic typewriter. */
     fputs("\\hbox{\\normalfont ", file);
-  fputs("$\\langle\\,${\\itshape ", file);
+  fputs("\\WEFTlangle{\\WEFTtint{weftaccent}\\itshape ", file);
   while (*p != '\000') {
     if (*p == ARG_CHR) {
       if (q == NULL) {
@@ -1000,11 +1113,11 @@ This scrap helps deal with bold keywords:
     else
        fputc(*p++, file);
   }
-  fputs("}\\nobreak\\ ", file);
+  fputs("}\\nobreak", file);
   if (scrap_name_has_parameters) {
     @<Format macro parameters@>
   }
-  fprintf(file, "{\\footnotesize ");
+  fprintf(file, "\\,{\\footnotesize\\WEFTtint{weftcom}");
   if (name->defs)
     @<Write abbreviated definition list@>
   else {
@@ -1012,7 +1125,7 @@ This scrap helps deal with bold keywords:
     fprintf(stderr, "%s: never defined <%s>\n",
             command_name, name->spelling);
   }
-  fputs("}$\\,\\rangle$", file);
+  fputs("}\\WEFTrangle", file);
   if (prefix)
      fputs("}", file);
   end_tex_escape(file);
@@ -1118,6 +1231,17 @@ write_ArglistElement(FILE * file, Arglist * args, char ** params)
 
 \subsection{Generating the Indices}
 
+The three back-of-book indices --- of file names, fragment names, and
+user-specified identifiers --- are each a compact vertical list, one
+entry per line.  Their entries share the scrap presentation's visual
+language: a fragment name is set in the accent-tinted italic inside the
+grey \verb|\WEFTlangle|/\verb|\WEFTrangle| brackets, a file name and an
+identifier in accent and keyword-coloured monospace respectively, and
+each entry's \verb|\WEFTtxtDefBy|/\verb|\WEFTtxtRefIn| metadata in the
+small grey used everywhere else.  Colour flows through the same \verb|\WEFTtint|
+indirection, so the indices too degrade to black and white when no colour
+package is loaded.
+
 @d Write index of file names
 @{{
   if (file_names) {
@@ -1143,27 +1267,25 @@ write_ArglistElement(FILE * file, Arglist * args, char ** params)
 
 @d Format a file index entry
 @{fputs("\\item ", tex_file);
-fprintf(tex_file, "\\verb%c\"%s\"%c ", nw_char, name->spelling, nw_char);
+fprintf(tex_file, "{\\WEFTtint{weftaccent}\\verb%c%s%c}\\ ",
+        nw_char, name->spelling, nw_char);
 @<Write file's defining scrap numbers@>
 putc('\n', tex_file);@}
 
 @d Write file's defining scrap numbers
 @{{
   Scrap_Node *p = name->defs;
-  fputs("{\\footnotesize {\\WEFTtxtDefBy}", tex_file);
+  fputs("{\\footnotesize\\WEFTtint{weftcom} {\\WEFTtxtDefBy}", tex_file);
+  putc(' ', tex_file);
   if (p->next) {
-    /* fputs("s ", tex_file); */
-      putc(' ', tex_file);
     print_scrap_numbers(tex_file, p);
   }
   else {
-    putc(' ', tex_file);
     fputs("\\WEFTlink{weft", tex_file);
     write_single_scrap_ref(tex_file, p->scrap);
     fputs("}{", tex_file);
     write_single_scrap_ref(tex_file, p->scrap);
     fputs("}", tex_file);
-    putc('.', tex_file);
   }
   putc('}', tex_file);
 }@}
@@ -1244,11 +1366,11 @@ for (j = 1; j < @2; j++)
 @d Format an index entry
 @{if (name->sector == sector){
   fputs("\\item ", tex_file);
-  fputs("$\\langle\\,$", tex_file);
+  fputs("\\WEFTlangle{\\WEFTtint{weftaccent}\\itshape ", tex_file);
   @<Write the macro's name@>
-  fputs("\\nobreak\\ {\\footnotesize ", tex_file);
+  fputs("}\\nobreak\\,{\\footnotesize\\WEFTtint{weftcom}", tex_file);
   @<Write defining scrap numbers@>
-  fputs("}$\\,\\rangle$ ", tex_file);
+  fputs("}\\WEFTrangle\\ ", tex_file);
   @<Write referencing scrap numbers@>
   putc('\n', tex_file);
 }@}
@@ -1280,26 +1402,23 @@ for (j = 1; j < @2; j++)
 @d Write referencing scrap numbers
 @{{
   Scrap_Node *p = name->uses;
-  fputs("{\\footnotesize ", tex_file);
+  fputs("{\\footnotesize\\WEFTtint{weftcom} ", tex_file);
   if (p) {
     fputs("{\\WEFTtxtRefIn}", tex_file);
+    putc(' ', tex_file);
     if (p->next) {
-      /* fputs("s ", tex_file); */
-      putc(' ', tex_file);
       print_scrap_numbers(tex_file, p);
     }
     else {
-      putc(' ', tex_file);
       fputs("\\WEFTlink{weft", tex_file);
       write_single_scrap_ref(tex_file, p->scrap);
       fputs("}{", tex_file);
       write_single_scrap_ref(tex_file, p->scrap);
       fputs("}", tex_file);
-      putc('.', tex_file);
     }
   }
   else
-    fputs("{\\WEFTtxtNoRef}.", tex_file);
+    fputs("{\\WEFTtxtNoRef}", tex_file);
   putc('}', tex_file);
 }@}
 
@@ -1357,7 +1476,8 @@ for (j = 1; j < @2; j++)
   if ( uses || dangling_flag ) {
     int page;
     Scrap_Node *defs = name->defs;
-    fprintf(tex_file, "\\item \\verb%c%s%c: ", nw_char,name->spelling,nw_char);
+    fprintf(tex_file, "\\item {\\WEFTtint{weftkw}\\verb%c%s%c}: ",
+            nw_char,name->spelling,nw_char);
     if (!uses) {
         fputs("(\\underline{", tex_file);
         fputs("\\WEFTlink{weft", tex_file);

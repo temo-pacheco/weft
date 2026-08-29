@@ -5,23 +5,23 @@
 /* {:10} */
 
 #line 32 "literate/source-io.weft"
-/* {242: literate/source-io.weft:32} */
+/* {244: literate/source-io.weft:32} */
 static FILE *source_file;  /* the current input file */
 static int double_at;
 static int include_depth;
-/* {:242} */
+/* {:244} */
 
 #line 39 "literate/source-io.weft"
-/* {243: literate/source-io.weft:39} */
+/* {245: literate/source-io.weft:39} */
 static struct {
   FILE *file;
   char *name;
   int line;
 } stack[10];
-/* {:243} */
+/* {:245} */
 
 #line 56 "literate/source-io.weft"
-/* {244: literate/source-io.weft:56} */
+/* {246: literate/source-io.weft:56} */
 
 int source_peek;
 int source_last;
@@ -52,7 +52,7 @@ int source_get(void)
                /* Handle an ``at'' character */
                
 #line 104 "literate/source-io.weft"
-               /* {247: literate/source-io.weft:104} */
+               /* {249: literate/source-io.weft:104} */
 {
                  c = getc(source_file);
                  if (double_at) {
@@ -147,7 +147,7 @@ int source_get(void)
                                     command_name, nw_char, c, c, source_name, source_line);
                             exit(-1);
                    }
-               }/* {:247} */
+               }/* {:249} */
 
 #line 71 "literate/source-io.weft"
 
@@ -157,10 +157,10 @@ int source_get(void)
                return c;
   }
 }
-/* {:244} */
+/* {:246} */
 
 #line 88 "literate/source-io.weft"
-/* {246: literate/source-io.weft:88} */
+/* {248: literate/source-io.weft:88} */
 void source_ungetc(int *c)
 {
   ungetc(source_peek, source_file);
@@ -168,10 +168,10 @@ void source_ungetc(int *c)
     source_line--;
   source_peek=*c;
 }
-/* {:246} */
+/* {:248} */
 
 #line 227 "literate/source-io.weft"
-/* {251: literate/source-io.weft:227} */
+/* {253: literate/source-io.weft:227} */
 void source_open(char *name)
 {
   source_file = fopen(name, "r");
@@ -186,4 +186,4 @@ void source_open(char *name)
   double_at = FALSE;
   include_depth = 0;
 }
-/* {:251} */
+/* {:253} */
