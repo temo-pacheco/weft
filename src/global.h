@@ -199,8 +199,8 @@ extern unsigned char prev_sector;
 extern char blockBuff[6400];
 /* {:68} */
 
-#line 629 "literate/latex-output.weft"
-/* {106: literate/latex-output.weft:629} */
+#line 632 "literate/latex-output.weft"
+/* {106: literate/latex-output.weft:632} */
 extern int extra_scraps;
 /* {:106} */
 
@@ -244,18 +244,18 @@ extern void pass1(char *file_name);
 extern void write_tex(char *file_name, char *tex_name, unsigned char sector);
 /* {:83} */
 
-#line 852 "literate/latex-output.weft"
-/* {119: literate/latex-output.weft:852} */
+#line 855 "literate/latex-output.weft"
+/* {119: literate/latex-output.weft:855} */
 void initialise_delimit_scrap_array(void);
 /* {:119} */
 
-#line 973 "literate/latex-output.weft"
-/* {125: literate/latex-output.weft:973} */
+#line 976 "literate/latex-output.weft"
+/* {125: literate/latex-output.weft:976} */
 void update_delimit_scrap(void);
 /* {:125} */
 
-#line 1456 "literate/latex-output.weft"
-/* {153: literate/latex-output.weft:1456} */
+#line 1459 "literate/latex-output.weft"
+/* {153: literate/latex-output.weft:1459} */
 extern int has_sector(Name *, unsigned char);
 /* {:153} */
 

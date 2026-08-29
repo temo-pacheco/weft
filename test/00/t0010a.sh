@@ -84,6 +84,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTeq}{\ {\WEFTtint{weftcom}$\equiv$}}
 \newcommand{\WEFTpluseq}{\ {\WEFTtint{weftcom}$\mathord{+}\equiv$}}
 \newcommand{\WEFTdot}{\ {\WEFTtint{weftcom}\textperiodcentered}\ }
+\newcommand{\WEFTnumsep}{\ }
 \newcommand{\WEFTmetabegin}[1]{\par\vspace{3pt}\begingroup\footnotesize\WEFTtint{weftcom}#1}
 \newcommand{\WEFTmetaend}{\endgroup\par}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\raggedright}
@@ -107,7 +108,7 @@ Here is a cross-reference: 1-01
 
 \WEFTbegin
 \label{scrap1}
-\WEFTtarget{weft1}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.c@}\nobreak\,{\footnotesize\WEFTtint{weftcom}1}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.c@}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
 This (1-01) is where it is referencing.
 

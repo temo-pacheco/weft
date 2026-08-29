@@ -109,6 +109,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTeq}{\ {\WEFTtint{weftcom}$\equiv$}}
 \newcommand{\WEFTpluseq}{\ {\WEFTtint{weftcom}$\mathord{+}\equiv$}}
 \newcommand{\WEFTdot}{\ {\WEFTtint{weftcom}\textperiodcentered}\ }
+\newcommand{\WEFTnumsep}{\ }
 \newcommand{\WEFTmetabegin}[1]{\par\vspace{3pt}\begingroup\footnotesize\WEFTtint{weftcom}#1}
 \newcommand{\WEFTmetaend}{\endgroup\par}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\raggedright}
@@ -130,12 +131,12 @@ cat > test.expected.tex <<"EOF"
 \begin{document}
 \WEFTbegin
 \label{scrap1}
-\WEFTtarget{weft1a}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.c@}\nobreak\,{\footnotesize\WEFTtint{weftcom}1a}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1a}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.c@}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1a}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
 Begin
 Define abc cba
-(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Outer abc and def retuO}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}, \ldots\ }\WEFTrangle}>*)
-(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Outer cba and fed retuO}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}, \ldots\ }\WEFTrangle}>*)
+(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Outer abc and def retuO}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}, \ldots\ }\WEFTrangle}>*)
+(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Outer cba and fed retuO}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}, \ldots\ }\WEFTrangle}>*)
 End
 
 \end{lstlisting}
@@ -143,12 +144,12 @@ End
 \WEFTend
 \WEFTbegin
 \label{scrap2}
-\WEFTtarget{weft1b}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO}\nobreak\,{\footnotesize\WEFTtint{weftcom}1b}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1b}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1b}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 Start
 Define def fed
 Use abc cba
-(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Inner \hbox{\ttfamily xArg1yArg2z} rennI}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1c}{1c}}\WEFTrangle}>*)
+(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Inner \hbox{\ttfamily xArg1yArg2z} rennI}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1c}{1c}}\WEFTrangle}>*)
 Finish
 
 \end{lstlisting}
@@ -156,7 +157,7 @@ Finish
 \WEFTend
 \WEFTbegin
 \label{scrap4}
-\WEFTtarget{weft1c}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Inner \hbox{\slshape\sffamily Stuff\/} rennI}\nobreak\,{\footnotesize\WEFTtint{weftcom}1c}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1c}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Inner \hbox{\slshape\sffamily Stuff\/} rennI}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1c}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 XX>>(*<\hbox{\slshape\sffamily Stuff\/}>*)<<YY
 \end{lstlisting}
@@ -164,7 +165,7 @@ XX>>(*<\hbox{\slshape\sffamily Stuff\/}>*)<<YY
 \WEFTend
 \WEFTbegin
 \label{scrap5}
-\WEFTtarget{weft1d}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.c@}\nobreak\,{\footnotesize\WEFTtint{weftcom}1d}\WEFTrangle\WEFTpluseq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1d}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.c@}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1d}\WEFTrangle\WEFTpluseq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
 More stuff
 
@@ -173,7 +174,7 @@ More stuff
 \WEFTend
 \WEFTbegin
 \label{scrap6}
-\WEFTtarget{weft1e}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO}\nobreak\,{\footnotesize\WEFTtint{weftcom}1e}\WEFTrangle\WEFTpluseq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1e}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1e}\WEFTrangle\WEFTpluseq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 Added stuff to force fragment defined
 cross-reference entry.
@@ -183,8 +184,8 @@ cross-reference entry.
 \WEFTend
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTlangle{\WEFTtint{weftaccent}\itshape Inner \hbox{\slshape\sffamily Stuff\/} rennI}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1c}{1c}}\WEFTrangle\ {\footnotesize\WEFTtint{weftcom} {\WEFTtxtRefIn} \WEFTlink{weft1b}{1b}}
-\item \WEFTlangle{\WEFTtint{weftaccent}\itshape Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}\WEFTlink{weft1e}{e}}\WEFTrangle\ {\footnotesize\WEFTtint{weftcom} {\WEFTtxtRefIn} \WEFTlink{weft1a}{1a}}
+\item \WEFTlangle{\WEFTtint{weftaccent}\itshape Inner \hbox{\slshape\sffamily Stuff\/} rennI}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1c}{1c}}\WEFTrangle\ {\footnotesize\WEFTtint{weftcom} {\WEFTtxtRefIn} \WEFTlink{weft1b}{1b}}
+\item \WEFTlangle{\WEFTtint{weftaccent}\itshape Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}\WEFTlink{weft1e}{e}}\WEFTrangle\ {\footnotesize\WEFTtint{weftcom} {\WEFTtxtRefIn} \WEFTlink{weft1a}{1a}}
 \end{list}}
 
 \end{document}

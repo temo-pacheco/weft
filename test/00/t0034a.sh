@@ -107,6 +107,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTeq}{\ {\WEFTtint{weftcom}$\equiv$}}
 \newcommand{\WEFTpluseq}{\ {\WEFTtint{weftcom}$\mathord{+}\equiv$}}
 \newcommand{\WEFTdot}{\ {\WEFTtint{weftcom}\textperiodcentered}\ }
+\newcommand{\WEFTnumsep}{\ }
 \newcommand{\WEFTmetabegin}[1]{\par\vspace{3pt}\begingroup\footnotesize\WEFTtint{weftcom}#1}
 \newcommand{\WEFTmetaend}{\endgroup\par}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\raggedright}
@@ -131,12 +132,12 @@ cat > test.expected.tex <<"EOF"
 
 \WEFTbegin
 \label{scrap1}
-\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.c@}\nobreak\,{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.c@}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
 int
 main(int argc, char ** argv)
 {
-   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Body of main}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle}>*)
+   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Body of main}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle}>*)
 }
 
 \end{lstlisting}
@@ -144,14 +145,14 @@ main(int argc, char ** argv)
 \WEFTend
 \WEFTbegin
 \label{scrap2}
-\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Body of main}\nobreak\,{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Body of main}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 int in;
 unsigned char out[20];
 
 while (scanf("%x", &in) == 1)
 {
-   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Do one item}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle}>*)
+   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Do one item}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle}>*)
 }
 return 0;
 \end{lstlisting}
@@ -159,7 +160,7 @@ return 0;
 \WEFTend
 \WEFTbegin
 \label{scrap3}
-\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Do one item}\nobreak\,{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Do one item}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 int n = mangle(in, out);
 

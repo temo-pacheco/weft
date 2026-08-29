@@ -96,6 +96,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTeq}{\ {\WEFTtint{weftcom}$\equiv$}}
 \newcommand{\WEFTpluseq}{\ {\WEFTtint{weftcom}$\mathord{+}\equiv$}}
 \newcommand{\WEFTdot}{\ {\WEFTtint{weftcom}\textperiodcentered}\ }
+\newcommand{\WEFTnumsep}{\ }
 \newcommand{\WEFTmetabegin}[1]{\par\vspace{3pt}\begingroup\footnotesize\WEFTtint{weftcom}#1}
 \newcommand{\WEFTmetaend}{\endgroup\par}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\raggedright}
@@ -118,7 +119,7 @@ cat > test.expected.tex <<"EOF"
 Here is a macro that defines something.
 \WEFTbegin
 \label{scrap1}
-\WEFTtarget{weft1a}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Define something}\nobreak\,{\footnotesize\WEFTtint{weftcom}1a}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1a}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Define something}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1a}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 something anything
 
@@ -128,7 +129,7 @@ something anything
 Here is a macro that uses an argument
 \WEFTbegin
 \label{scrap2}
-\WEFTtarget{weft1b}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Use the \hbox{\slshape\sffamily thing\/}}\nobreak\,{\footnotesize\WEFTtint{weftcom}1b}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1b}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Use the \hbox{\slshape\sffamily thing\/}}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1b}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 Use (*<\hbox{\slshape\sffamily thing\/}>*)
 Use anything
@@ -139,11 +140,11 @@ Use anything
 Now use the something in an argument
 \WEFTbegin
 \label{scrap3}
-\WEFTtarget{weft1c}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.c@}\nobreak\,{\footnotesize\WEFTtint{weftcom}1c}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1c}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.c@}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1c}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
 
-(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Define something}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1a}{1a}}\WEFTrangle}>*)
-(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Use the something}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}}\WEFTrangle}>*)
+(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Define something}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1a}{1a}}\WEFTrangle}>*)
+(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Use the something}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}}\WEFTrangle}>*)
 
 \end{lstlisting}
 \WEFTmetabegin{1c}\WEFTdot \WEFTtxtIdentsUsed\nobreak\  {\WEFTtint{weftkw}\verb@something@}\nobreak\ \WEFTlink{weft1a}{1a}\WEFTmetaend

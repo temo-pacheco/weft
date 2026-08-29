@@ -88,6 +88,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTeq}{\ {\WEFTtint{weftcom}$\equiv$}}
 \newcommand{\WEFTpluseq}{\ {\WEFTtint{weftcom}$\mathord{+}\equiv$}}
 \newcommand{\WEFTdot}{\ {\WEFTtint{weftcom}\textperiodcentered}\ }
+\newcommand{\WEFTnumsep}{\ }
 \newcommand{\WEFTmetabegin}[1]{\par\vspace{3pt}\begingroup\footnotesize\WEFTtint{weftcom}#1}
 \newcommand{\WEFTmetaend}{\endgroup\par}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\raggedright}
@@ -108,7 +109,7 @@ cat > test.expected.tex <<"EOF"
 \begin{document}
 \WEFTbegin
 \label{scrap1}
-\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Frag with \hbox{\slshape\sffamily arg1\/} and \hbox{\slshape\sffamily \$arg2\/}}\nobreak\,{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Frag with \hbox{\slshape\sffamily arg1\/} and \hbox{\slshape\sffamily \$arg2\/}}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 Here is the first arg:(*<\hbox{\slshape\sffamily arg1\/}>*).
 Here is the second arg:(*<\hbox{\slshape\sffamily \$arg2\/}>*).
@@ -118,10 +119,10 @@ Here is the second arg:(*<\hbox{\slshape\sffamily \$arg2\/}>*).
 \WEFTend
 \WEFTbegin
 \label{scrap2}
-\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.c@}\nobreak\,{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.c@}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
 Front
-(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag with \$tuff and Non\_sense}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle}>*)
+(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag with \$tuff and Non\_sense}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle}>*)
 Back
 
 \end{lstlisting}

@@ -87,6 +87,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTeq}{\ {\WEFTtint{weftcom}$\equiv$}}
 \newcommand{\WEFTpluseq}{\ {\WEFTtint{weftcom}$\mathord{+}\equiv$}}
 \newcommand{\WEFTdot}{\ {\WEFTtint{weftcom}\textperiodcentered}\ }
+\newcommand{\WEFTnumsep}{\ }
 \newcommand{\WEFTmetabegin}[1]{\par\vspace{3pt}\begingroup\footnotesize\WEFTtint{weftcom}#1}
 \newcommand{\WEFTmetaend}{\endgroup\par}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\raggedright}
@@ -108,7 +109,7 @@ cat > test.expected.tex <<"EOF"
 Test text.
 \WEFTbegin
 \label{scrap1}
-\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Fragment one}\nobreak\,{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Fragment one}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 Stuff 1
 \end{lstlisting}
@@ -121,7 +122,7 @@ None.
 
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTlangle{\WEFTtint{weftaccent}\itshape Fragment one}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle\ {\footnotesize\WEFTtint{weftcom} {\WEFTtxtNoRef}}
+\item \WEFTlangle{\WEFTtint{weftaccent}\itshape Fragment one}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle\ {\footnotesize\WEFTtint{weftcom} {\WEFTtxtNoRef}}
 \end{list}}
 \end{document}
 EOF

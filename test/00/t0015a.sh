@@ -98,6 +98,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTeq}{\ {\WEFTtint{weftcom}$\equiv$}}
 \newcommand{\WEFTpluseq}{\ {\WEFTtint{weftcom}$\mathord{+}\equiv$}}
 \newcommand{\WEFTdot}{\ {\WEFTtint{weftcom}\textperiodcentered}\ }
+\newcommand{\WEFTnumsep}{\ }
 \newcommand{\WEFTmetabegin}[1]{\par\vspace{3pt}\begingroup\footnotesize\WEFTtint{weftcom}#1}
 \newcommand{\WEFTmetaend}{\endgroup\par}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\raggedright}
@@ -118,7 +119,7 @@ cat > test.expected.tex <<"EOF"
 \begin{document}
 \WEFTbegin
 \label{scrap1}
-\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Sort \hbox{\slshape\sffamily key\/} of size \hbox{\slshape\sffamily n\/} for \hbox{\slshape\sffamily ordering\/}}\nobreak\,{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Sort \hbox{\slshape\sffamily key\/} of size \hbox{\slshape\sffamily n\/} for \hbox{\slshape\sffamily ordering\/}}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 for (int j = 1; j < (*<\hbox{\slshape\sffamily n\/}>*); j++)
 {
@@ -140,7 +141,7 @@ for (int j = 1; j < (*<\hbox{\slshape\sffamily n\/}>*); j++)
 \end{lstlisting}
 \WEFTmetabegin{?}\WEFTdot {\WEFTtxtMacroNoRef}\WEFTmetaend
 \WEFTend
-Test in-text (*<\WEFTlangle{\WEFTtint{weftaccent}\itshape Sort key of size n for ordering}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle>*) usage.
+Test in-text (*<\WEFTlangle{\WEFTtint{weftaccent}\itshape Sort key of size n for ordering}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle>*) usage.
 \end{document}
 EOF
 

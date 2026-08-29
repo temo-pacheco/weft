@@ -99,6 +99,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTeq}{\ {\WEFTtint{weftcom}$\equiv$}}
 \newcommand{\WEFTpluseq}{\ {\WEFTtint{weftcom}$\mathord{+}\equiv$}}
 \newcommand{\WEFTdot}{\ {\WEFTtint{weftcom}\textperiodcentered}\ }
+\newcommand{\WEFTnumsep}{\ }
 \newcommand{\WEFTmetabegin}[1]{\par\vspace{3pt}\begingroup\footnotesize\WEFTtint{weftcom}#1}
 \newcommand{\WEFTmetaend}{\endgroup\par}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\raggedright}
@@ -119,19 +120,19 @@ cat > test.expected.tex <<"EOF"
 \begin{document}
 \WEFTbegin
 \label{scrap1}
-\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.c@}\nobreak\,{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.c@}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
 Call the macro
-   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Fragment with $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$ as parameter}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle}>*)
-   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Second frag with $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$ as parameter}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle}>*)
-   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Third frag with $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$ as parameter}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle}>*)
+   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Fragment with $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$ as parameter}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle}>*)
+   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Second frag with $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$ as parameter}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle}>*)
+   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Third frag with $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$ as parameter}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle}>*)
 
 \end{lstlisting}
 \WEFTmetabegin{?}\WEFTmetaend
 \WEFTend
 \WEFTbegin
 \label{scrap2}
-\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Fragment with \hbox{\slshape\sffamily Begin macro\/} as parameter}\nobreak\,{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Fragment with \hbox{\slshape\sffamily Begin macro\/} as parameter}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 (*<\hbox{\slshape\sffamily Begin macro\/}>*)<<<Here 'tis.
 That argument was at the beginning of the fragment
@@ -140,7 +141,7 @@ That argument was at the beginning of the fragment
 \WEFTend
 \WEFTbegin
 \label{scrap3}
-\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Second frag with \hbox{\slshape\sffamily Begin line\/} as parameter}\nobreak\,{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Second frag with \hbox{\slshape\sffamily Begin line\/} as parameter}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 Here is the beginning of the second macro
 (*<\hbox{\slshape\sffamily Begin line\/}>*)<<<That is the argument
@@ -150,7 +151,7 @@ And this is the end of the second frag
 \WEFTend
 \WEFTbegin
 \label{scrap4}
-\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Third frag with \hbox{\slshape\sffamily Embedded\/} as parameter}\nobreak\,{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Third frag with \hbox{\slshape\sffamily Embedded\/} as parameter}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 Here is the argument>>>(*<\hbox{\slshape\sffamily Embedded\/}>*)<<<That was it.
 \end{lstlisting}
@@ -158,7 +159,7 @@ Here is the argument>>>(*<\hbox{\slshape\sffamily Embedded\/}>*)<<<That was it.
 \WEFTend
 \WEFTbegin
 \label{scrap5}
-\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape A macro argument}\nobreak\,{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape A macro argument}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 Hello folks
 \end{lstlisting}

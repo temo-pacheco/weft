@@ -93,6 +93,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTeq}{\ {\WEFTtint{weftcom}$\equiv$}}
 \newcommand{\WEFTpluseq}{\ {\WEFTtint{weftcom}$\mathord{+}\equiv$}}
 \newcommand{\WEFTdot}{\ {\WEFTtint{weftcom}\textperiodcentered}\ }
+\newcommand{\WEFTnumsep}{\ }
 \newcommand{\WEFTmetabegin}[1]{\par\vspace{3pt}\begingroup\footnotesize\WEFTtint{weftcom}#1}
 \newcommand{\WEFTmetaend}{\endgroup\par}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\raggedright}
@@ -117,20 +118,20 @@ cat > test.expected.tex <<"EOF"
 Here is a block comment which contains the word 'target'.
 \par\vspace{\baselineskip}
 \label{scrap1}
-\WEFTtarget{weft1a}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.c@}\nobreak\,{\footnotesize\WEFTtint{weftcom}1a}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1a}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.c@}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1a}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
 Here is a fragment which contains the block comment
 (*<\hbox{\sffamily\slshape (Comment)}>*)
 That was the block comment.
 Here we use another fragment.
-(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Define our target}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}}\WEFTrangle}>*)
+(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Define our target}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}}\WEFTrangle}>*)
 
 \end{lstlisting}
 \WEFTmetabegin{1a}\WEFTmetaend
 \WEFTend
 \WEFTbegin
 \label{scrap2}
-\WEFTtarget{weft1b}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Define our target}\nobreak\,{\footnotesize\WEFTtint{weftcom}1b}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1b}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Define our target}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1b}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 This fragment defines 'target'.
 

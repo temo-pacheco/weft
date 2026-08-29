@@ -126,6 +126,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTeq}{\ {\WEFTtint{weftcom}$\equiv$}}
 \newcommand{\WEFTpluseq}{\ {\WEFTtint{weftcom}$\mathord{+}\equiv$}}
 \newcommand{\WEFTdot}{\ {\WEFTtint{weftcom}\textperiodcentered}\ }
+\newcommand{\WEFTnumsep}{\ }
 \newcommand{\WEFTmetabegin}[1]{\par\vspace{3pt}\begingroup\footnotesize\WEFTtint{weftcom}#1}
 \newcommand{\WEFTmetaend}{\endgroup\par}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\raggedright}
@@ -147,17 +148,17 @@ cat > test.expected.tex <<"EOF"
 \begin{document}
 \WEFTbegin
 \label{scrap1}
-\WEFTtarget{weft1a}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.actual.c@}\nobreak\,{\footnotesize\WEFTtint{weftcom}1a}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1a}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.actual.c@}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1a}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
  First use in global
-(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}, \ldots\ }\WEFTrangle}>*)
+(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}, \ldots\ }\WEFTrangle}>*)
 
 \end{lstlisting}
 \WEFTmetabegin{1a}\WEFTdot \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft1i}{i}\WEFTlink{weft2b}{, 2b}\WEFTmetaend
 \WEFTend
 \WEFTbegin
 \label{scrap2}
-\WEFTtarget{weft1b}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\,{\footnotesize\WEFTtint{weftcom}1b}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1b}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1b}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 Global sector line one.
 
@@ -167,7 +168,7 @@ Global sector line one.
 
 \WEFTbegin
 \label{scrap3}
-\WEFTtarget{weft1c}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\,{\footnotesize\WEFTtint{weftcom}1c}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1c}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1c}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 First sector line one.
 
@@ -176,32 +177,32 @@ First sector line one.
 \WEFTend
 \WEFTbegin
 \label{scrap4}
-\WEFTtarget{weft1d}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.actual.c@}\nobreak\,{\footnotesize\WEFTtint{weftcom}1d}\WEFTrangle\WEFTpluseq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1d}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.actual.c@}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1d}\WEFTrangle\WEFTpluseq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
 Use first local
-(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1c}{1c}}\WEFTrangle}>*)
+(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1c}{1c}}\WEFTrangle}>*)
 
 \end{lstlisting}
 \WEFTmetabegin{1d}\WEFTdot \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft1i}{i}\WEFTlink{weft2b}{, 2b}\WEFTmetaend
 \WEFTend
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1c}{1c}}\WEFTrangle\ {\footnotesize\WEFTtint{weftcom} {\WEFTtxtRefIn} \WEFTlink{weft1d}{1d}}
+\item \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1c}{1c}}\WEFTrangle\ {\footnotesize\WEFTtint{weftcom} {\WEFTtxtRefIn} \WEFTlink{weft1d}{1d}}
 \end{list}}
 
 \WEFTbegin
 \label{scrap5}
-\WEFTtarget{weft1e}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.actual.c@}\nobreak\,{\footnotesize\WEFTtint{weftcom}1e}\WEFTrangle\WEFTpluseq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1e}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.actual.c@}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1e}\WEFTrangle\WEFTpluseq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
 Use second local
-(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1f}{1f}}\WEFTrangle}>*)
+(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1f}{1f}}\WEFTrangle}>*)
 
 \end{lstlisting}
 \WEFTmetabegin{1e}\WEFTdot \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft1i}{i}\WEFTlink{weft2b}{, 2b}\WEFTmetaend
 \WEFTend
 \WEFTbegin
 \label{scrap6}
-\WEFTtarget{weft1f}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\,{\footnotesize\WEFTtint{weftcom}1f}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1f}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1f}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 Second sector line one.
 
@@ -210,12 +211,12 @@ Second sector line one.
 \WEFTend
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1f}{1f}}\WEFTrangle\ {\footnotesize\WEFTtint{weftcom} {\WEFTtxtRefIn} \WEFTlink{weft1e}{1e}}
+\item \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1f}{1f}}\WEFTrangle\ {\footnotesize\WEFTtint{weftcom} {\WEFTtxtRefIn} \WEFTlink{weft1e}{1e}}
 \end{list}}
 
 \WEFTbegin
 \label{scrap7}
-\WEFTtarget{weft1g}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\,{\footnotesize\WEFTtint{weftcom}1g}\WEFTrangle\WEFTpluseq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1g}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1g}\WEFTrangle\WEFTpluseq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 Global sector line two.
 
@@ -225,7 +226,7 @@ Global sector line two.
 
 \WEFTbegin
 \label{scrap8}
-\WEFTtarget{weft1h}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\,{\footnotesize\WEFTtint{weftcom}1h}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1h}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1h}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 Third sector line one.
 
@@ -234,22 +235,22 @@ Third sector line one.
 \WEFTend
 \WEFTbegin
 \label{scrap9}
-\WEFTtarget{weft1i}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.actual.c@}\nobreak\,{\footnotesize\WEFTtint{weftcom}1i}\WEFTrangle\WEFTpluseq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft1i}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.actual.c@}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1i}\WEFTrangle\WEFTpluseq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
 Use second local
-(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1h}{1h}}\WEFTrangle}>*)
+(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1h}{1h}}\WEFTrangle}>*)
 
 \end{lstlisting}
 \WEFTmetabegin{1i}\WEFTdot \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft1i}{i}\WEFTlink{weft2b}{, 2b}\WEFTmetaend
 \WEFTend
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1h}{1h}}\WEFTrangle\ {\footnotesize\WEFTtint{weftcom} {\WEFTtxtRefIn} \WEFTlink{weft1i}{1i}}
+\item \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1h}{1h}}\WEFTrangle\ {\footnotesize\WEFTtint{weftcom} {\WEFTtxtRefIn} \WEFTlink{weft1i}{1i}}
 \end{list}}
 
 \WEFTbegin
 \label{scrap10}
-\WEFTtarget{weft2a}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\,{\footnotesize\WEFTtint{weftcom}2a}\WEFTrangle\WEFTpluseq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft2a}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}2a}\WEFTrangle\WEFTpluseq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 Global sector line three.
 
@@ -258,17 +259,17 @@ Global sector line three.
 \WEFTend
 \WEFTbegin
 \label{scrap11}
-\WEFTtarget{weft2b}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.actual.c@}\nobreak\,{\footnotesize\WEFTtint{weftcom}2b}\WEFTrangle\WEFTpluseq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft2b}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.actual.c@}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}2b}\WEFTrangle\WEFTpluseq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
  Last use in global
-(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}, \ldots\ }\WEFTrangle}>*)
+(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}, \ldots\ }\WEFTrangle}>*)
 
 \end{lstlisting}
 \WEFTmetabegin{2b}\WEFTdot \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft1i}{i}\WEFTlink{weft2b}{, 2b}\WEFTmetaend
 \WEFTend
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}\WEFTlink{weft1g}{g}\WEFTlink{weft2a}{, 2a}}\WEFTrangle\ {\footnotesize\WEFTtint{weftcom} {\WEFTtxtRefIn} \WEFTlink{weft1a}{1a}\WEFTlink{weft2b}{, 2b}}
+\item \WEFTlangle{\WEFTtint{weftaccent}\itshape Frag 1}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}\WEFTlink{weft1g}{g}\WEFTlink{weft2a}{, 2a}}\WEFTrangle\ {\footnotesize\WEFTtint{weftcom} {\WEFTtxtRefIn} \WEFTlink{weft1a}{1a}\WEFTlink{weft2b}{, 2b}}
 \end{list}}
 \end{document}
 EOF

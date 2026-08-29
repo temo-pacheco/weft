@@ -180,6 +180,8 @@ site is written \verb|{\WEFTtint{name}...}| rather than \verb|\color|
 directly: it degrades gracefully.
 
 \verb|\WEFTlangle|/\verb|\WEFTrangle| are the grey angle brackets;
+\verb|\WEFTnumsep| is the space set between a fragment name and its scrap
+number (wide enough that \hbox{\tt name\,41a} never reads as one token);
 \verb|\WEFTeq| and \verb|\WEFTpluseq| are the definition (\(\equiv\)) and
 additive-continuation (\(+\!\equiv\)) markers; \verb|\WEFTdot| is the
 mid-dot that separates footer items; and \verb|\WEFTmetabegin|/%
@@ -199,6 +201,7 @@ fputs("\\newcommand{\\WEFTpluseq}{\\ {\\WEFTtint{weftcom}"
       "$\\mathord{+}\\equiv$}}\n", tex_file);
 fputs("\\newcommand{\\WEFTdot}{\\ {\\WEFTtint{weftcom}"
       "\\textperiodcentered}\\ }\n", tex_file);
+fputs("\\newcommand{\\WEFTnumsep}{\\ }\n", tex_file);
 fputs("\\newcommand{\\WEFTmetabegin}[1]{\\par\\vspace{3pt}\\begingroup"
       "\\footnotesize\\WEFTtint{weftcom}#1}\n", tex_file);
 fputs("\\newcommand{\\WEFTmetaend}{\\endgroup\\par}\n", tex_file);
@@ -341,7 +344,7 @@ prose, define and reference it as a scrap in the usual way.
      else
        fputc(*p++, @1);
    }
-   fputs("}\\nobreak\\,{\\footnotesize\\WEFTtint{weftcom}", @1);
+   fputs("}\\nobreak\\WEFTnumsep{\\footnotesize\\WEFTtint{weftcom}", @1);
    if (name->defs) {
      Scrap_Node *q = name->defs;
      fputs("\\WEFTlink{weft", @1);
@@ -431,7 +434,7 @@ after a hair of vertical space, by the code.
   write_single_scrap_ref(tex_file, scraps);
   fputs("}{}", tex_file);
   fprintf(tex_file, "\\WEFTlangle{\\WEFTtint{weftaccent}\\verb%c%s%c}\\nobreak"
-          "\\,{\\footnotesize\\WEFTtint{weftcom}", nw_char, name->spelling, nw_char);
+          "\\WEFTnumsep{\\footnotesize\\WEFTtint{weftcom}", nw_char, name->spelling, nw_char);
   write_single_scrap_ref(tex_file, scraps);
   fputs("}\\WEFTrangle", tex_file);
   fputs(additive ? "\\WEFTpluseq" : "\\WEFTeq", tex_file);
@@ -463,7 +466,7 @@ and accent tint are only the default dress.
   write_single_scrap_ref(tex_file, scraps);
   fputs("}{}\\WEFTlangle{\\WEFTtint{weftaccent}\\itshape ", tex_file);
   @<Write the macro's name@>
-  fputs("}\\nobreak\\,{\\footnotesize\\WEFTtint{weftcom}", tex_file);
+  fputs("}\\nobreak\\WEFTnumsep{\\footnotesize\\WEFTtint{weftcom}", tex_file);
   write_single_scrap_ref(tex_file, scraps);
   fputs("}\\WEFTrangle", tex_file);
   fputs(additive ? "\\WEFTpluseq" : "\\WEFTeq", tex_file);
@@ -1147,7 +1150,7 @@ This scrap helps deal with bold keywords:
   if (scrap_name_has_parameters) {
     @<Format macro parameters@>
   }
-  fprintf(file, "\\,{\\footnotesize\\WEFTtint{weftcom}");
+  fprintf(file, "\\WEFTnumsep{\\footnotesize\\WEFTtint{weftcom}");
   if (name->defs)
     @<Write abbreviated definition list@>
   else {
@@ -1398,7 +1401,7 @@ for (j = 1; j < @2; j++)
   fputs("\\item ", tex_file);
   fputs("\\WEFTlangle{\\WEFTtint{weftaccent}\\itshape ", tex_file);
   @<Write the macro's name@>
-  fputs("}\\nobreak\\,{\\footnotesize\\WEFTtint{weftcom}", tex_file);
+  fputs("}\\nobreak\\WEFTnumsep{\\footnotesize\\WEFTtint{weftcom}", tex_file);
   @<Write defining scrap numbers@>
   fputs("}\\WEFTrangle\\ ", tex_file);
   @<Write referencing scrap numbers@>
