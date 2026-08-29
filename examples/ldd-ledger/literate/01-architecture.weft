@@ -1,0 +1,60 @@
+\chapter{Architecture}
+
+\section{Concepts}
+
+The system decomposes into three concepts, each a chapter that crosses the
+whole stack (types, logic, and the seams it exposes to its neighbours):
+
+\begin{itemize}
+  \item \textbf{Accounts} --- the store of accounts and their balances. It
+    owns what an account \emph{is} and the only operations that change a
+    balance.
+  \item \textbf{Ledger} --- transactions and postings. It owns the
+    \emph{invariant}: it refuses to apply a transaction whose postings do not
+    sum to zero.
+  \item \textbf{Api} --- the surface. For this stage it is a small command
+    line program that opens accounts, posts one transaction, and prints the
+    balances.
+\end{itemize}
+
+\section{Technology}
+
+Plain C, one static binary, no dependencies beyond libc. The domain is small
+and correctness-critical, which is exactly where C's directness helps and its
+footguns (floating point, partial mutation) must be designed out rather than
+hoped away.
+
+\section{Decision records}
+
+\subsection{Decision: integer cents, never floating point}
+Chosen: balances are \texttt{long} cents. Considered and rejected:
+\texttt{double} dollars, because \texttt{0.1 + 0.2 != 0.3} in binary floating
+point, and a ledger that cannot represent a dime exactly is not fit for
+purpose.
+
+\subsection{Decision: the invariant lives in Ledger, not in Accounts}
+Chosen: \texttt{Accounts} exposes a neutral \texttt{acc\_apply(id, delta)}
+that changes one balance, and \texttt{Ledger} is the only place that knows a
+transaction must sum to zero. Considered and rejected: enforcing balance in
+Accounts, which would force every balance change to know about transactions
+and couple the two concepts permanently. Keeping the invariant in one concept
+is what makes it auditable.
+
+\subsection{Decision: transactions are atomic}
+Chosen: \texttt{ledger\_post} validates the sum \emph{and} every account
+before it mutates anything, so a rejected transaction leaves no partial
+effect. This is why Accounts exposes an \texttt{acc\_exists} check separate
+from \texttt{acc\_apply}.
+
+\section{The dependency contract}
+
+A concept may reference another only along an allowed edge. Anything not
+listed is forbidden and fails the conformance gate. The forbidden directions
+are the design: \textbf{Accounts must not know about Ledger} (the store is
+ignorant of transactions), and \textbf{no concept below Api may depend on
+Api} (the domain must not reach up into its surface).
+
+% --- machine-readable policy: enforced by `ldd conformance` ---
+% ARCH-ALLOW: Ledger -> Accounts
+% ARCH-ALLOW: Api -> Ledger
+% ARCH-ALLOW: Api -> Accounts

@@ -76,16 +76,9 @@ cat > test.expected.with.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsDefed}{Defines:}
 \newcommand{\WEFTsep}{${\diamond}$}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
-\newcommand{\WEFTbreakpenalty}{500}
-\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
-\newcommand{\WEFTbrk}{\discretionary{}{}{}}
-\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
-\newlength{\WEFThang}\setlength{\WEFThang}{2em}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
 \newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
-\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
-\newcommand{\WEFTendcode}{\par\endgroup}
-\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\providecommand{\WEFTlstsetup}{\lstset{basicstyle=\ttfamily\small,breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true,showstringspaces=false,keywordstyle=\bfseries,commentstyle=\itshape,tabsize=8,xleftmargin=1.5em}}
 \newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \begin{document}
@@ -93,9 +86,11 @@ Here >>3.14159<< is the version information.
 \WEFTbegin
 \label{scrap1}
 \WEFTtarget{weft?}{} \verb@"test.c"@\nobreak\ {\footnotesize {?}}$\equiv$
-\WEFTcode
-\mbox{\strut}Here\WEFTsp >\WEFTbrk >\WEFTbrk 3.14159<\WEFTbrk <\WEFTbrk \WEFTsp is\WEFTsp the\WEFTsp version\WEFTsp information\WEFTsp in\WEFTsp code.\WEFTbrk \WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+Here >>3.14159<< is the version information in code.
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -125,16 +120,9 @@ cat > test.expected.without.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsDefed}{Defines:}
 \newcommand{\WEFTsep}{${\diamond}$}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
-\newcommand{\WEFTbreakpenalty}{500}
-\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
-\newcommand{\WEFTbrk}{\discretionary{}{}{}}
-\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
-\newlength{\WEFThang}\setlength{\WEFThang}{2em}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
 \newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
-\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
-\newcommand{\WEFTendcode}{\par\endgroup}
-\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\providecommand{\WEFTlstsetup}{\lstset{basicstyle=\ttfamily\small,breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true,showstringspaces=false,keywordstyle=\bfseries,commentstyle=\itshape,tabsize=8,xleftmargin=1.5em}}
 \newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \begin{document}
@@ -142,9 +130,11 @@ Here >>no version<< is the version information.
 \WEFTbegin
 \label{scrap1}
 \WEFTtarget{weft?}{} \verb@"test.c"@\nobreak\ {\footnotesize {?}}$\equiv$
-\WEFTcode
-\mbox{\strut}Here\WEFTsp >\WEFTbrk >\WEFTbrk no version<\WEFTbrk <\WEFTbrk \WEFTsp is\WEFTsp the\WEFTsp version\WEFTsp information\WEFTsp in\WEFTsp code.\WEFTbrk \WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+Here >>no version<< is the version information in code.
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}

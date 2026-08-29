@@ -81,26 +81,21 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsDefed}{Defines:}
 \newcommand{\WEFTsep}{${\diamond}$}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
-\newcommand{\WEFTbreakpenalty}{500}
-\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
-\newcommand{\WEFTbrk}{\discretionary{}{}{}}
-\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
-\newlength{\WEFThang}\setlength{\WEFThang}{2em}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
 \newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
-\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
-\newcommand{\WEFTendcode}{\par\endgroup}
-\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\providecommand{\WEFTlstsetup}{\lstset{basicstyle=\ttfamily\small,breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true,showstringspaces=false,keywordstyle=\bfseries,commentstyle=\itshape,tabsize=8,xleftmargin=1.5em}}
 \newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \begin{document}
 \WEFTbegin
 \label{scrap1}
 \WEFTtarget{weft?}{} $\langle\,${\itshape Frag with \hbox{\slshape\sffamily arg1\/} and \hbox{\slshape\sffamily \$arg2\/}}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}Here\WEFTsp is\WEFTsp the\WEFTsp first\WEFTsp arg:\WEFTbrk \hbox{\slshape\sffamily arg1\/}.\WEFTbrk \WEFTeol
-\mbox{\strut}Here\WEFTsp is\WEFTsp the\WEFTsp second\WEFTsp arg:\WEFTbrk \hbox{\slshape\sffamily \$arg2\/}.\WEFTbrk \WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+Here is the first arg:(*<\hbox{\slshape\sffamily arg1\/}>*).
+Here is the second arg:(*<\hbox{\slshape\sffamily \$arg2\/}>*).
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -112,11 +107,13 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap2}
 \WEFTtarget{weft?}{} \verb@"test.c"@\nobreak\ {\footnotesize {?}}$\equiv$
-\WEFTcode
-\mbox{\strut}Front\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape Frag with \$tuff and Non\_\WEFTbrk sense}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
-\mbox{\strut}Back\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+Front
+(*<\hbox{\normalfont $\langle\,${\itshape Frag with \$tuff and Non\_sense}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}>*)
+Back
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}

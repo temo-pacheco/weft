@@ -52,6 +52,7 @@ if test $? -ne 0 ; then no_result; fi
 
 cat > test.w <<"EOF"
 \documentclass{article}
+\usepackage{listings}
 \begin{document}
 Here is a macro that defines something.
 @d Define something
@@ -88,26 +89,22 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsDefed}{Defines:}
 \newcommand{\WEFTsep}{${\diamond}$}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
-\newcommand{\WEFTbreakpenalty}{500}
-\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
-\newcommand{\WEFTbrk}{\discretionary{}{}{}}
-\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
-\newlength{\WEFThang}\setlength{\WEFThang}{2em}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
 \newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
-\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
-\newcommand{\WEFTendcode}{\par\endgroup}
-\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\providecommand{\WEFTlstsetup}{\lstset{basicstyle=\ttfamily\small,breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true,showstringspaces=false,keywordstyle=\bfseries,commentstyle=\itshape,tabsize=8,xleftmargin=1.5em}}
 \newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
+\usepackage{listings}
 \begin{document}
 Here is a macro that defines something.
 \WEFTbegin
 \label{scrap1}
 \WEFTtarget{weft1a}{} $\langle\,${\itshape Define something}\nobreak\ {\footnotesize {1a}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}something\WEFTsp anything\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+something anything
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -120,10 +117,12 @@ Here is a macro that uses an argument
 \WEFTbegin
 \label{scrap2}
 \WEFTtarget{weft1b}{} $\langle\,${\itshape Use the \hbox{\slshape\sffamily thing\/}}\nobreak\ {\footnotesize {1b}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}Use\WEFTsp \hbox{\slshape\sffamily thing\/}\WEFTeol
-\mbox{\strut}Use\WEFTsp anything\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+Use (*<\hbox{\slshape\sffamily thing\/}>*)
+Use anything
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -136,11 +135,13 @@ Now use the something in an argument
 \WEFTbegin
 \label{scrap3}
 \WEFTtarget{weft1c}{} \verb@"test.c"@\nobreak\ {\footnotesize {1c}}$\equiv$
-\WEFTcode
-\mbox{\strut}\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape Define something}\nobreak\ {\footnotesize \WEFTlink{weft1a}{1a}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape Use the something}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}}$\,\rangle$}\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+
+(*<\hbox{\normalfont $\langle\,${\itshape Define something}\nobreak\ {\footnotesize \WEFTlink{weft1a}{1a}}$\,\rangle$}>*)
+(*<\hbox{\normalfont $\langle\,${\itshape Use the something}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}}$\,\rangle$}>*)
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}

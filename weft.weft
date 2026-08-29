@@ -211,6 +211,7 @@ work supported by ARPA, through ONR grant N00014-91-J-1989.}
 \\ \normalfont\sffamily with contributions by Keith Harwood, Simon Wright,
 \\ Marc W. Mengel, John D. Ramsdell, and Gregor Goldbach}
 
+\WEFTlstsetup
 \begin{document}
 \pagenumbering{roman}
 \maketitle

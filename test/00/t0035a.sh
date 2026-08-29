@@ -52,6 +52,7 @@ if test $? -ne 0 ; then no_result; fi
 
 cat > test.w <<"EOF"
 \documentclass{article}
+\usepackage{listings}
 \usepackage[pdftex,colorlinks=true]{hyperref}
 \begin{document}
 @o test.c -cc
@@ -78,26 +79,22 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsDefed}{Defines:}
 \newcommand{\WEFTsep}{${\diamond}$}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
-\newcommand{\WEFTbreakpenalty}{500}
-\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
-\newcommand{\WEFTbrk}{\discretionary{}{}{}}
-\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
-\newlength{\WEFThang}\setlength{\WEFThang}{2em}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
 \newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
-\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
-\newcommand{\WEFTendcode}{\par\endgroup}
-\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\providecommand{\WEFTlstsetup}{\lstset{basicstyle=\ttfamily\small,breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true,showstringspaces=false,keywordstyle=\bfseries,commentstyle=\itshape,tabsize=8,xleftmargin=1.5em}}
 \newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
+\usepackage{listings}
 \usepackage[pdftex,colorlinks=true]{hyperref}
 \begin{document}
 \WEFTbegin
 \label{scrap1}
 \WEFTtarget{weft1a}{} \verb@"test.c"@\nobreak\ {\footnotesize {1a}}$\equiv$
-\WEFTcode
-\mbox{\strut}\hbox{$\langle\,${\itshape Use a fragment}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}}$\,\rangle$}\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+(*<\hbox{\normalfont $\langle\,${\itshape Use a fragment}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}}$\,\rangle$}>*)
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -108,9 +105,11 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap2}
 \WEFTtarget{weft1b}{} $\langle\,${\itshape Use a fragment}\nobreak\ {\footnotesize {1b}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}Here\WEFTsp is\WEFTsp a\WEFTsp fragment.\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp Make\WEFTsp sure\WEFTsp it\WEFTsp is\WEFTsp referenced\WEFTsp properly.\WEFTbrk {\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+Here is a fragment.
+   Make sure it is referenced properly.
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}

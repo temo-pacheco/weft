@@ -58,7 +58,10 @@ all the output files.
 package.
 \item[\tt -r] Turn on hyperlinks. You must include the |usepackage|
 options in the text.
-\item[\tt -l] Use the \texttt{listings} package for formatting scraps.
+\item[\tt -l] Deprecated no-op.  Code scraps are always formatted with
+the \texttt{listings} package now, so this flag has no effect and is kept
+only for backward compatibility.  Remember to \verb|\usepackage{listings}|
+in your document preamble.
 \end{description}
 
 There are two ways to get hyper-links into your documentation. With
@@ -330,7 +333,7 @@ printf("                    Example: make 2>&1 | weft --errors\n\n");
 printf("  LaTeX:\n");
 printf("    -r              Enable hyperref cross-reference links\n");
 printf("    -h options      Pass options to hyperref package\n");
-printf("    -l              Use listings package for scrap formatting\n");
+printf("    -l              Deprecated no-op (listings is always used)\n");
 printf("    -d              List dangling identifier references\n\n");
 printf("  General:\n");
 printf("    -V string       Set version string (expands @@v in source)\n");

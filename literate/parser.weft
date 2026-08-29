@@ -432,9 +432,9 @@ but we do show where they go.
 
 @d Show presence of a block comment
 @{{
-  fputs(delimit_scrap[scrap_type][1],file);
+  begin_tex_escape(file);
   fprintf(file, "\\hbox{\\sffamily\\slshape (Comment)}");
-  fputs(delimit_scrap[scrap_type][0], file);
+  end_tex_escape(file);
 }
 @}
 
@@ -690,11 +690,20 @@ argument list for a fragment.
 
      fputs("{\\footnotesize ", file);
      write_single_scrap_ref(file, scraps + 1);
-     fprintf(file, "\\label{scrap%d}\n", scraps + 1);
+     fprintf(file, "\\label{scrap%d}", scraps + 1);
      fputs(" }", file);
 
      source_last = '{';
-     copy_scrap(file, TRUE, NULL);
+     {
+       /* The parameter is rendered inside a fragment reference, i.e.
+          inside a listings escape, so it must be single-line LaTeX with
+          the special characters neutralised: switch copy_scrap into its
+          inline mode for the duration. */
+       int saved_inline = code_inline;
+       code_inline = TRUE;
+       copy_scrap(file, TRUE, NULL);
+       code_inline = saved_inline;
+     }
 
      ++scraps;
 

@@ -1,0 +1,15 @@
+# LaTeX build intermediates (regenerable from project.weft via weft -w tex)
+*.aux
+*.log
+*.toc
+*.out
+project.tex
+# compiled objects and the demo binary
+*.o
+ledger
+# NOTE: src/ (tangled C), project.pdf, and .ldd-prose-lock are kept on
+# purpose — the tangled output enables the Sync gate, the PDF is the book,
+# and the lock is the Prime Directive's baseline.
+# weft weave scratch files
+nw??????
+texput.log

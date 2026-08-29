@@ -91,40 +91,35 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsDefed}{Defines:}
 \newcommand{\WEFTsep}{${\diamond}$}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
-\newcommand{\WEFTbreakpenalty}{500}
-\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
-\newcommand{\WEFTbrk}{\discretionary{}{}{}}
-\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
-\newlength{\WEFThang}\setlength{\WEFThang}{2em}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
 \newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
-\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
-\newcommand{\WEFTendcode}{\par\endgroup}
-\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\providecommand{\WEFTlstsetup}{\lstset{basicstyle=\ttfamily\small,breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true,showstringspaces=false,keywordstyle=\bfseries,commentstyle=\itshape,tabsize=8,xleftmargin=1.5em}}
 \newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \begin{document}
 \WEFTbegin
 \label{scrap1}
 \WEFTtarget{weft?}{} $\langle\,${\itshape Sort \hbox{\slshape\sffamily key\/} of size \hbox{\slshape\sffamily n\/} for \hbox{\slshape\sffamily ordering\/}}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}for\WEFTsp (\WEFTbrk int\WEFTsp j\WEFTsp =\WEFTbrk \WEFTsp 1;\WEFTbrk \WEFTsp j\WEFTsp <\WEFTbrk \WEFTsp \hbox{\slshape\sffamily n\/};\WEFTbrk \WEFTsp j+\WEFTbrk +\WEFTbrk )\WEFTbrk \WEFTeol
-\mbox{\strut}\{\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp int\WEFTsp i\WEFTsp =\WEFTbrk \WEFTsp j\WEFTsp -\WEFTbrk \WEFTsp 1;\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp int\WEFTsp kj\WEFTsp =\WEFTbrk \WEFTsp \hbox{\slshape\sffamily key\/}[\WEFTbrk j]\WEFTbrk ;\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp do\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \{\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp int\WEFTsp ki\WEFTsp =\WEFTbrk \WEFTsp \hbox{\slshape\sffamily key\/}[\WEFTbrk i]\WEFTbrk ;\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp if\WEFTsp (\WEFTbrk \hbox{\slshape\sffamily ordering\/})\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp break;\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp \hbox{\slshape\sffamily key\/}[\WEFTbrk i\WEFTsp +\WEFTbrk \WEFTsp 1]\WEFTbrk \WEFTsp =\WEFTbrk \WEFTsp ki;\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp \WEFTsp i\WEFTsp -\WEFTbrk =\WEFTbrk \WEFTsp 1;\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \}\WEFTsp while\WEFTsp (\WEFTbrk i\WEFTsp >\WEFTbrk =\WEFTbrk \WEFTsp 0)\WEFTbrk ;\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{\slshape\sffamily key\/}[\WEFTbrk i\WEFTsp +\WEFTbrk \WEFTsp 1]\WEFTbrk \WEFTsp =\WEFTbrk \WEFTsp kj;\WEFTbrk \WEFTeol
-\mbox{\strut}\}\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+for (int j = 1; j < (*<\hbox{\slshape\sffamily n\/}>*); j++)
+{
+   int i = j - 1;
+   int kj = (*<\hbox{\slshape\sffamily key\/}>*)[j];
+
+   do
+   {
+      int ki = (*<\hbox{\slshape\sffamily key\/}>*)[i];
+
+      if ((*<\hbox{\slshape\sffamily ordering\/}>*))
+         break;
+      (*<\hbox{\slshape\sffamily key\/}>*)[i + 1] = ki;
+      i -= 1;
+   } while (i >= 0);
+   (*<\hbox{\slshape\sffamily key\/}>*)[i + 1] = kj;
+}
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -133,7 +128,7 @@ cat > test.expected.tex <<"EOF"
 \item{}
 \end{list}
 \WEFTend
-Test in-text $\langle\,${\itshape Sort key of size n for ordering}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$ usage.
+Test in-text (*<$\langle\,${\itshape Sort key of size n for ordering}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$>*) usage.
 \end{document}
 EOF
 

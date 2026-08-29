@@ -1,0 +1,43 @@
+% ======================================================================
+%  A Double-Entry Ledger — the LDD bootstrap reference project.
+%  This master is pure LaTeX (limbo) plus include directives. It weaves the
+%  whole book; it tangles nothing itself. Weave:  weft -w tex project.weft
+% ======================================================================
+\documentclass[11pt,a4paper]{report}
+
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{color}
+\definecolor{linkcolor}{rgb}{0,0,0.5}
+\usepackage[colorlinks,linkcolor=linkcolor,urlcolor=linkcolor,
+            citecolor=linkcolor,breaklinks]{hyperref}
+
+\setlength{\textwidth}{6.3in}
+\setlength{\oddsidemargin}{0in}
+
+\title{\bfseries A Double-Entry Ledger\\[4pt]
+       \large A worked example in Literate Driven Development}
+\author{Built with weft, gated by \texttt{ldd}}
+\date{\today}
+
+\WEFTlstsetup
+\begin{document}
+\pagenumbering{roman}
+\maketitle
+\tableofcontents
+\pagenumbering{arabic}
+
+% ---- Phase 0: the design chapters (prose only, tangle nothing) --------
+@i literate/00-domain.weft
+@i literate/01-architecture.weft
+@i literate/02-roadmap.weft
+
+% ---- Parts II+: one chapter per concept ------------------------------
+@i literate/concepts/accounts.weft
+@i literate/concepts/ledger.weft
+@i literate/concepts/api.weft
+
+% ---- Appendix: the assembly (the only file with output directives) ---
+@i literate/assembly.weft
+
+\end{document}

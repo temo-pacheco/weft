@@ -95,16 +95,9 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsDefed}{Defines:}
 \newcommand{\WEFTsep}{${\diamond}$}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
-\newcommand{\WEFTbreakpenalty}{500}
-\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
-\newcommand{\WEFTbrk}{\discretionary{}{}{}}
-\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
-\newlength{\WEFThang}\setlength{\WEFThang}{2em}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
 \newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
-\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
-\newcommand{\WEFTendcode}{\par\endgroup}
-\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\providecommand{\WEFTlstsetup}{\lstset{basicstyle=\ttfamily\small,breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true,showstringspaces=false,keywordstyle=\bfseries,commentstyle=\itshape,tabsize=8,xleftmargin=1.5em}}
 \newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \begin{document}
@@ -124,12 +117,14 @@ need line-breaking.
 \par\vspace{\baselineskip}
 \label{scrap1}
 \WEFTtarget{weft?}{} \verb@"test.c"@\nobreak\ {\footnotesize {?}}$\equiv$
-\WEFTcode
-\mbox{\strut}Here\WEFTsp is\WEFTsp some\WEFTsp stuff.\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{\sffamily\slshape (Comment)}\WEFTeol
-\mbox{\strut}Here\WEFTsp is\WEFTsp the\WEFTsp end\WEFTsp of\WEFTsp the\WEFTsp stuff.\WEFTbrk \WEFTeol
-\mbox{\strut}Here\WEFTsp (\WEFTbrk \hbox{\sffamily\slshape (Comment)})\WEFTbrk \WEFTsp is\WEFTsp a\WEFTsp block\WEFTsp comment\WEFTsp in\WEFTsp code.\WEFTbrk \WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+Here is some stuff.
+   (*<\hbox{\sffamily\slshape (Comment)}>*)
+Here is the end of the stuff.
+Here ((*<\hbox{\sffamily\slshape (Comment)}>*)) is a block comment in code.
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -144,9 +139,11 @@ newline. (So long as its length is right.
 \par\vspace{\baselineskip}
 \label{scrap2}
 \WEFTtarget{weft?}{} \verb@"test.c"@\nobreak\ {\footnotesize {?}}$\equiv$
-\WEFTcode
-\mbox{\strut}This\WEFTsp -\WEFTbrk -\WEFTbrk \hbox{\sffamily\slshape (Comment)}-\WEFTbrk -\WEFTbrk \WEFTsp is\WEFTsp where\WEFTsp it\WEFTsp is\WEFTsp used.\WEFTbrk \WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+This --(*<\hbox{\sffamily\slshape (Comment)}>*)-- is where it is used.
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}

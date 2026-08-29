@@ -1,0 +1,48 @@
+@c ======================================================================
+@c  02-roadmap.weft — SEQUENCE. The logical stages and the Concept Ledger.
+@c  Prose-only: NO @o. Ends Phase 0 with everything `planned` or `stubbed`.
+@c ======================================================================
+
+\chapter{Roadmap}
+
+\section{Stage 1 --- the walking skeleton}
+
+<The thinnest vertical slice that tangles to a RUNNING system. It must touch
+every Stage-1 concept, however thinly — a skeleton that skips a concept does
+not prove the architecture. When this builds green end to end, the shape is
+proven and everything after is thickening.>
+
+\section{Stage 2 --- <name>}
+<...>
+
+\section{Stage 3 --- <name>}
+<...>
+
+\section{The concept ledger}
+
+The single source of truth for what exists and what is planned --- the
+literate backlog. Lifecycle: \texttt{planned → stubbed → implemented → stable}.
+The AI reads this to orient before touching code; it is the map of the
+\emph{design}, complementing \texttt{weft -m}, the map of the \emph{code}.
+
+\begin{center}
+\begin{tabular}{lllll}
+\toprule
+Concept & Status & Depends on & Stage & Chapter \\
+\midrule
+<concept-a> & stubbed  & ---        & 1 & \S4 \\
+<concept-b> & stubbed  & <concept-a>& 1 & \S5 \\
+<concept-c> & planned  & <concept-b>& 2 & --- \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Seam contracts}
+
+The chunks at the boundaries between concepts, named but empty. Naming the
+seams before filling bodies fixes the interfaces so no one improvises them.
+\texttt{weft --lint} will flag these as unused until the assembly wires them —
+that is the expected signal of ``designed, not yet built''.
+
+@d <Concept-A>: <seam operation> @{ @% TODO stage 1 @}
+@d <Concept-B>: <seam operation> @{ @% TODO stage 1 @}

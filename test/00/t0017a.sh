@@ -52,6 +52,7 @@ if test $? -ne 0 ; then no_result; fi
 
 cat > test.w <<"EOF"
 \documentclass{article}
+\usepackage{listings}
 \begin{document}
 @o test.c -cc
 @{Test of quoted fragments.
@@ -113,30 +114,26 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsDefed}{Defines:}
 \newcommand{\WEFTsep}{${\diamond}$}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
-\newcommand{\WEFTbreakpenalty}{500}
-\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
-\newcommand{\WEFTbrk}{\discretionary{}{}{}}
-\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
-\newlength{\WEFThang}\setlength{\WEFThang}{2em}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
 \newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
-\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
-\newcommand{\WEFTendcode}{\par\endgroup}
-\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\providecommand{\WEFTlstsetup}{\lstset{basicstyle=\ttfamily\small,breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true,showstringspaces=false,keywordstyle=\bfseries,commentstyle=\itshape,tabsize=8,xleftmargin=1.5em}}
 \newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
+\usepackage{listings}
 \begin{document}
 \WEFTbegin
 \label{scrap1}
 \WEFTtarget{weft1a}{} \verb@"test.c"@\nobreak\ {\footnotesize {1a}}$\equiv$
-\WEFTcode
-\mbox{\strut}Test\WEFTsp of\WEFTsp quoted\WEFTsp fragments.\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert first fragment}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert second fragment}\nobreak\ {\footnotesize \WEFTlink{weft1c}{1c}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert third fragment}\nobreak\ {\footnotesize \WEFTlink{weft1d}{1d}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert parameter whatsit fragment}\nobreak\ {\footnotesize \WEFTlink{weft1g}{1g}}$\,\rangle$}\WEFTeol
-\mbox{\strut}End\WEFTsp of\WEFTsp test.\WEFTbrk \WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+Test of quoted fragments.
+   (*<\hbox{\normalfont $\langle\,${\itshape Insert first fragment}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}}$\,\rangle$}>*)
+   (*<\hbox{\normalfont $\langle\,${\itshape Insert second fragment}\nobreak\ {\footnotesize \WEFTlink{weft1c}{1c}}$\,\rangle$}>*)
+   (*<\hbox{\normalfont $\langle\,${\itshape Insert third fragment}\nobreak\ {\footnotesize \WEFTlink{weft1d}{1d}}$\,\rangle$}>*)
+   (*<\hbox{\normalfont $\langle\,${\itshape Insert parameter whatsit fragment}\nobreak\ {\footnotesize \WEFTlink{weft2b}{2b}}$\,\rangle$}>*)
+End of test.
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -147,13 +144,15 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap2}
 \WEFTtarget{weft1b}{} $\langle\,${\itshape Insert first fragment}\nobreak\ {\footnotesize {1b}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}This\WEFTsp fragment\WEFTsp is\WEFTsp not\WEFTsp quoted.\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert unquoted fragment}\nobreak\ {\footnotesize \WEFTlink{weft1e}{1e}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert quoted fragment}\nobreak\ {\footnotesize \WEFTlink{weft1f}{1f}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert parameter 1 fragment}\nobreak\ {\footnotesize \WEFTlink{weft1g}{1g}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert parameter thing fragment}\nobreak\ {\footnotesize \WEFTlink{weft1g}{1g}}$\,\rangle$}\WEFTeol
-\mbox{\strut}End\WEFTsp of\WEFTsp first\WEFTsp fragment.\WEFTbrk {\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+This fragment is not quoted.
+   (*<\hbox{\normalfont $\langle\,${\itshape Insert unquoted fragment}\nobreak\ {\footnotesize \WEFTlink{weft1e}{1e}}$\,\rangle$}>*)
+   (*<\hbox{\normalfont $\langle\,${\itshape Insert quoted fragment}\nobreak\ {\footnotesize \WEFTlink{weft2a}{2a}}$\,\rangle$}>*)
+   (*<\hbox{\normalfont $\langle\,${\itshape Insert parameter 1 fragment}\nobreak\ {\footnotesize \WEFTlink{weft2b}{2b}}$\,\rangle$}>*)
+   (*<\hbox{\normalfont $\langle\,${\itshape Insert parameter thing fragment}\nobreak\ {\footnotesize \WEFTlink{weft2b}{2b}}$\,\rangle$}>*)
+End of first fragment.
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -165,13 +164,15 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap3}
 \WEFTtarget{weft1c}{} $\langle\,${\itshape Insert second fragment}\nobreak\ {\footnotesize {1c}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}This\WEFTsp fragment\WEFTsp is\WEFTsp quoted.\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert unquoted fragment}\nobreak\ {\footnotesize \WEFTlink{weft1e}{1e}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert quoted fragment}\nobreak\ {\footnotesize \WEFTlink{weft1f}{1f}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert parameter 2 fragment}\nobreak\ {\footnotesize \WEFTlink{weft1g}{1g}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert parameter thing fragment}\nobreak\ {\footnotesize \WEFTlink{weft1g}{1g}}$\,\rangle$}\WEFTeol
-\mbox{\strut}End\WEFTsp of\WEFTsp second\WEFTsp fragment.\WEFTbrk {\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+This fragment is quoted.
+   (*<\hbox{\normalfont $\langle\,${\itshape Insert unquoted fragment}\nobreak\ {\footnotesize \WEFTlink{weft1e}{1e}}$\,\rangle$}>*)
+   (*<\hbox{\normalfont $\langle\,${\itshape Insert quoted fragment}\nobreak\ {\footnotesize \WEFTlink{weft2a}{2a}}$\,\rangle$}>*)
+   (*<\hbox{\normalfont $\langle\,${\itshape Insert parameter 2 fragment}\nobreak\ {\footnotesize \WEFTlink{weft2b}{2b}}$\,\rangle$}>*)
+   (*<\hbox{\normalfont $\langle\,${\itshape Insert parameter thing fragment}\nobreak\ {\footnotesize \WEFTlink{weft2b}{2b}}$\,\rangle$}>*)
+End of second fragment.
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -183,13 +184,15 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap4}
 \WEFTtarget{weft1d}{} $\langle\,${\itshape Insert third fragment}\nobreak\ {\footnotesize {1d}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}This\WEFTsp fragment\WEFTsp is\WEFTsp not\WEFTsp quoted.\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert unquoted fragment}\nobreak\ {\footnotesize \WEFTlink{weft1e}{1e}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert quoted fragment}\nobreak\ {\footnotesize \WEFTlink{weft1f}{1f}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert parameter 3 fragment}\nobreak\ {\footnotesize \WEFTlink{weft1g}{1g}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Insert parameter thing fragment}\nobreak\ {\footnotesize \WEFTlink{weft1g}{1g}}$\,\rangle$}\WEFTeol
-\mbox{\strut}End\WEFTsp of\WEFTsp third\WEFTsp fragment.\WEFTbrk {\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+This fragment is not quoted.
+   (*<\hbox{\normalfont $\langle\,${\itshape Insert unquoted fragment}\nobreak\ {\footnotesize \WEFTlink{weft1e}{1e}}$\,\rangle$}>*)
+   (*<\hbox{\normalfont $\langle\,${\itshape Insert quoted fragment}\nobreak\ {\footnotesize \WEFTlink{weft2a}{2a}}$\,\rangle$}>*)
+   (*<\hbox{\normalfont $\langle\,${\itshape Insert parameter 3 fragment}\nobreak\ {\footnotesize \WEFTlink{weft2b}{2b}}$\,\rangle$}>*)
+   (*<\hbox{\normalfont $\langle\,${\itshape Insert parameter thing fragment}\nobreak\ {\footnotesize \WEFTlink{weft2b}{2b}}$\,\rangle$}>*)
+End of third fragment.
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -201,8 +204,10 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap5}
 \WEFTtarget{weft1e}{} $\langle\,${\itshape Insert unquoted fragment}\nobreak\ {\footnotesize {1e}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}This\WEFTsp fragment\WEFTsp in\WEFTsp file\WEFTsp \hbox{\sffamily\slshape file name}\WEFTsp is\WEFTsp not\WEFTsp quoted{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+This fragment in file (*<\hbox{\sffamily\slshape file name}>*) is not quoted
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -213,9 +218,11 @@ cat > test.expected.tex <<"EOF"
 \WEFTend
 \WEFTbegin
 \label{scrap6}
-\WEFTtarget{weft1f}{} $\langle\,${\itshape Insert quoted fragment}\nobreak\ {\footnotesize {1f}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}This\WEFTsp fragment\WEFTsp in\WEFTsp file\WEFTsp \hbox{\sffamily\slshape file name}\WEFTsp is\WEFTsp quoted{\WEFTsep}\WEFTendcode
+\WEFTtarget{weft2a}{} $\langle\,${\itshape Insert quoted fragment}\nobreak\ {\footnotesize {2a}}$\,\rangle\equiv$
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+This fragment in file (*<\hbox{\sffamily\slshape file name}>*) is quoted
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -226,9 +233,11 @@ cat > test.expected.tex <<"EOF"
 \WEFTend
 \WEFTbegin
 \label{scrap7}
-\WEFTtarget{weft1g}{} $\langle\,${\itshape Insert parameter \hbox{\slshape\sffamily thing\/} fragment}\nobreak\ {\footnotesize {1g}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}Here\WEFTsp >\WEFTbrk >\WEFTbrk \hbox{\slshape\sffamily thing\/}<\WEFTbrk <\WEFTbrk \WEFTsp is\WEFTsp the\WEFTsp parameter{\WEFTsep}\WEFTendcode
+\WEFTtarget{weft2b}{} $\langle\,${\itshape Insert parameter \hbox{\slshape\sffamily thing\/} fragment}\nobreak\ {\footnotesize {2b}}$\,\rangle\equiv$
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+Here >>(*<\hbox{\slshape\sffamily thing\/}>*)<< is the parameter
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}

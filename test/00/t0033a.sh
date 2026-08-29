@@ -52,6 +52,7 @@ if test $? -ne 0 ; then no_result; fi
 
 cat > test.w <<"EOF"
 \documentclass{article}
+\usepackage{listings}
 \begin{document}
 @o test.c -cc
 @{Begin
@@ -101,29 +102,25 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsDefed}{Defines:}
 \newcommand{\WEFTsep}{${\diamond}$}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
-\newcommand{\WEFTbreakpenalty}{500}
-\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
-\newcommand{\WEFTbrk}{\discretionary{}{}{}}
-\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
-\newlength{\WEFThang}\setlength{\WEFThang}{2em}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
 \newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
-\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
-\newcommand{\WEFTendcode}{\par\endgroup}
-\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\providecommand{\WEFTlstsetup}{\lstset{basicstyle=\ttfamily\small,breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true,showstringspaces=false,keywordstyle=\bfseries,commentstyle=\itshape,tabsize=8,xleftmargin=1.5em}}
 \newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
+\usepackage{listings}
 \begin{document}
 \WEFTbegin
 \label{scrap1}
 \WEFTtarget{weft1a}{} \verb@"test.c"@\nobreak\ {\footnotesize {1a}}$\equiv$
-\WEFTcode
-\mbox{\strut}Begin\WEFTeol
-\mbox{\strut}Define\WEFTsp abc\WEFTsp cba\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape Outer abc and def retuO}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}, \ldots\ }$\,\rangle$}\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape Outer cba and fed retuO}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}, \ldots\ }$\,\rangle$}\WEFTeol
-\mbox{\strut}End\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+Begin
+Define abc cba
+(*<\hbox{\normalfont $\langle\,${\itshape Outer abc and def retuO}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}, \ldots\ }$\,\rangle$}>*)
+(*<\hbox{\normalfont $\langle\,${\itshape Outer cba and fed retuO}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}, \ldots\ }$\,\rangle$}>*)
+End
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -135,13 +132,15 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap2}
 \WEFTtarget{weft1b}{} $\langle\,${\itshape Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO}\nobreak\ {\footnotesize {1b}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}Start\WEFTeol
-\mbox{\strut}Define\WEFTsp def\WEFTsp fed\WEFTeol
-\mbox{\strut}Use\WEFTsp abc\WEFTsp cba\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape Inner xArg1yArg2z rennI}\nobreak\ {\footnotesize \WEFTlink{weft1c}{1c}}$\,\rangle$}\WEFTeol
-\mbox{\strut}Finish\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+Start
+Define def fed
+Use abc cba
+(*<\hbox{\normalfont $\langle\,${\itshape Inner \hbox{\ttfamily xArg1yArg2z} rennI}\nobreak\ {\footnotesize \WEFTlink{weft1c}{1c}}$\,\rangle$}>*)
+Finish
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -154,8 +153,10 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap4}
 \WEFTtarget{weft1c}{} $\langle\,${\itshape Inner \hbox{\slshape\sffamily Stuff\/} rennI}\nobreak\ {\footnotesize {1c}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}XX>\WEFTbrk >\WEFTbrk \hbox{\slshape\sffamily Stuff\/}<\WEFTbrk <\WEFTbrk YY{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+XX>>(*<\hbox{\slshape\sffamily Stuff\/}>*)<<YY
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -167,9 +168,11 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap5}
 \WEFTtarget{weft1d}{} \verb@"test.c"@\nobreak\ {\footnotesize {1d}}$\equiv$
-\WEFTcode
-\mbox{\strut}More\WEFTsp stuff\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+More stuff
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -181,10 +184,12 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap6}
 \WEFTtarget{weft1e}{} $\langle\,${\itshape Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO}\nobreak\ {\footnotesize {1e}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}Added\WEFTsp stuff\WEFTsp to\WEFTsp force\WEFTsp fragment\WEFTsp defined\WEFTeol
-\mbox{\strut}cross-\WEFTbrk reference\WEFTsp entry.\WEFTbrk \WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+Added stuff to force fragment defined
+cross-reference entry.
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}

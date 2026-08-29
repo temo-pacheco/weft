@@ -21,6 +21,7 @@ of \verb|write_tex|.
 @o latex.c
 @{static void copy_scrap(FILE *file, int prefix, Name *name);             /* formats the body of a scrap */
 static void latex_code_putc(FILE *file, int c);                          /* escapes one code character for LaTeX */
+static const char *latex_language(const char *lang);                     /* maps a weft language tag to a listings name */
 static void print_scrap_numbers(FILE *tex_file, Scrap_Node *scraps);      /* formats a list of scrap numbers */
 static void format_entry(Name *name, FILE *tex_file, unsigned char sector);             /* formats an index entry */
 static void format_file_entry(Name *name, FILE *tex_file);        /* formats a file index entry */
@@ -63,11 +64,18 @@ or (better) redefine them in the preamble with \verb|\renewcommand|.
 Two groups of macros are written.  The first group are the textual and
 cross-reference macros (\verb|\WEFTtarget|, \verb|\WEFTlink|, the
 \verb|\WEFTtxt...| labels, and so on).  The second group, written by the
-scrap-formatting fragment below, are the layout macros that typeset a
-scrap's body.  These replace the old \verb|minipage|/\verb|verb|
-machinery with plain \LaTeX\ that neither overflows the bottom of the
-page (scraps may break across pages) nor the right margin (long lines
-wrap with a hanging indent).
+scrap-formatting fragment below, are the layout macros that frame a
+scrap.
+
+Code bodies are typeset with the \texttt{listings} package: every scrap
+becomes an \verb|lstlisting| environment.  This gives syntax
+highlighting (driven by the scrap's language, see \verb|latex_language|),
+automatic line wrapping (\verb|breaklines|), and page breaking for free.
+The document \emph{must} therefore load \verb|\usepackage{listings}| in
+its preamble --- weft cannot inject it, because the limbo is written
+before \verb|\documentclass|.  Fragment references that appear in the
+middle of code are typeset by briefly escaping out of the listing back
+to \LaTeX; see \S\ref{latex-file} and the \verb|escapeinside| option.
 
 @d Write LaTeX limbo definitions
 @{if (hyperref_flag) {
@@ -98,37 +106,32 @@ if (hyperoptions[0] != '\0')
 fputs("}\n", tex_file);
 @}
 
-The layout macros.  \verb|\WEFTbegin|/\verb|\WEFTend| open and close a
-scrap as an ordinary vertical block (a group, not a \verb|minipage|), so
-the page breaker is free to split a tall scrap across pages.
-\verb|\WEFTcode|/\verb|\WEFTendcode| open and close the code body in
-\verb|\ttfamily|, ragged right, with a hanging indent so that a wrapped
-continuation line is visibly offset from the source lines.  A code line
-is ended by \verb|\WEFTeol|, which inserts a mild penalty
-(\verb|\WEFTbreakpenalty|, default 500) so that TeX prefers to keep a
-scrap together but will break it when it must.  \verb|\WEFTsp| is a
-breakable, fixed-width space used to reproduce (and preserve) code
-indentation; \verb|\WEFTbrk| is a zero-width break opportunity inserted
-after punctuation so that long unbroken tokens can still wrap.  Every
-length and penalty is exposed so a document may tune the appearance.
+The layout macros.  \verb|\WEFTbegin|/\verb|\WEFTend| open and close the
+vertical block that holds a scrap's header line, its \verb|lstlisting|
+body, and its cross-reference list.  A fragment reference appearing in
+the middle of code is assembled inline and wrapped in an \verb|\hbox| so
+that \verb|listings|' line-breaker never splits it while it sits inside
+an escape.  (We use \verb|\hbox| rather than \verb|\mbox| because a
+fragment name may legitimately contain \verb|\verb|, which is illegal in
+a macro argument such as \verb|\mbox|'s but fine inside a primitive
+\verb|\hbox|.)  \verb|\WEFTlstsetup| is a convenience the user may call once,
+after \verb|\usepackage{listings}|, to apply weft's recommended
+\verb|\lstset| defaults (monospace, line breaking, keyword/comment
+styles).  It is optional: the \verb|escapeinside| and \verb|language|
+options that make the output \emph{correct} are written on every
+\verb|lstlisting| itself, so references and highlighting work even
+without it.
 
 @d Write the scrap formatting macros
-@{fputs("\\newcommand{\\WEFTbreakpenalty}{500}\n", tex_file);
-fputs("\\newcommand{\\WEFTsp}{\\hskip\\fontdimen2\\font\\relax}\n", tex_file);
-fputs("\\newcommand{\\WEFTbrk}{\\discretionary{}{}{}}\n", tex_file);
-fputs("\\newlength{\\WEFTindent}\\setlength{\\WEFTindent}{1.5em}\n", tex_file);
-fputs("\\newlength{\\WEFThang}\\setlength{\\WEFThang}{2em}\n", tex_file);
-fputs("\\newcommand{\\WEFTbegin}{\\par\\addvspace{2.3ex plus .6ex}"
+@{fputs("\\newcommand{\\WEFTbegin}{\\par\\addvspace{2.3ex plus .6ex}"
       "\\begingroup\\small\\raggedright}\n", tex_file);
 fputs("\\newcommand{\\WEFTend}{\\par\\endgroup"
       "\\addvspace{2.3ex plus .6ex}}\n", tex_file);
-fputs("\\newcommand{\\WEFTcode}{\\par\\nobreak\\vspace{-.5ex}\\begingroup"
-      "\\ttfamily\\small\\parindent0pt\\parskip0pt\\raggedright"
-      "\\leftskip\\WEFTindent\\hangindent\\WEFThang\\hangafter1\\relax"
-      "\\everypar{\\hangindent\\WEFThang\\hangafter1\\relax}}\n", tex_file);
-fputs("\\newcommand{\\WEFTendcode}{\\par\\endgroup}\n", tex_file);
-fputs("\\newcommand{\\WEFTeol}{\\par\\penalty\\WEFTbreakpenalty\\relax}\n",
-      tex_file);
+fputs("\\providecommand{\\WEFTlstsetup}{\\lstset{basicstyle=\\ttfamily"
+      "\\small,breaklines=true,breakatwhitespace=false,"
+      "columns=fullflexible,keepspaces=true,showstringspaces=false,"
+      "keywordstyle=\\bfseries,commentstyle=\\itshape,tabsize=8,"
+      "xleftmargin=1.5em}}\n", tex_file);
 @}
 
 @d Write the hyperlink usage macro
@@ -248,15 +251,17 @@ The \LaTeX\ for the previous fragment definition should look like this
 \label{scrap70}
 \WEFTtarget{weft70}{} $\langle\,${\itshape Interpret at-sequence}%
   \nobreak\ {\footnotesize {70}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}{\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp int\WEFTsp big\_definition\WEFTbrk\WEFTsp =\WEFTsp FALSE;\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp c\WEFTsp =\WEFTsp source\_get();\WEFTbrk\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp switch\WEFTsp (c)\WEFTsp \{\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \WEFTsp case\WEFTsp 'o':\WEFTsp \hbox{$\langle\,${\itshape %
-  Write output file definition}\nobreak\ {\footnotesize \WEFTlink{weft19a}{19a}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \}{\WEFTsep}\WEFTendcode
-\vspace{-1.5ex}
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+{
+  int big_definition = FALSE;
+  c = source_get();
+  switch (c) {
+    case 'o': (*<\hbox{\normalfont $\langle\,${\itshape Write output file definition}%
+  \nobreak\ {\footnotesize \WEFTlink{weft19a}{19a}}$\,\rangle$}>*)
+  }
+\end{lstlisting}
+{\WEFTsep}
+\vspace{-1ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item Fragment referenced in \WEFTlink{weft17b}{17b}.
@@ -266,16 +271,17 @@ The \LaTeX\ for the previous fragment definition should look like this
 \end{verbatim}}
 
 \noindent
-There is no \verb|minipage| any more, so the page breaker may split a
-tall scrap across a page boundary; \verb|\WEFTeol| discourages (but does
-not forbid) those breaks.  Because the body is set in ordinary
-\verb|\ttfamily| text rather than inside \verb|\verb|, long lines wrap
-with a hanging indent instead of running off the right margin.  The
-price is that the special \LaTeX\ characters must be escaped as the code
-is copied out; that is what \verb|latex_code_putc| does.
-\verb|\WEFTsp| reproduces each source space as a breakable,
-fixed-width space (so indentation survives) and \verb|\WEFTbrk| marks a
-harmless place to break a long token.
+The code body is now an \verb|lstlisting|.  Because \verb|listings|
+reads the body verbatim, the special \LaTeX\ characters need \emph{no}
+escaping --- they are printed as typed.  The \verb|escapeinside={(*<}{>*)}|
+option carves out the one place we \emph{do} need \LaTeX: a fragment
+reference in the middle of code, which is emitted between \verb|(*<| and
+\verb|>*)| and wrapped in an \verb|\hbox| so \verb|breaklines| cannot
+split it.  The delimiter pair \verb|(*<|\ldots\verb|>*)| is deliberately
+chosen to be a sequence that never occurs in real source (weft warns if
+a scrap body contains it).  \verb|listings| supplies page breaking,
+line wrapping, and --- via the \verb|language=| option, taken from the
+scrap's language tag --- syntax highlighting.
 
 Fragment and file definitions are formatted nearly identically.
 I've factored the common parts out into separate scraps.
@@ -408,17 +414,45 @@ inBlock = TRUE;@}
 @{fputs("\\WEFTend\n", tex_file);
 inBlock = FALSE;@}
 
-The interesting things here are the $\diamond$ inserted at the end of
-each scrap (\verb|\WEFTsep|) and the code group opened by
-\verb|\WEFTcode|.  The diamond helps to clearly indicate the end of a
-scrap.
+The body of a code scrap (\verb|@@{...@@}|) is emitted as an
+\verb|lstlisting|.  We tag it with our fixed \verb|escapeinside| pair and,
+when the scrap has a language listings understands, with a
+\verb|language=| option so the code is highlighted.
+
+Both ends of the listing must sit on their own lines.  We emit a newline
+right after the closing \verb|]| of the options, so the first line of code
+starts fresh; without it a scrap beginning with \verb|#| (a C
+\verb|#ifndef|, say) would land immediately after \verb|]|, and
+\verb|listings| reads that \verb|#| as a macro parameter and aborts with
+\emph{Illegal parameter number}.  Symmetrically, \verb|\end{lstlisting}|
+must start its own line, so we emit a newline before it even when the scrap
+body did not end in one.  The diamond (\verb|\WEFTsep|) that marks the end
+of a scrap goes just after the listing.  A non-code block scrap (the unusual
+\verb|@@d name @@[...@@]| or \verb|@@(...@@)| forms) is emitted as before,
+without a listing.
 
 @d Fill in the middle of the scrap environment
 @{{
-  fputs("\\WEFTcode\n", tex_file);
+  int is_code = (source_last == '{');
+  if (is_code) {
+    const char *lstlang = latex_language(name->lang);
+    /* the delimiter halves are split so this source line does not itself
+       contain the escape sequence when weft typesets its own source */
+    fputs("\\begin{lstlisting}[escapeinside={(*" "<}{>" "*)}", tex_file);
+    if (lstlang)
+      fprintf(tex_file, ",language=%s", lstlang);
+    /* newline after ']' so the first code line starts fresh; a scrap
+       beginning with '#' would otherwise break listings (see prose above) */
+    fputs("]\n", tex_file);
+  }
   extra_scraps = 0;
   copy_scrap(tex_file, TRUE, name);
-  fputs("{\\WEFTsep}\\WEFTendcode\n", tex_file);
+  if (is_code)
+    /* the closing tag is split across two literals so that this very
+       line does not end a listing when weft typesets its own source;
+       the leading newline keeps \end{lstlisting} on its own line */
+    fputs("\n\\end{ls" "tlisting}\n", tex_file);
+  fputs("{\\WEFTsep}\n", tex_file);
 }@}
 
 \newpage
@@ -461,7 +495,7 @@ c = source_get();
 
 @d Begin the cross-reference environment
 @{{
-  fputs("\\vspace{-1.5ex}\n", tex_file);
+  fputs("\\vspace{1.0ex}\n", tex_file);
   fputs("\\footnotesize\n", tex_file);
   fputs("\\begin{list}{}{\\setlength{\\itemsep}{-\\parsep}",
     tex_file);
@@ -548,29 +582,28 @@ list.
 
 \subsubsection{Formatting a Scrap}
 
-Each source line begins with \verb|\mbox{\strut}|: the \verb|\mbox|
-anchors horizontal mode so leading spaces are kept, and the
-\verb|\strut| gives blank lines a full line height.
 This is the only place we really care whether a scrap is
 delimited with \verb|@@{...@@}|, \verb|@@[...@@]|, or \verb|@@(...@@)|,
-and we base our output sequences on that.
+and we base our output sequences on that.  The code (\verb|@@{...@@}|)
+mode is now handled by \verb|listings|, so its per-line strings are all
+empty: \verb|copy_scrap| just copies the body out verbatim, one raw line
+per source line, and the surrounding \verb|lstlisting| does the
+formatting.  The \verb|@@[...@@]| (verbatim \TeX) and \verb|@@(...@@)|
+(math) modes keep their old inline treatment.
 
-We have an array \texttt{delimit\_scrap} where we store our strings
-that perform the formatting for one line of a scrap.  For the code
-(\verb|@@{...@@}|) mode the \emph{begin} and \emph{end} strings are now
-empty: the body is set as ordinary \verb|\ttfamily| text rather than
-inside \verb|\verb|, so the special \LaTeX\ characters must instead be
-escaped one at a time (see \verb|latex_code_putc| below).  The
-\emph{prefix} opens each line and the \emph{suffix} ends it.  Upon
-initialisation we copy our strings from the source
-\texttt{orig\_delimit\_scrap} to it to have the strings writeable.  We
-might change the \emph{insert nw\_char} string later when we encounter
-the command to change the `weft character'.
+We still keep the array \texttt{delimit\_scrap}: it carries the small
+\emph{begin}/\emph{end} strings for the math mode (a pair of \verb|$|)
+and, for every mode, the single character that stands in for the weft
+character.  Upon initialisation we copy the strings from
+\texttt{orig\_delimit\_scrap} into a writeable array; we might change the
+\emph{insert nw\_char} entry later, when the weft character changes.
 
 @o latex.c
 @{static char *orig_delimit_scrap[3][5] = {
-  /* {} mode (code): begin, end, insert nw_char, prefix, suffix */
-  { "", "", "@@", "\\mbox{\\strut}", "\\WEFTeol" },
+  /* {} mode (code): begin, end, insert nw_char, prefix, suffix.
+     All empty: listings copies the body verbatim, one raw line per
+     source line, so there is no per-line wrapper. */
+  { "", "", "@@", "", "" },
   /* [] mode: begin, end, insert nw_char, prefix, suffix */
   { "", "", "@@", "", "" },
   /* () mode: begin, end, insert nw_char, prefix, suffix */
@@ -601,16 +634,16 @@ Copying one code character to the \verb|.tex| file.  Because the code is
 no longer wrapped in \verb|\verb|, every character that is special to
 \LaTeX\ has to be turned into something harmless in \verb|\ttfamily|
 text.  A literal space becomes \verb|\WEFTsp| (a breakable, fixed-width
-space) so that indentation is both preserved and a legal place to wrap.
-After an underscore and after common code punctuation we emit a
-\verb|\WEFTbrk|, a zero-width break opportunity, so that a long
-unbroken token can still be wrapped rather than overrunning the margin.
+the code body itself needs none of this --- \verb|listings| copies it
+verbatim.  \verb|latex_code_putc| is used only for the little bits of
+text that are emitted \emph{inside} an escape (a fragment reference's
+name and its substituted arguments), which land in ordinary \LaTeX\
+text mode and so must have the \LaTeX-special characters neutralised.
 
 @o latex.c
 @{static void latex_code_putc(FILE *file, int c)
 {
   switch (c) {
-    case ' ':  fputs("\\WEFTsp ", file);          break;
     case '\\': fputs("\\textbackslash{}", file);  break;
     case '{':  fputs("\\{", file);                break;
     case '}':  fputs("\\}", file);                break;
@@ -618,20 +651,59 @@ unbroken token can still be wrapped rather than overrunning the margin.
     case '&':  fputs("\\&", file);                break;
     case '#':  fputs("\\#", file);                break;
     case '%':  fputs("\\%", file);                break;
+    case '_':  fputs("\\_", file);                break;
     case '^':  fputs("\\textasciicircum{}", file);break;
     case '~':  fputs("\\textasciitilde{}", file); break;
-    case '_':  fputs("\\_\\WEFTbrk ", file);      break;
-    /* escape-free punctuation that is a good place to break a long line */
-    case ',': case ';': case ':': case '.':
-    case '(': case ')': case '[': case ']':
-    case '/': case '|': case '=': case '<': case '>':
-    case '+': case '-':
-      putc(c, file); fputs("\\WEFTbrk ", file);   break;
-    default:
-      putc(c, file);                              break;
+    default:   putc(c, file);                     break;
   }
 }
 @| latex_code_putc @}
+
+The language mapper turns a scrap's weft language tag (\verb|"c"|,
+\verb|"python"|, \ldots) into the exact name \verb|listings| expects, or
+\verb|NULL| when we have no safe mapping.  Returning \verb|NULL| (rather
+than guessing) matters: \verb|listings| aborts the run on an unknown
+\verb|language=|, so we only ever name languages it is known to ship.
+
+@o latex.c
+@{static const char *latex_language(const char *lang)
+{
+  static const struct { const char *tag, *lst; } map[] = {
+    {"c","C"}, {"h","C"},
+    {"cpp","C++"}, {"c++","C++"}, {"cc","C++"}, {"cxx","C++"},
+    {"hpp","C++"}, {"hxx","C++"},
+    {"java","Java"},
+    {"python","Python"}, {"py","Python"},
+    {"sql","SQL"},
+    {"html","HTML"}, {"htm","HTML"}, {"xml","XML"},
+    {"php","PHP"},
+    {"perl","Perl"}, {"pl","Perl"},
+    {"ruby","Ruby"}, {"rb","Ruby"},
+    {"pascal","Pascal"}, {"pas","Pascal"},
+    {"lisp","Lisp"}, {"el","Lisp"}, {"scheme","Lisp"},
+    {"matlab","Matlab"},
+    {"tex","[LaTeX]TeX"}, {"latex","[LaTeX]TeX"},
+    {"make","make"}, {"makefile","make"},
+    {"awk","Awk"},
+    {"fortran","Fortran"}, {"f","Fortran"}, {"f90","Fortran"},
+    {"r","R"}, {"lua","Lua"}, {"ada","Ada"},
+    {"vhdl","VHDL"}, {"verilog","Verilog"},
+    {"erlang","erlang"}, {"cobol","COBOL"}, {"eiffel","Eiffel"},
+    {"ocaml","Caml"}, {"caml","Caml"},
+    {NULL,NULL}
+  };
+  int i;
+  if (lang == NULL || lang[0] == '\0')
+    return NULL;
+  for (i = 0; map[i].tag; i++) {
+    const char *a = lang, *b = map[i].tag;
+    while (*a && *b && tolower((unsigned char)*a) == (unsigned char)*b) { a++; b++; }
+    if (*a == '\0' && *b == '\0')
+      return map[i].lst;
+  }
+  return NULL;
+}
+@| latex_language @}
 
 @d Function prototypes
 @{void initialise_delimit_scrap_array(void);
@@ -658,11 +730,44 @@ unbroken token can still be wrapped rather than overrunning the margin.
 }
 @| write_literal @}
 
+Two little helpers bracket every place where we must step out of the
+verbatim body to run \LaTeX\ (a fragment reference, a bold keyword, an
+italic title, a substituted parameter).  In code mode this opens and
+closes a \verb|listings| escape; in math mode it closes and reopens the
+math run; in the verbatim-\TeX\ (\verb|@@[...@@]|) mode both are empty.
+
+The escape delimiters are written with the two halves as separate string
+literals (\verb|"(*" "<"|).  The C compiler concatenates them, so the
+emitted text is exactly \verb|(*<|; but the \emph{source} never contains
+the delimiter as one contiguous token, which matters because weft
+typesets its own source --- otherwise these very lines would trip the
+\verb|listings| tokeniser when they appear in a scrap.
+
+When \verb|code_inline| is set we are already rendering inside an escape
+(a parameter of a fragment reference), so we must \emph{not} open a
+nested escape --- both helpers do nothing in code mode.
+
+@o latex.c
+@{int code_inline = FALSE;
+
+static void begin_tex_escape(FILE *file)  /* leave the verbatim body */
+{
+  if (scrap_type == 0) { if (!code_inline) fputs("(*" "<", file); }
+  else fputs(delimit_scrap[scrap_type][1], file);
+}
+static void end_tex_escape(FILE *file)      /* re-enter the verbatim body */
+{
+  if (scrap_type == 0) { if (!code_inline) fputs(">" "*)", file); }
+  else fputs(delimit_scrap[scrap_type][0], file);
+}
+@| begin_tex_escape end_tex_escape code_inline @}
+
 @o latex.c
 @{static void copy_scrap(FILE *file, int prefix, Name *name)
 {
   int indent = 0;
   int c;
+  int coll_h1 = 0, coll_h2 = 0, coll_warned = FALSE;
   char ** params = name->arg;
   if (source_last == '{') scrap_type = 0;
   if (source_last == '[') scrap_type = 1;
@@ -672,14 +777,19 @@ unbroken token can still be wrapped rather than overrunning the margin.
   fputs(delimit_scrap[scrap_type][0], file);
   while (1) {
     switch (c) {
-      case '\n': fputs(delimit_scrap[scrap_type][1], file);
+      case '\n': if (code_inline) {
+                   putc(' ', file);   /* an inline parameter stays on one line */
+                   indent = 0;
+                   break;
+                 }
+                 fputs(delimit_scrap[scrap_type][1], file);
                  if (prefix) fputs(delimit_scrap[scrap_type][4], file);
                  fputs("\n", file);
                  if (prefix) fputs(delimit_scrap[scrap_type][3], file);
                  fputs(delimit_scrap[scrap_type][0], file);
                  indent = 0;
                  break;
-      case '\t': @<Widen a code tab into spaces@>
+      case '\t': @<Expand tab into spaces@>
                  break;
       default:
          if (c==nw_char)
@@ -687,10 +797,12 @@ unbroken token can still be wrapped rather than overrunning the margin.
              @<Check at-sequence for end-of-scrap@>
              break;
            }
-         if (scrap_type == 0)
-           latex_code_putc(file, c);
-         else
+         if (code_inline)
+           latex_code_putc(file, c);   /* inside an escape: neutralise LaTeX */
+         else {
+           @<Note a delimiter collision@>
            putc(c, file);
+         }
                  indent++;
                  break;
     }
@@ -728,22 +840,25 @@ this function. It updates the scrap formatting directives accordingly.
   }
 }@}
 
-The tab handling inside \verb|copy_scrap| is separate from the shared
-tab expander above because in code (\verb|@@{...@@}|) mode each space
-must be written as a \verb|\WEFTsp| so that the indentation survives and
-stays breakable.
+Since the code body is copied verbatim, a scrap that literally contains
+our escape delimiter (\verb|(*<| or \verb|>*)|) would desynchronise
+\verb|listings|' tokeniser.  This never happens in ordinary source, but
+we watch a two-character rolling window and warn once per scrap if it
+does, so a corrupted listing is never silent.
 
-@d Widen a code tab into spaces
-@{{
-  int delta = 8 - (indent % 8);
-  indent += delta;
-  while (delta > 0) {
-    if (scrap_type == 0)
-      latex_code_putc(file, ' ');
-    else
-      putc(' ', file);
-    delta--;
+@d Note a delimiter collision
+@{if (scrap_type == 0) {
+  if ((coll_h2 == '(' && coll_h1 == '*' && c == '<') ||
+      (coll_h2 == '>' && coll_h1 == '*' && c == ')')) {
+    if (!coll_warned) {
+      fprintf(stderr,
+        "%s: warning: a scrap body contains the listings escape "
+        "delimiter; its typeset code may be corrupted.\n", command_name);
+      coll_warned = TRUE;
+    }
   }
+  coll_h2 = coll_h1;
+  coll_h1 = c;
 }@}
 
 @d Check at-sequence...
@@ -786,9 +901,9 @@ stays breakable.
                 fputc(c,   file);
               }
               else {
-                fputs(delimit_scrap[scrap_type][1], file);
+                begin_tex_escape(file);
                 write_arg(file, name->arg[c - '1']);
-                fputs(delimit_scrap[scrap_type][0], file);
+                end_tex_escape(file);
               }
               break;
     default:
@@ -836,7 +951,7 @@ This scrap helps deal with bold keywords:
 
 @d Bold Keyword
 @{{
-  fputs(delimit_scrap[scrap_type][1],file);
+  begin_tex_escape(file);
   fprintf(file, "\\hbox{\\sffamily\\bfseries ");
   c = source_get();
   do {
@@ -845,14 +960,14 @@ This scrap helps deal with bold keywords:
   } while (c != nw_char);
   c = source_get();
   fprintf(file, "}");
-  fputs(delimit_scrap[scrap_type][0], file);
+  end_tex_escape(file);
 }@}
 
 @d Italic "@'whatever@'"
 @{{
-  fputs(delimit_scrap[scrap_type][1],file);
+  begin_tex_escape(file);
   fprintf(file, "\\hbox{\\sffamily\\slshape @1}");
-  fputs(delimit_scrap[scrap_type][0], file);
+  end_tex_escape(file);
 }@}
 
 @d Format macro name
@@ -863,9 +978,12 @@ This scrap helps deal with bold keywords:
   Arglist *q = args->args;
   int narg = 0;
 
-  fputs(delimit_scrap[scrap_type][1],file);
+  begin_tex_escape(file);
   if (prefix)
-    fputs("\\hbox{", file);
+    /* \normalfont resets the listing's \ttfamily basicstyle, so the
+       fragment name is set in the ordinary document font (roman italic)
+       rather than as italic typewriter. */
+    fputs("\\hbox{\\normalfont ", file);
   fputs("$\\langle\\,${\\itshape ", file);
   while (*p != '\000') {
     if (*p == ARG_CHR) {
@@ -897,7 +1015,7 @@ This scrap helps deal with bold keywords:
   fputs("}$\\,\\rangle$", file);
   if (prefix)
      fputs("}", file);
-  fputs(delimit_scrap[scrap_type][0], file);
+  end_tex_escape(file);
 }@}
 
 
@@ -912,6 +1030,42 @@ This scrap helps deal with bold keywords:
   p = p->next;
   if (p)
     fputs(", \\ldots\\ ", file);
+}@}
+
+A quoted scrap (\verb|@@{...@@}|) can appear as the argument of a
+parameterised fragment reference, e.g.\ \hbox{\tt @@<Name @@\{code@@\}
+eman@@>}.  In the old \verb|\verb|-based output that code was simply set
+in a verbatim run in the middle of the reference.  Under \verb|listings|
+we cannot leave the escape here --- the reference is being built inside an
+\verb|\hbox|, and closing the escape mid-box would leave the braces
+straddling the escape boundary (a \verb|! Extra }| error).  Instead we
+capture the scrap's expansion into a memory buffer and re-emit it
+\emph{inside} the escape, as \LaTeX-escaped typewriter text on a single
+line, so the box stays balanced.
+
+@d Emit a quoted scrap argument inline
+@{{
+  Scrap_Node * qq = (Scrap_Node *)q;
+  char *buf = NULL;
+  size_t sz = 0;
+  FILE *mem = open_memstream(&buf, &sz);
+  qq->quoted = TRUE;
+  if (mem) {
+    char *s;
+    write_scraps(mem, "", qq, -1, "", 0, 0, 0, 0, 0, NULL, params, 0, "");
+    fclose(mem);
+    fputs("\\hbox{\\ttfamily ", file);
+    for (s = buf; *s != '\0'; s++) {
+      if (*s == '\n')
+        putc(' ', file);
+      else
+        latex_code_putc(file, (unsigned char)*s);
+    }
+    fputs("}", file);
+    free(buf);
+  }
+  extra_scraps++;
+  qq->quoted = FALSE;
 }@}
 
 @o latex.c
@@ -930,15 +1084,7 @@ write_ArglistElement(FILE * file, Arglist * args, char ** params)
        write_literal(file, (char *)q, 0);
     }
   } else if (name == (Name *)1) {
-    Scrap_Node * qq = (Scrap_Node *)q;
-    qq->quoted = TRUE;
-    fputs(delimit_scrap[scrap_type][0], file);
-    write_scraps(file, "", qq,
-                 -1, "", 0, 0, 0, 0, 0,
-                 NULL, params, 0, "");
-    fputs(delimit_scrap[scrap_type][1], file);
-    extra_scraps++;
-    qq->quoted = FALSE;
+    @<Emit a quoted scrap argument inline@>
   } else {
     char * p = name->spelling;
     fputs("$\\langle\\,${\\itshape ", file);

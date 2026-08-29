@@ -109,24 +109,19 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsDefed}{Defines:}
 \newcommand{\WEFTsep}{${\diamond}$}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
-\newcommand{\WEFTbreakpenalty}{500}
-\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
-\newcommand{\WEFTbrk}{\discretionary{}{}{}}
-\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
-\newlength{\WEFThang}\setlength{\WEFThang}{2em}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
 \newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
-\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
-\newcommand{\WEFTendcode}{\par\endgroup}
-\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\providecommand{\WEFTlstsetup}{\lstset{basicstyle=\ttfamily\small,breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true,showstringspaces=false,keywordstyle=\bfseries,commentstyle=\itshape,tabsize=8,xleftmargin=1.5em}}
 \newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \begin{document}
 \WEFTbegin
 \label{scrap1}
 \WEFTtarget{weft?}{} $\langle\,${\itshape Atom}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -138,8 +133,10 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap2}
 \WEFTtarget{weft?}{} $\langle\,${\itshape atom}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -151,8 +148,10 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap3}
 \WEFTtarget{weft?}{} $\langle\,${\itshape Atomic}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -164,9 +163,11 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap4}
 \WEFTtarget{weft?}{} $\langle\,${\itshape atomic}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -178,8 +179,10 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap5}
 \WEFTtarget{weft?}{} $\langle\,${\itshape Save |file| abc}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -191,8 +194,10 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap6}
 \WEFTtarget{weft?}{} $\langle\,${\itshape Save file uvw}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -204,8 +209,10 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap7}
 \WEFTtarget{weft?}{} $\langle\,${\itshape Adam}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -217,8 +224,10 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap8}
 \WEFTtarget{weft?}{} $\langle\,${\itshape atoms}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -230,16 +239,18 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap9}
 \WEFTtarget{weft?}{} \verb@"test.c"@\nobreak\ {\footnotesize {?}}$\equiv$
-\WEFTcode
-\mbox{\strut}\hbox{$\langle\,${\itshape Atom}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape atom}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape Save |file| abc}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape Save file uvw}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape Adam}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape atomic}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape atoms}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape Atomic}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+(*<\hbox{\normalfont $\langle\,${\itshape Atom}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}>*)
+(*<\hbox{\normalfont $\langle\,${\itshape atom}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}>*)
+(*<\hbox{\normalfont $\langle\,${\itshape Save |file| abc}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}>*)
+(*<\hbox{\normalfont $\langle\,${\itshape Save file uvw}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}>*)
+(*<\hbox{\normalfont $\langle\,${\itshape Adam}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}>*)
+(*<\hbox{\normalfont $\langle\,${\itshape atomic}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}>*)
+(*<\hbox{\normalfont $\langle\,${\itshape atoms}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}>*)
+(*<\hbox{\normalfont $\langle\,${\itshape Atomic}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}>*)
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}

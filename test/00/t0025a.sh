@@ -52,6 +52,7 @@ if test $? -ne 0 ; then no_result; fi
 
 cat > test.w <<"EOF"
 \documentclass{article}
+\usepackage{listings}
 \begin{document}
 @o test.actual.c
 @{ First use in global
@@ -123,30 +124,26 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsDefed}{Defines:}
 \newcommand{\WEFTsep}{${\diamond}$}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
-\newcommand{\WEFTbreakpenalty}{500}
-\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
-\newcommand{\WEFTbrk}{\discretionary{}{}{}}
-\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
-\newlength{\WEFThang}\setlength{\WEFThang}{2em}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
 \newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
-\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
-\newcommand{\WEFTendcode}{\par\endgroup}
-\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\providecommand{\WEFTlstsetup}{\lstset{basicstyle=\ttfamily\small,breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true,showstringspaces=false,keywordstyle=\bfseries,commentstyle=\itshape,tabsize=8,xleftmargin=1.5em}}
 \newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
+\usepackage{listings}
 \begin{document}
 \WEFTbegin
 \label{scrap1}
 \WEFTtarget{weft1a}{} \verb@"test.actual.c"@\nobreak\ {\footnotesize {1a}}$\equiv$
-\WEFTcode
-\mbox{\strut}\WEFTsp First\WEFTsp use\WEFTsp in\WEFTsp global\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}, \ldots\ }$\,\rangle$}\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+ First use in global
+(*<\hbox{\normalfont $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}, \ldots\ }$\,\rangle$}>*)
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft2a}{, 2a}\WEFTlink{weft2c}{c}.
+\item \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft2b}{, 2b}\WEFTlink{weft2d}{d}.
 
 \item{}
 \end{list}
@@ -154,14 +151,16 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap2}
 \WEFTtarget{weft1b}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {1b}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}Base\WEFTsp sector\WEFTsp line\WEFTsp one.\WEFTbrk \WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+Base sector line one.
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTtxtMacroDefBy\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1g}{g}\WEFTlink{weft2b}{, 2b}.
-\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTlink{weft2c}{, 2c}.
+\item \WEFTtxtMacroDefBy\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1g}{g}\WEFTlink{weft2c}{, 2c}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTlink{weft2d}{, 2d}.
 
 \item{}
 \end{list}
@@ -170,9 +169,11 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap3}
 \WEFTtarget{weft1c}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {1c}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}First\WEFTsp sector\WEFTsp line\WEFTsp one.\WEFTbrk \WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+First sector line one.
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -184,15 +185,17 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap4}
 \WEFTtarget{weft1d}{} \verb@"test.actual.c"@\nobreak\ {\footnotesize {1d}}$\equiv$
-\WEFTcode
-\mbox{\strut}Use\WEFTsp first\WEFTsp local\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \WEFTlink{weft1c}{1c}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape Frag 2}\nobreak\ {\footnotesize \WEFTlink{weft2d}{2d}}$\,\rangle$}\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+Use first local
+(*<\hbox{\normalfont $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \WEFTlink{weft1c}{1c}}$\,\rangle$}>*)
+(*<\hbox{\normalfont $\langle\,${\itshape Frag 2}\nobreak\ {\footnotesize \WEFTlink{weft2e}{2e}}$\,\rangle$}>*)
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft2a}{, 2a}\WEFTlink{weft2c}{c}.
+\item \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft2b}{, 2b}\WEFTlink{weft2d}{d}.
 
 \item{}
 \end{list}
@@ -205,14 +208,16 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap5}
 \WEFTtarget{weft1e}{} \verb@"test.actual.c"@\nobreak\ {\footnotesize {1e}}$\equiv$
-\WEFTcode
-\mbox{\strut}Use\WEFTsp second\WEFTsp local\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \WEFTlink{weft1f}{1f}}$\,\rangle$}\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+Use second local
+(*<\hbox{\normalfont $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \WEFTlink{weft1f}{1f}}$\,\rangle$}>*)
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft2a}{, 2a}\WEFTlink{weft2c}{c}.
+\item \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft2b}{, 2b}\WEFTlink{weft2d}{d}.
 
 \item{}
 \end{list}
@@ -220,9 +225,11 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap6}
 \WEFTtarget{weft1f}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {1f}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}Second\WEFTsp sector\WEFTsp line\WEFTsp one.\WEFTbrk \WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+Second sector line one.
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -239,14 +246,16 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap7}
 \WEFTtarget{weft1g}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {1g}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}Base\WEFTsp sector\WEFTsp line\WEFTsp two.\WEFTbrk \WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+Base sector line two.
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTtxtMacroDefBy\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1g}{g}\WEFTlink{weft2b}{, 2b}.
-\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTlink{weft2c}{, 2c}.
+\item \WEFTtxtMacroDefBy\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1g}{g}\WEFTlink{weft2c}{, 2c}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTlink{weft2d}{, 2d}.
 
 \item{}
 \end{list}
@@ -254,74 +263,84 @@ cat > test.expected.tex <<"EOF"
 
 \WEFTbegin
 \label{scrap8}
-\WEFTtarget{weft1h}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {1h}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}Third\WEFTsp sector\WEFTsp line\WEFTsp one.\WEFTbrk \WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\WEFTtarget{weft2a}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {2a}}$\,\rangle\equiv$
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+Third sector line one.
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTtxtMacroRefIn\ \WEFTlink{weft2a}{2a}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft2b}{2b}.
 
 \item{}
 \end{list}
 \WEFTend
 \WEFTbegin
 \label{scrap9}
-\WEFTtarget{weft2a}{} \verb@"test.actual.c"@\nobreak\ {\footnotesize {2a}}$\equiv$
-\WEFTcode
-\mbox{\strut}Use\WEFTsp second\WEFTsp local\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \WEFTlink{weft1h}{1h}}$\,\rangle$}\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\WEFTtarget{weft2b}{} \verb@"test.actual.c"@\nobreak\ {\footnotesize {2b}}$\equiv$
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+Use second local
+(*<\hbox{\normalfont $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \WEFTlink{weft2a}{2a}}$\,\rangle$}>*)
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft2a}{, 2a}\WEFTlink{weft2c}{c}.
+\item \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft2b}{, 2b}\WEFTlink{weft2d}{d}.
 
 \item{}
 \end{list}
 \WEFTend
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item $\langle\,$Frag 1\nobreak\ {\footnotesize \WEFTlink{weft1h}{1h}}$\,\rangle$ {\footnotesize {\WEFTtxtRefIn} \WEFTlink{weft2a}{2a}.}
+\item $\langle\,$Frag 1\nobreak\ {\footnotesize \WEFTlink{weft2a}{2a}}$\,\rangle$ {\footnotesize {\WEFTtxtRefIn} \WEFTlink{weft2b}{2b}.}
 \end{list}}
 
 \WEFTbegin
 \label{scrap10}
-\WEFTtarget{weft2b}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {2b}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}Base\WEFTsp sector\WEFTsp line\WEFTsp three.\WEFTbrk \WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\WEFTtarget{weft2c}{} $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize {2c}}$\,\rangle\equiv$
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+Base sector line three.
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTtxtMacroDefBy\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1g}{g}\WEFTlink{weft2b}{, 2b}.
-\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTlink{weft2c}{, 2c}.
+\item \WEFTtxtMacroDefBy\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1g}{g}\WEFTlink{weft2c}{, 2c}.
+\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTlink{weft2d}{, 2d}.
 
 \item{}
 \end{list}
 \WEFTend
 \WEFTbegin
 \label{scrap11}
-\WEFTtarget{weft2c}{} \verb@"test.actual.c"@\nobreak\ {\footnotesize {2c}}$\equiv$
-\WEFTcode
-\mbox{\strut}\WEFTsp Last\WEFTsp use\WEFTsp in\WEFTsp global\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}, \ldots\ }$\,\rangle$}\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\WEFTtarget{weft2d}{} \verb@"test.actual.c"@\nobreak\ {\footnotesize {2d}}$\equiv$
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+ Last use in global
+(*<\hbox{\normalfont $\langle\,${\itshape Frag 1}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}, \ldots\ }$\,\rangle$}>*)
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft2a}{, 2a}\WEFTlink{weft2c}{c}.
+\item \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTlink{weft1e}{e}\WEFTlink{weft2b}{, 2b}\WEFTlink{weft2d}{d}.
 
 \item{}
 \end{list}
 \WEFTend
 \WEFTbegin
 \label{scrap12}
-\WEFTtarget{weft2d}{} $\langle\,${\itshape Frag 2}\nobreak\ {\footnotesize {2d}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}Here\WEFTsp is\WEFTsp frag\WEFTsp 2\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\WEFTtarget{weft2e}{} $\langle\,${\itshape Frag 2}\nobreak\ {\footnotesize {2e}}$\,\rangle\equiv$
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+Here is frag 2
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -332,114 +351,114 @@ cat > test.expected.tex <<"EOF"
 \WEFTend
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item $\langle\,$Frag 1\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}\WEFTlink{weft1g}{g}\WEFTlink{weft2b}{, 2b}}$\,\rangle$ {\footnotesize {\WEFTtxtRefIn} \WEFTlink{weft1a}{1a}\WEFTlink{weft2c}{, 2c}.
+\item $\langle\,$Frag 1\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}\WEFTlink{weft1g}{g}\WEFTlink{weft2c}{, 2c}}$\,\rangle$ {\footnotesize {\WEFTtxtRefIn} \WEFTlink{weft1a}{1a}\WEFTlink{weft2d}{, 2d}.
 }
 \end{list}}
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item $\langle\,$Frag 2\nobreak\ {\footnotesize \WEFTlink{weft2d}{2d}}$\,\rangle$ {\footnotesize {\WEFTtxtRefIn} \WEFTlink{weft1d}{1d}.}
+\item $\langle\,$Frag 2\nobreak\ {\footnotesize \WEFTlink{weft2e}{2e}}$\,\rangle$ {\footnotesize {\WEFTtxtRefIn} \WEFTlink{weft1d}{1d}.}
 \end{list}}
 \end{document}
 EOF
 
 cat > test.expected.c <<"EOF"
 
-#line 4 "test.w"
-/* {1: test.w:4} */
+#line 5 "test.w"
+/* {1: test.w:5} */
  First use in global
 /* Frag 1 */
 
-#line 8 "test.w"
-/* {2: test.w:8} */
+#line 9 "test.w"
+/* {2: test.w:9} */
 Base sector line one.
 /* {:2} */
 
-#line 31 "test.w"
-/* {7: test.w:31} */
+#line 32 "test.w"
+/* {7: test.w:32} */
 Base sector line two.
 /* {:7} */
 
-#line 44 "test.w"
-/* {10: test.w:44} */
+#line 45 "test.w"
+/* {10: test.w:45} */
 Base sector line three.
 /* {:10} */
 
-#line 5 "test.w"
+#line 6 "test.w"
 
 /* {:1} */
 
-#line 15 "test.w"
-/* {4: test.w:15} */
+#line 16 "test.w"
+/* {4: test.w:16} */
 Use first local
 /* Frag 1 */
 
-#line 12 "test.w"
-/* {3: test.w:12} */
+#line 13 "test.w"
+/* {3: test.w:13} */
 First sector line one.
 /* {:3} */
 
-#line 16 "test.w"
+#line 17 "test.w"
 
 /* Frag 2 */
 
-#line 51 "test.w"
-/* {12: test.w:51} */
+#line 52 "test.w"
+/* {12: test.w:52} */
 Here is frag 2
 /* {:12} */
 
-#line 17 "test.w"
+#line 18 "test.w"
 
 /* {:4} */
 
-#line 22 "test.w"
-/* {5: test.w:22} */
+#line 23 "test.w"
+/* {5: test.w:23} */
 Use second local
 /* Frag 1 */
 
-#line 26 "test.w"
-/* {6: test.w:26} */
+#line 27 "test.w"
+/* {6: test.w:27} */
 Second sector line one.
 /* {:6} */
 
-#line 23 "test.w"
+#line 24 "test.w"
 
 /* {:5} */
 
-#line 38 "test.w"
-/* {9: test.w:38} */
+#line 39 "test.w"
+/* {9: test.w:39} */
 Use second local
 /* Frag 1 */
 
-#line 35 "test.w"
-/* {8: test.w:35} */
+#line 36 "test.w"
+/* {8: test.w:36} */
 Third sector line one.
 /* {:8} */
 
-#line 39 "test.w"
+#line 40 "test.w"
 
 /* {:9} */
 
-#line 47 "test.w"
-/* {11: test.w:47} */
+#line 48 "test.w"
+/* {11: test.w:48} */
  Last use in global
 /* Frag 1 */
 
-#line 8 "test.w"
-/* {2: test.w:8} */
+#line 9 "test.w"
+/* {2: test.w:9} */
 Base sector line one.
 /* {:2} */
 
-#line 31 "test.w"
-/* {7: test.w:31} */
+#line 32 "test.w"
+/* {7: test.w:32} */
 Base sector line two.
 /* {:7} */
 
-#line 44 "test.w"
-/* {10: test.w:44} */
+#line 45 "test.w"
+/* {10: test.w:45} */
 Base sector line three.
 /* {:10} */
 
-#line 48 "test.w"
+#line 49 "test.w"
 
 /* {:11} */
 EOF

@@ -1,0 +1,30 @@
+{
+  "Accounts: demo accounts": {
+    "code": "1d2b9103347aefb61146c390bd0746384fb8f3668f1369bf23850de74cb26eab",
+    "prose": "66d0f5c962baae1579f7e1e9fc91a18b0edc7ccfcd65e8c96514fb89aaef4908"
+  },
+  "Accounts: header": {
+    "code": "835d1548f3e7121f9c1ee5b6cdd98005f46a98a989205fb41161ffcef794eb5c",
+    "prose": "0c8e0e5518e2a1ba0fc6ec6c9287ae07918ddd71c541ddb03569e2d2d684ed1a"
+  },
+  "Accounts: implementation": {
+    "code": "530cb354ac4dbbe046e98ebcd626d3d74487291a6e06720b28def25ccf486cb3",
+    "prose": "9e1d940655ed9397cb74796d0188ae87fa8f7963c0d6b5a0a8f8b01c02bd8f5e"
+  },
+  "Api: main": {
+    "code": "f9ea260655fd7373ce26c901558c34aebb5f5bcbcc16b411d47025a484e31269",
+    "prose": "27d37d8df2f65117c17add2acc065424194ff0adb3dd8d032f81c0904cc1a982"
+  },
+  "Ledger: demo posting": {
+    "code": "6352350f9956a062ffabdca2c3bc0a78a3095cf373bd5682340d70eae484bb37",
+    "prose": "75fad543584af07c3d3070f9b86c4fd94664aef9b8165ccda0f13ffd8b87ca8b"
+  },
+  "Ledger: header": {
+    "code": "d285768fcde28d8e9c9517a639958a233756801adf16295715f2ffde2798f4ab",
+    "prose": "7b374edf82680d6135b00574167929113306270e1d35ddc6dfc4165a9b7605a7"
+  },
+  "Ledger: implementation": {
+    "code": "b9321d1802af62db71a73f76b0344087d3fcd4bcaa2061ef2bd855efe72799f8",
+    "prose": "3bc1744bfd271088e874e54a4e827eb9b75b5407df2ed5c6d173d439077bd653"
+  }
+}

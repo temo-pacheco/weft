@@ -44,22 +44,22 @@ typedef int *Parameters;
 /* {:78} */
 
 #line 37 "literate/output-files.weft"
-/* {229: literate/output-files.weft:37} */
+/* {232: literate/output-files.weft:37} */
 
 #define MAX_INDENT 8192
-/* {:229} */
+/* {:232} */
 
 #line 5 "literate/names.weft"
-/* {327: literate/names.weft:5} */
+/* {330: literate/names.weft:5} */
 typedef struct scrap_node {
   struct scrap_node *next;
   int scrap;
   char quoted;
 } Scrap_Node;
-/* {:327} */
+/* {:330} */
 
 #line 34 "literate/names.weft"
-/* {328: literate/names.weft:34} */
+/* {331: literate/names.weft:34} */
 typedef struct name {
   char *spelling;
   struct name *llink;
@@ -77,47 +77,47 @@ typedef struct name {
   char lang[64];
   unsigned char sector;
 } Name;
-/* {:328} */
+/* {:331} */
 
 #line 1167 "literate/names.weft"
-/* {354: literate/names.weft:1167} */
+/* {357: literate/names.weft:1167} */
 #define ARG_CHR '\001'
-/* {:354} */
+/* {:357} */
 
 #line 1228 "literate/names.weft"
-/* {360: literate/names.weft:1228} */
+/* {363: literate/names.weft:1228} */
 typedef struct arglist
 {Name * name;
 struct arglist * args;
 struct arglist * next;
 } Arglist;
-/* {:360} */
+/* {:363} */
 
 #line 1392 "literate/names.weft"
-/* {367: literate/names.weft:1392} */
+/* {370: literate/names.weft:1392} */
 typedef struct embed {
    Scrap_Node * defs;
    Arglist * args;
 } Embed_Node;
-/* {:367} */
+/* {:370} */
 
 #line 433 "literate/search-labels.weft"
-/* {398: literate/search-labels.weft:433} */
+/* {401: literate/search-labels.weft:433} */
 typedef struct uses {
   struct uses *next;
   Name *defn;
 } Uses;
-/* {:398} */
+/* {:401} */
 
 #line 6 "literate/arena.weft"
-/* {421: literate/arena.weft:6} */
+/* {424: literate/arena.weft:6} */
 typedef struct l_node
 {
    struct l_node * left, * right;
    int scrap, seq;
    char name[1];
 } label_node;
-/* {:421} */
+/* {:424} */
 
 #line 24 "literate/architecture.weft"
 
@@ -137,8 +137,8 @@ typedef struct l_node
 
 /* Global variable declarations */
 
-#line 90 "literate/main.weft"
-/* {17: literate/main.weft:90} */
+#line 93 "literate/main.weft"
+/* {17: literate/main.weft:93} */
 extern int tex_flag;      /* if FALSE, don't emit the documentation file */
 extern int output_flag;   /* if FALSE, don't emit the output files */
 extern int compare_flag;  /* if FALSE, overwrite without comparison */
@@ -178,13 +178,13 @@ extern int lint_flag;      /* if TRUE, run static analysis */
 extern int errors_flag;    /* if TRUE, annotate compiler errors from stdin */
 /* {:17} */
 
-#line 178 "literate/main.weft"
-/* {19: literate/main.weft:178} */
+#line 181 "literate/main.weft"
+/* {19: literate/main.weft:181} */
 extern int nw_char;
 /* {:19} */
 
-#line 188 "literate/main.weft"
-/* {21: literate/main.weft:188} */
+#line 191 "literate/main.weft"
+/* {21: literate/main.weft:191} */
 extern char *command_name;
 /* {:21} */
 
@@ -199,36 +199,36 @@ extern unsigned char prev_sector;
 extern char blockBuff[6400];
 /* {:68} */
 
-#line 448 "literate/latex-output.weft"
-/* {104: literate/latex-output.weft:448} */
+#line 471 "literate/latex-output.weft"
+/* {104: literate/latex-output.weft:471} */
 extern int extra_scraps;
 /* {:104} */
 
 #line 19 "literate/source-io.weft"
-/* {237: literate/source-io.weft:19} */
+/* {240: literate/source-io.weft:19} */
 extern char *source_name;  /* name of the current file */
 extern int source_line;    /* current line in the source file */
-/* {:237} */
+/* {:240} */
 
 #line 161 "literate/scraps.weft"
-/* {265: literate/scraps.weft:161} */
+/* {268: literate/scraps.weft:161} */
 extern int already_warned;
-/* {:265} */
+/* {:268} */
 
 #line 60 "literate/names.weft"
-/* {329: literate/names.weft:60} */
+/* {332: literate/names.weft:60} */
 extern Name *file_names;
 extern Name *macro_names;
 extern Name *user_names;
 extern int scrap_name_has_parameters;
 extern int scrap_ended_with;
 extern char pending_lang[64];
-/* {:329} */
+/* {:332} */
 
 #line 15 "literate/arena.weft"
-/* {422: literate/arena.weft:15} */
+/* {425: literate/arena.weft:15} */
 extern label_node * label_tab;
-/* {:422} */
+/* {:425} */
 
 #line 26 "literate/architecture.weft"
 
@@ -244,56 +244,56 @@ extern void pass1(char *file_name);
 extern void write_tex(char *file_name, char *tex_name, unsigned char sector);
 /* {:83} */
 
-#line 637 "literate/latex-output.weft"
-/* {116: literate/latex-output.weft:637} */
+#line 698 "literate/latex-output.weft"
+/* {117: literate/latex-output.weft:698} */
 void initialise_delimit_scrap_array(void);
-/* {:116} */
+/* {:117} */
 
-#line 718 "literate/latex-output.weft"
-/* {121: literate/latex-output.weft:718} */
+#line 819 "literate/latex-output.weft"
+/* {123: literate/latex-output.weft:819} */
 void update_delimit_scrap(void);
-/* {:121} */
+/* {:123} */
 
-#line 1161 "literate/latex-output.weft"
-/* {148: literate/latex-output.weft:1161} */
+#line 1296 "literate/latex-output.weft"
+/* {151: literate/latex-output.weft:1296} */
 extern int has_sector(Name *, unsigned char);
-/* {:148} */
+/* {:151} */
 
 #line 10 "literate/markdown-output.weft"
-/* {153: literate/markdown-output.weft:10} */
+/* {156: literate/markdown-output.weft:10} */
 extern void write_md(char *file_name, char *md_name, unsigned char sector);
-/* {:153} */
+/* {:156} */
 
 #line 4 "literate/output-files.weft"
-/* {226: literate/output-files.weft:4} */
+/* {229: literate/output-files.weft:4} */
 extern void write_files(Name *files);
-/* {:226} */
+/* {:229} */
 
 #line 8 "literate/output-files.weft"
-/* {227: literate/output-files.weft:8} */
+/* {230: literate/output-files.weft:8} */
 extern void write_map(Name *file_names, Name *macro_names);
 extern void write_extract(char *name, Name *file_names, Name *macro_names);
 extern void write_reverse_map(const char *arg);
 extern void write_callers(char *name, Name *file_names, Name *macro_names);
 extern void write_lint(Name *file_names, Name *macro_names);
 extern void write_error_annotator(void);
-/* {:227} */
+/* {:230} */
 
 #line 9 "literate/source-io.weft"
-/* {236: literate/source-io.weft:9} */
+/* {239: literate/source-io.weft:9} */
 extern void source_open(char *name); /* pass in the name of the source file */
 extern int source_get(void);   /* no args; returns the next char or EOF */
 extern int source_last;   /* what last source_get() returned. */
 extern int source_peek;   /* The next character to get */
-/* {:236} */
+/* {:239} */
 
 #line 83 "literate/source-io.weft"
-/* {242: literate/source-io.weft:83} */
+/* {245: literate/source-io.weft:83} */
 extern void source_ungetc(int*);
-/* {:242} */
+/* {:245} */
 
 #line 51 "literate/scraps.weft"
-/* {252: literate/scraps.weft:51} */
+/* {255: literate/scraps.weft:51} */
 extern void init_scraps(void);
 extern int collect_scrap(void);
 extern int write_scraps(FILE *file, char *spelling, Scrap_Node *defs, int global_indent, char *indent_chars, char debug_flag, char tab_flag, char indent_flag, unsigned char comment_flag, char location_flag, Arglist *inArgs, char *inParams[9], Parameters parameters, char *title);
@@ -302,10 +302,10 @@ extern void write_single_scrap_ref(FILE *file, int num);
 extern int num_scraps(void);
 extern Uses * get_scrap_uses(int scrap);
 extern Uses * get_scrap_defs(int scrap);
-/* {:252} */
+/* {:255} */
 
 #line 120 "literate/scraps.weft"
-/* {258: literate/scraps.weft:120} */
+/* {261: literate/scraps.weft:120} */
 extern const char *scrap_file_name(int i);
 extern int scrap_file_line(int i);
 extern int scrap_end_line(int i);
@@ -315,25 +315,25 @@ extern void dump_scrap_text(FILE *file, int scrap_idx);
 extern void dump_scrap_json(FILE *f, int scrap_idx);
 extern void set_scrap_prose(int i, char *p);
 extern void set_scrap_owner(int i, Name *n);
-/* {:258} */
+/* {:261} */
 
 #line 429 "literate/scraps.weft"
-/* {282: literate/scraps.weft:429} */
+/* {285: literate/scraps.weft:429} */
 extern void add_to_use(Name * name, int current_scrap);
-/* {:282} */
+/* {:285} */
 
 #line 605 "literate/scraps.weft"
-/* {291: literate/scraps.weft:605} */
+/* {294: literate/scraps.weft:605} */
 Arglist *instance(Arglist *a, Arglist *par, char *arg[9], int *ch);
-/* {:291} */
+/* {:294} */
 
 #line 1088 "literate/scraps.weft"
-/* {320: literate/scraps.weft:1088} */
+/* {323: literate/scraps.weft:1088} */
 extern void collect_numbers(char *aux_name);
-/* {:320} */
+/* {:323} */
 
 #line 78 "literate/names.weft"
-/* {331: literate/names.weft:78} */
+/* {334: literate/names.weft:78} */
 extern Name *collect_file_name(void);
 extern Name *collect_macro_name(void);
 extern Arglist *collect_scrap_name(int current_scrap);
@@ -343,44 +343,44 @@ extern char *save_string(char *s);
 extern void reverse_lists(Name *names);
 extern void collect_lang_def(void);
 extern void collect_weave_format(void);
-/* {:331} */
+/* {:334} */
 
 #line 224 "literate/names.weft"
-/* {337: literate/names.weft:224} */
+/* {340: literate/names.weft:224} */
 extern int robs_strcmp(char*, char*);
-/* {:337} */
+/* {:340} */
 
 #line 1211 "literate/names.weft"
-/* {358: literate/names.weft:1211} */
+/* {361: literate/names.weft:1211} */
 extern Name *install_args(Name *name, int argc, char *arg[9]);
-/* {:358} */
+/* {:361} */
 
 #line 193 "literate/search-labels.weft"
-/* {387: literate/search-labels.weft:193} */
+/* {390: literate/search-labels.weft:193} */
 extern void search(void);
-/* {:387} */
+/* {:390} */
 
 #line 440 "literate/search-labels.weft"
-/* {399: literate/search-labels.weft:440} */
+/* {402: literate/search-labels.weft:440} */
 extern void format_uses_refs(FILE *, int);
-/* {:399} */
+/* {:402} */
 
 #line 495 "literate/search-labels.weft"
-/* {404: literate/search-labels.weft:495} */
+/* {407: literate/search-labels.weft:495} */
 extern void format_defs_refs(FILE *, int);
-/* {:404} */
+/* {:407} */
 
 #line 606 "literate/search-labels.weft"
-/* {412: literate/search-labels.weft:606} */
+/* {415: literate/search-labels.weft:606} */
 void write_label(char label_name[], FILE * file);
-/* {:412} */
+/* {:415} */
 
 #line 30 "literate/arena.weft"
-/* {423: literate/arena.weft:30} */
+/* {426: literate/arena.weft:30} */
 extern void *arena_getmem(size_t n);
 extern void arena_free(void);
 extern void arglist_reset(void);
-/* {:423} */
+/* {:426} */
 
 #line 27 "literate/architecture.weft"
 

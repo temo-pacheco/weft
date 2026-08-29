@@ -148,16 +148,9 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsDefed}{Defines:}
 \newcommand{\WEFTsep}{${\diamond}$}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
-\newcommand{\WEFTbreakpenalty}{500}
-\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
-\newcommand{\WEFTbrk}{\discretionary{}{}{}}
-\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
-\newlength{\WEFThang}\setlength{\WEFThang}{2em}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
 \newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
-\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
-\newcommand{\WEFTendcode}{\par\endgroup}
-\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\providecommand{\WEFTlstsetup}{\lstset{basicstyle=\ttfamily\small,breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true,showstringspaces=false,keywordstyle=\bfseries,commentstyle=\itshape,tabsize=8,xleftmargin=1.5em}}
 \newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \begin{document}
@@ -230,17 +223,19 @@ go on forever just because:)
 \par\vspace{\baselineskip}
 \label{scrap1}
 \WEFTtarget{weft?}{} $\langle\,${\itshape Here is a scrap.}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}This\WEFTsp is\WEFTsp the\WEFTsp contents\WEFTsp of\WEFTsp the\WEFTsp scrap.\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTeol
-\mbox{\strut}More\WEFTsp stuff,\WEFTbrk \WEFTsp not\WEFTsp related\WEFTsp to\WEFTsp songs\WEFTsp without\WEFTsp ends.\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTeol
-\mbox{\strut}"This\WEFTsp is\WEFTsp a\WEFTsp song\WEFTsp that\WEFTsp will\WEFTsp get\WEFTsp on\WEFTsp your\WEFTsp nerves,\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp Get\WEFTsp on\WEFTsp your\WEFTsp nerves,\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp Get\WEFTsp on\WEFTsp your\WEFTsp nerves,\WEFTbrk "\WEFTeol
-\mbox{\strut}\WEFTeol
-\mbox{\strut}Ad\WEFTsp infinitum.\WEFTbrk \WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+This is the contents of the scrap.
+
+More stuff, not related to songs without ends.
+
+"This is a song that will get on your nerves,
+   Get on your nerves,
+   Get on your nerves,"
+
+Ad infinitum.
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}

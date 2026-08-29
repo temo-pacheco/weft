@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+"""LDD pre-commit hook — enforces the Prime Directive locally, in pure Python.
+
+Install:  cp templates/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+
+Blocks any commit where a chunk's code changed but its prose did not (and new
+code chunks that ship without prose). To commit a legitimate no-prose-change,
+first run  `python3 ldd.py prose lock --affirm`  and stage the updated
+.ldd-prose-lock (+ .ldd-prose-affirmations).
+
+Override the master file with:  LDD_MAIN=foo.weft git commit
+"""
+import os
+import subprocess
+import sys
+
+
+def run(*cmd):
+    return subprocess.run(cmd, capture_output=True, text=True)
+
+
+def main():
+    root = run("git", "rev-parse", "--show-toplevel").stdout.strip()
+    master = os.environ.get("LDD_MAIN", "project.weft")
+    if not root or not os.path.exists(os.path.join(root, master)):
+        return 0
+    staged = run("git", "diff", "--cached", "--name-only").stdout.splitlines()
+    if not any(line.strip().endswith(".weft") for line in staged):
+        return 0
+
+    print("LDD pre-commit: checking the Prime Directive (prose ↔ code)…")
+    rc = subprocess.run(
+        [sys.executable, os.path.join(root, "ldd.py"),
+         "--main", master, "prose", "check"]
+    ).returncode
+    if rc != 0:
+        print("\nCOMMIT BLOCKED — a task is not done until its prose is updated.")
+        print("Fix the prose, or affirm it explicitly and stage the lock:")
+        print("  python3 ldd.py prose lock --affirm")
+        print("  git add .ldd-prose-lock .ldd-prose-affirmations")
+        return 1
+    print("LDD pre-commit: prose in sync ✓")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

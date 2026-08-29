@@ -85,27 +85,22 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsDefed}{Defines:}
 \newcommand{\WEFTsep}{${\diamond}$}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
-\newcommand{\WEFTbreakpenalty}{500}
-\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
-\newcommand{\WEFTbrk}{\discretionary{}{}{}}
-\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
-\newlength{\WEFThang}\setlength{\WEFThang}{2em}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
 \newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
-\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
-\newcommand{\WEFTendcode}{\par\endgroup}
-\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\providecommand{\WEFTlstsetup}{\lstset{basicstyle=\ttfamily\small,breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true,showstringspaces=false,keywordstyle=\bfseries,commentstyle=\itshape,tabsize=8,xleftmargin=1.5em}}
 \newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \begin{document}
 \WEFTbegin
 \label{scrap1}
 \WEFTtarget{weft?}{} \verb@"test.c"@\nobreak\ {\footnotesize {?}}$\equiv$
-\WEFTcode
-\mbox{\strut}Start\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Here is the first call}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
-\mbox{\strut}End\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+Start
+   (*<\hbox{\normalfont $\langle\,${\itshape Here is the first call}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}>*)
+End
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -116,10 +111,12 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap2}
 \WEFTtarget{weft?}{} $\langle\,${\itshape Here is the first call}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}\hbox{$\langle\,${\itshape Use xxx as parameter}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\hbox{$\langle\,${\itshape Use ZZZ as parameter}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+(*<\hbox{\normalfont $\langle\,${\itshape Use xxx as parameter}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}>*)
+(*<\hbox{\normalfont $\langle\,${\itshape Use ZZZ as parameter}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}>*)
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -131,9 +128,11 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap3}
 \WEFTtarget{weft?}{} $\langle\,${\itshape Use \hbox{\slshape\sffamily yyy\/} as parameter}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}\hbox{\slshape\sffamily yyy\/}\WEFTsp is\WEFTsp here.\WEFTbrk \WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+(*<\hbox{\slshape\sffamily yyy\/}>*) is here.
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}

@@ -6,30 +6,44 @@ All notable changes to weft are documented in this file.
 
 ### Changed
 
-- **LaTeX output rewritten** — the woven `.tex` no longer wraps each scrap
-  in a `minipage` typeset with per-line `\verb`. Scraps are now plain
-  `\ttfamily` blocks that **break across pages** (no more scraps overrunning
-  the bottom margin) and whose long lines **wrap with a hanging indent**
-  (no more code running off the right margin). Special LaTeX characters in
-  code are escaped as the body is copied out; spaces become `\WEFTsp`
-  (breakable, fixed-width) and a `\WEFTbrk` break opportunity is emitted
-  after underscores and common punctuation so long tokens can still wrap.
+- **LaTeX code output now uses the `listings` package** — every code scrap
+  (`@{...@}`) is woven as an `lstlisting` environment instead of the old
+  `minipage`/`\verb` machinery. This is now the default and only code
+  format. The gains: **syntax highlighting** (driven by the scrap's
+  language, see below), automatic **line wrapping** (`breaklines`, so long
+  lines no longer run off the right margin), and **page breaking** (tall
+  scraps split across pages instead of overrunning the bottom). Because
+  `listings` reads the body verbatim, special characters (`\ { } $ & # % _
+  ^ ~`) need no escaping.
+
+  **Requirement:** the document preamble must load `\usepackage{listings}`
+  (weft cannot inject it, as the limbo is written before `\documentclass`).
+  Fragment references that appear in the middle of code are typeset by
+  briefly escaping out of the listing via `escapeinside={(*<}{>*)}`, which
+  weft writes on every `lstlisting`; the delimiter is chosen to never occur
+  in real source, and weft warns if a scrap body happens to contain it.
+
+- **Per-scrap syntax highlighting** — the language weft already tracks
+  (`@l tag`, `@L`, or file-extension inference) is now passed to
+  `lstlisting` as `language=`, for the languages `listings` ships. Untagged
+  fragments are typeset without highlighting (still verbatim).
+
+- **`\WEFTlstsetup`** — a convenience macro written to the limbo. Call it
+  once, after `\usepackage{listings}`, to apply weft's recommended
+  `\lstset` (monospace, `breaklines`, keyword/comment styles). Optional:
+  the `escapeinside`/`language` options that make the output correct are
+  written per-listing, so references and highlighting work without it.
 
 - **Macros renamed `\NW...` → `\WEFT...`** — every default definition weft
   writes into the document limbo (`\WEFTtarget`, `\WEFTlink`, the
-  `\WEFTtxt...` labels, `\WEFTsep`, `\WEFTnotglobal`, `\WEFTuseHyperlinks`)
-  now uses the `WEFT` prefix. Documents that redefined the old `\NW...`
-  commands (for hyperref or localisation) must rename their overrides.
-  The hypertarget anchor prefix (`weftN`) is unchanged.
+  `\WEFTtxt...` labels, `\WEFTsep`, `\WEFTnotglobal`, `\WEFTuseHyperlinks`,
+  plus `\WEFTbegin`/`\WEFTend`) now uses the `WEFT` prefix. Documents that
+  redefined the old `\NW...` commands (for hyperref or localisation) must
+  rename their overrides. The hypertarget anchor prefix (`weftN`) is
+  unchanged.
 
-- **New layout macros** are written to the limbo and may be redefined to
-  tune the appearance: `\WEFTbegin`/`\WEFTend`, `\WEFTcode`/`\WEFTendcode`,
-  `\WEFTeol`, `\WEFTsp`, `\WEFTbrk`, the lengths `\WEFTindent` and
-  `\WEFThang`, and the penalty `\WEFTbreakpenalty` (default 500, controlling
-  how strongly a scrap resists being split across a page).
-
-- The `-l` (listings) flag is now a no-op: the block layout no longer uses
-  `\verb`, so the old `\lstinline` substitution it performed is gone.
+- The `-l` flag is now a no-op (accepted but ignored): `listings` is always
+  used, so the old opt-in and its `\lstinline` substitution are gone.
 
 ## [1.0.5] - 2026-07-26
 

@@ -65,6 +65,30 @@ See [references/literate-philosophy.md](references/literate-philosophy.md)
 for the complete philosophy guide including Childs' 7 requirements.
 
 
+## The Prime Directive
+
+> **A task is NOT complete until its prose has been updated. No exceptions.**
+
+This is the one rule that keeps the entire paradigm honest. If prose can lag
+behind code, the document stops being the source of truth and literate
+programming collapses into ordinary code with stale comments.
+
+State it in its strongest form. In LP the code is the *derived* artifact and
+the prose is the *source*. Therefore:
+
+> **Changing code without changing its prose is the same category of error as
+> editing the tangled output** — in both cases you edited the wrong layer.
+
+Editing tangled output is already forbidden. So is leaving prose stale. They
+are the same sin.
+
+Concretely, a change to a chunk's code is **incomplete** until the prose that
+introduces and explains that chunk has been re-read and either updated or
+explicitly affirmed still-correct. This applies to every change, however
+small. "It compiles" is not done. "It compiles and the prose still tells the
+truth" is done.
+
+
 ## Workflow
 
 When the user asks to create or work on a literate project:
@@ -94,10 +118,14 @@ the only file with `@o` directives. Concepts never know their output paths.
 
 **6. Iterate** — all changes go through `.weft` files. Never edit tangled output.
 
-**Definition of done**: a change is **not complete** until its surrounding
-prose is updated. Code and narrative must always be in sync. If you modify
-a chunk, update the prose that explains it. If you add a chunk, write the
-prose that introduces it. A code change without updated prose is not finished.
+**Definition of done** (the Prime Directive, restated): a change is **not
+complete** until its surrounding prose is updated. Code and narrative must
+always be in sync. If you modify a chunk, update the prose that explains it.
+If you add a chunk, write the prose that introduces it. A code change without
+updated prose is not finished — it is the same error as editing tangled
+output. When reporting a task done, state explicitly that the prose was
+updated (or affirmed still-correct); if you cannot say that, the task is not
+done.
 
 ### Common `@` Escaping by Language
 

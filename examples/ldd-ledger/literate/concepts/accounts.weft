@@ -1,0 +1,84 @@
+\chapter{Accounts}\label{chap:accounts}
+
+The Accounts concept owns what an account \emph{is} and the only operations
+that move a balance. It knows nothing about transactions --- that ignorance is
+deliberate (see the architecture chapter): the store of value must not depend
+on the rules that govern movement, or the two could never be reasoned about
+apart.
+
+\section{The public seam}
+
+Everything another concept may call lives in one header. An account is opened
+by name and referred to afterwards by a small integer id. Balances are signed
+\texttt{long} cents. Four operations are exposed: open an account, read a
+balance, apply a signed delta, and --- so a caller can validate before it
+mutates --- test whether an id refers to a live account.
+
+@d Accounts: header @{#ifndef LEDGER_ACCOUNTS_H
+#define LEDGER_ACCOUNTS_H
+
+#define ACC_MAX 64              /* the store holds at most this many accounts */
+
+int         acc_open(const char *name); /* -> id >= 0, or -1 if the store is full */
+long        acc_balance(int id);        /* balance in cents, 0 for an unknown id */
+int         acc_apply(int id, long delta); /* add delta cents; 0 ok, -1 bad id  */
+int         acc_exists(int id);         /* 1 if id is a live account, else 0     */
+const char *acc_name(int id);           /* the account's name, or "?"            */
+
+#endif
+@}
+
+\section{The store}
+
+The implementation is a fixed array of accounts. A real ledger would persist
+to a journal (Stage 3); the walking skeleton keeps the store in memory, which
+is enough to prove the invariant. Note that \texttt{acc\_apply} is neutral: it
+adds a delta and asks no questions about balance. The rule that deltas must
+come in balanced sets belongs to Ledger, not here.
+
+@d Accounts: implementation @{#include "accounts.h"
+#include <string.h>
+
+static struct { char name[32]; long balance; int used; } accounts[ACC_MAX];
+
+int acc_open(const char *name) {
+    for (int i = 0; i < ACC_MAX; i++) {
+        if (!accounts[i].used) {
+            accounts[i].used = 1;
+            accounts[i].balance = 0;
+            strncpy(accounts[i].name, name, sizeof accounts[i].name - 1);
+            accounts[i].name[sizeof accounts[i].name - 1] = '\0';
+            return i;
+        }
+    }
+    return -1;
+}
+
+int acc_exists(int id) {
+    return id >= 0 && id < ACC_MAX && accounts[id].used;
+}
+
+long acc_balance(int id) {
+    return acc_exists(id) ? accounts[id].balance : 0;
+}
+
+int acc_apply(int id, long delta) {
+    if (!acc_exists(id)) return -1;
+    accounts[id].balance += delta;
+    return 0;
+}
+
+const char *acc_name(int id) {
+    return acc_exists(id) ? accounts[id].name : "?";
+}
+@}
+
+\section{Seed: the demo accounts}
+
+The walking skeleton needs two accounts to move money between. Opening them is
+an Accounts concern, so the snippet lives here and Api composes it. When this
+chunk is expanded inside \texttt{main}, it declares \texttt{cash} and
+\texttt{revenue} in that scope.
+
+@d Accounts: demo accounts @{int cash    = acc_open("cash");
+    int revenue = acc_open("revenue");@}

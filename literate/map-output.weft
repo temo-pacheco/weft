@@ -523,7 +523,7 @@ what precedes the opening brace so that any comment style works.
         scrap = scrap * 10 + (*start++ - '0');
       if (*start != ':' || *(start+1) != ' ') { p++; continue; }
       start += 2; /* skip ": " */
-      /* file:line — find the closing brace, then work backwards for :line */
+      /* file:line -- find the closing brace, then work backwards for :line */
       const char *end = strchr(start, '}');
       if (!end) { p++; continue; }
       /* find last ':' between start and end */

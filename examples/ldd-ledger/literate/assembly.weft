@@ -1,0 +1,33 @@
+\chapter{Assembly}
+
+This is the only file with \texttt{@@o} directives. The concept chapters never
+name an output path; they define chunks, and the assembly routes those chunks
+to the layer-oriented files the C toolchain expects. Because routing lives
+here alone, the physical layout can change --- split a file, rename a
+directory --- without touching a single concept narrative.
+
+The store and its header:
+
+@o src/accounts.h
+@{@<Accounts: header@>
+@}
+
+@o src/accounts.c
+@{@<Accounts: implementation@>
+@}
+
+The ledger and its header:
+
+@o src/ledger.h
+@{@<Ledger: header@>
+@}
+
+@o src/ledger.c
+@{@<Ledger: implementation@>
+@}
+
+The command-line surface:
+
+@o src/main.c
+@{@<Api: main@>
+@}

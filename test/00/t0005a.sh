@@ -92,28 +92,23 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsDefed}{Defines:}
 \newcommand{\WEFTsep}{${\diamond}$}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
-\newcommand{\WEFTbreakpenalty}{500}
-\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
-\newcommand{\WEFTbrk}{\discretionary{}{}{}}
-\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
-\newlength{\WEFThang}\setlength{\WEFThang}{2em}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
 \newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
-\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
-\newcommand{\WEFTendcode}{\par\endgroup}
-\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\providecommand{\WEFTlstsetup}{\lstset{basicstyle=\ttfamily\small,breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true,showstringspaces=false,keywordstyle=\bfseries,commentstyle=\itshape,tabsize=8,xleftmargin=1.5em}}
 \newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \begin{document}
 \WEFTbegin
 \label{scrap1}
 \WEFTtarget{weft?}{} \verb@"test.c"@\nobreak\ {\footnotesize {?}}$\equiv$
-\WEFTcode
-\mbox{\strut}Call\WEFTsp the\WEFTsp macro\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Fragment with $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$ as parameter}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Second frag with $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$ as parameter}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Third frag with $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$ as parameter}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+Call the macro
+   (*<\hbox{\normalfont $\langle\,${\itshape Fragment with $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$ as parameter}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}>*)
+   (*<\hbox{\normalfont $\langle\,${\itshape Second frag with $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$ as parameter}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}>*)
+   (*<\hbox{\normalfont $\langle\,${\itshape Third frag with $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$ as parameter}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}>*)
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -124,9 +119,11 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap2}
 \WEFTtarget{weft?}{} $\langle\,${\itshape Fragment with \hbox{\slshape\sffamily Begin macro\/} as parameter}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}\hbox{\slshape\sffamily Begin macro\/}<\WEFTbrk <\WEFTbrk <\WEFTbrk Here\WEFTsp 'tis.\WEFTbrk \WEFTeol
-\mbox{\strut}That\WEFTsp argument\WEFTsp was\WEFTsp at\WEFTsp the\WEFTsp beginning\WEFTsp of\WEFTsp the\WEFTsp fragment{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+(*<\hbox{\slshape\sffamily Begin macro\/}>*)<<<Here 'tis.
+That argument was at the beginning of the fragment
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -138,10 +135,12 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap3}
 \WEFTtarget{weft?}{} $\langle\,${\itshape Second frag with \hbox{\slshape\sffamily Begin line\/} as parameter}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}Here\WEFTsp is\WEFTsp the\WEFTsp beginning\WEFTsp of\WEFTsp the\WEFTsp second\WEFTsp macro\WEFTeol
-\mbox{\strut}\hbox{\slshape\sffamily Begin line\/}<\WEFTbrk <\WEFTbrk <\WEFTbrk That\WEFTsp is\WEFTsp the\WEFTsp argument\WEFTeol
-\mbox{\strut}And\WEFTsp this\WEFTsp is\WEFTsp the\WEFTsp end\WEFTsp of\WEFTsp the\WEFTsp second\WEFTsp frag{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+Here is the beginning of the second macro
+(*<\hbox{\slshape\sffamily Begin line\/}>*)<<<That is the argument
+And this is the end of the second frag
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -153,8 +152,10 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap4}
 \WEFTtarget{weft?}{} $\langle\,${\itshape Third frag with \hbox{\slshape\sffamily Embedded\/} as parameter}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}Here\WEFTsp is\WEFTsp the\WEFTsp argument>\WEFTbrk >\WEFTbrk >\WEFTbrk \hbox{\slshape\sffamily Embedded\/}<\WEFTbrk <\WEFTbrk <\WEFTbrk That\WEFTsp was\WEFTsp it.\WEFTbrk {\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+Here is the argument>>>(*<\hbox{\slshape\sffamily Embedded\/}>*)<<<That was it.
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -166,8 +167,10 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap5}
 \WEFTtarget{weft?}{} $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}Hello\WEFTsp folks{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+Hello folks
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}

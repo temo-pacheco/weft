@@ -1,0 +1,63 @@
+\chapter{Ledger}\label{chap:ledger}
+
+The Ledger concept owns the one law that makes this a ledger: a transaction is
+a set of postings that sum to zero, and nothing else may be committed. It is
+the only place in the system that knows this rule, which is what makes the
+rule auditable --- to check that money is conserved, a reader looks in exactly
+one function.
+
+\section{The public seam}
+
+A \texttt{Entry} is one posting: a signed amount, in cents, into one account.
+A transaction is an array of them. \texttt{ledger\_post} is the only door
+through which balances change as a group.
+
+@d Ledger: header @{#ifndef LEDGER_LEDGER_H
+#define LEDGER_LEDGER_H
+
+typedef struct { int account; long amount; } Entry; /* one posting, cents */
+
+/* Post a balanced transaction. Returns 0 on success; -1 if the entries do
+   not sum to zero (the invariant) or name an account that does not exist.
+   On failure NO account is modified --- the post is atomic. */
+int ledger_post(const Entry *entries, int n);
+
+#endif
+@}
+
+\section{Enforcing the invariant}
+
+The implementation makes the atomicity promise real by validating everything
+before it changes anything: first the postings must sum to zero, then every
+referenced account must exist. Only once both checks pass does it apply the
+deltas through \texttt{acc\_apply}. Because the store was validated up front,
+the apply loop cannot fail partway and leave a half-posted transaction. This
+is the single allowed dependency of Ledger on Accounts.
+
+@d Ledger: implementation @{#include "ledger.h"
+#include "accounts.h"
+
+int ledger_post(const Entry *entries, int n) {
+    long sum = 0;
+    for (int i = 0; i < n; i++) sum += entries[i].amount;
+    if (sum != 0) return -1;                  /* the invariant: money is conserved */
+
+    for (int i = 0; i < n; i++)
+        if (!acc_exists(entries[i].account)) return -1;   /* validate before mutate */
+
+    for (int i = 0; i < n; i++)
+        acc_apply(entries[i].account, entries[i].amount); /* now safe: all valid */
+    return 0;
+}
+@}
+
+\section{Seed: the demo posting}
+
+The walking skeleton's one transaction moves one hundred dollars: a debit to
+\texttt{cash} and an equal credit to \texttt{revenue}. The two postings sum to
+zero, so the ledger accepts it. Building the transaction is a Ledger concern,
+so the snippet lives here; Api composes it after the demo accounts exist, and
+it reads the \texttt{cash} and \texttt{revenue} ids from that scope.
+
+@d Ledger: demo posting @{Entry txn[] = { { cash, +10000 }, { revenue, -10000 } };
+    int rc = ledger_post(txn, 2);@}

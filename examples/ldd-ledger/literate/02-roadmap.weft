@@ -1,0 +1,55 @@
+\chapter{Roadmap}
+
+\section{Stage 1 --- the walking skeleton}
+
+The thinnest slice that runs end to end and proves the architecture: open two
+accounts, post one balanced transaction between them, print both balances,
+and show that an \emph{unbalanced} transaction is refused. It touches every
+concept thinly --- Accounts (open, apply, balance), Ledger (post, invariant),
+Api (the demo main) --- so when it builds green the shape is proven and
+everything after is thickening.
+
+\section{Later stages (planned)}
+
+\begin{itemize}
+  \item \textbf{Stage 2 --- Reporting}: a trial balance and per-account
+    statements over the ledger. New concept \texttt{Reporting}, depending on
+    Ledger and Accounts.
+  \item \textbf{Stage 3 --- Persistence}: an append-only journal on disk so
+    balances survive a restart.
+\end{itemize}
+
+\section{The concept ledger}
+
+The single source of truth for what exists and what is planned. Lifecycle:
+\texttt{planned $\rightarrow$ stubbed $\rightarrow$ implemented $\rightarrow$
+stable}.
+
+\begin{center}
+\begin{tabular}{lllll}
+\toprule
+Concept & Status & Depends on & Stage & Chapter \\
+\midrule
+Accounts  & implemented & ---              & 1 & \ref{chap:accounts} \\
+Ledger    & implemented & Accounts         & 1 & \ref{chap:ledger} \\
+Api       & implemented & Ledger, Accounts & 1 & \ref{chap:api} \\
+Reporting & planned     & Ledger, Accounts & 2 & --- \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Seam contracts}
+
+The chunks at the boundaries between concepts, named so no one improvises an
+interface. In Stage 1 they are filled immediately by the concept chapters:
+
+\begin{description}
+  \item[\texttt{Accounts: header}] the account type and the balance-changing
+    operations every other concept is allowed to call.
+  \item[\texttt{Ledger: header}] the \texttt{Entry} type and
+    \texttt{ledger\_post}, the only door through which balances change in a
+    transaction.
+  \item[\texttt{Accounts: demo accounts} / \texttt{Ledger: demo posting}]
+    seed snippets each concept owns and Api composes into the walking
+    skeleton.
+\end{description}

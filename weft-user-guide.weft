@@ -55,6 +55,7 @@
 \small with contributions by Keith Harwood, Simon Wright,\\
 \small Marc W. Mengel, John D. Ramsdell, and Gregor Goldbach}
 \date{\sffamily March 5, 2026}
+\WEFTlstsetup
 \begin{document}
 \maketitle
 \tableofcontents

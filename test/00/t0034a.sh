@@ -100,16 +100,9 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsDefed}{Defines:}
 \newcommand{\WEFTsep}{${\diamond}$}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
-\newcommand{\WEFTbreakpenalty}{500}
-\newcommand{\WEFTsp}{\hskip\fontdimen2\font\relax}
-\newcommand{\WEFTbrk}{\discretionary{}{}{}}
-\newlength{\WEFTindent}\setlength{\WEFTindent}{1.5em}
-\newlength{\WEFThang}\setlength{\WEFThang}{2em}
 \newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
 \newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
-\newcommand{\WEFTcode}{\par\nobreak\vspace{-.5ex}\begingroup\ttfamily\small\parindent0pt\parskip0pt\raggedright\leftskip\WEFTindent\hangindent\WEFThang\hangafter1\relax\everypar{\hangindent\WEFThang\hangafter1\relax}}
-\newcommand{\WEFTendcode}{\par\endgroup}
-\newcommand{\WEFTeol}{\par\penalty\WEFTbreakpenalty\relax}
+\providecommand{\WEFTlstsetup}{\lstset{basicstyle=\ttfamily\small,breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true,showstringspaces=false,keywordstyle=\bfseries,commentstyle=\itshape,tabsize=8,xleftmargin=1.5em}}
 \newcommand{\WEFTuseHyperlinks}{}
 \documentclass{article}
 \usepackage{listings}
@@ -120,13 +113,15 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap1}
 \WEFTtarget{weft?}{} \verb@"test.c"@\nobreak\ {\footnotesize {?}}$\equiv$
-\WEFTcode
-\mbox{\strut}int\WEFTeol
-\mbox{\strut}main(\WEFTbrk int\WEFTsp argc,\WEFTbrk \WEFTsp char\WEFTsp **\WEFTsp argv)\WEFTbrk \WEFTeol
-\mbox{\strut}\{\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Body of main}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\}\WEFTeol
-\mbox{\strut}{\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
+int
+main(int argc, char ** argv)
+{
+   (*<\hbox{\normalfont $\langle\,${\itshape Body of main}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}>*)
+}
+
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -137,15 +132,17 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap2}
 \WEFTtarget{weft?}{} $\langle\,${\itshape Body of main}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}int\WEFTsp in;\WEFTbrk \WEFTeol
-\mbox{\strut}unsigned\WEFTsp char\WEFTsp out[\WEFTbrk 20]\WEFTbrk ;\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTeol
-\mbox{\strut}while\WEFTsp (\WEFTbrk scanf(\WEFTbrk "\%x",\WEFTbrk \WEFTsp \&in)\WEFTbrk \WEFTsp =\WEFTbrk =\WEFTbrk \WEFTsp 1)\WEFTbrk \WEFTeol
-\mbox{\strut}\{\WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp \hbox{$\langle\,${\itshape Do one item}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}\WEFTeol
-\mbox{\strut}\}\WEFTeol
-\mbox{\strut}return\WEFTsp 0;\WEFTbrk {\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+int in;
+unsigned char out[20];
+
+while (scanf("%x", &in) == 1)
+{
+   (*<\hbox{\normalfont $\langle\,${\itshape Do one item}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$}>*)
+}
+return 0;
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -157,12 +154,14 @@ cat > test.expected.tex <<"EOF"
 \WEFTbegin
 \label{scrap3}
 \WEFTtarget{weft?}{} $\langle\,${\itshape Do one item}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
-\WEFTcode
-\mbox{\strut}int\WEFTsp n\WEFTsp =\WEFTbrk \WEFTsp mangle(\WEFTbrk in,\WEFTbrk \WEFTsp out)\WEFTbrk ;\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTeol
-\mbox{\strut}for\WEFTsp (\WEFTbrk int\WEFTsp i\WEFTsp =\WEFTbrk \WEFTsp 0;\WEFTbrk \WEFTsp i\WEFTsp <\WEFTbrk \WEFTsp n;\WEFTbrk \WEFTsp i+\WEFTbrk +\WEFTbrk )\WEFTbrk \WEFTeol
-\mbox{\strut}\WEFTsp \WEFTsp \WEFTsp printf(\WEFTbrk "\%02x",\WEFTbrk \WEFTsp out[\WEFTbrk i]\WEFTbrk )\WEFTbrk ;\WEFTbrk \WEFTeol
-\mbox{\strut}printf(\WEFTbrk "\textbackslash{}n")\WEFTbrk ;\WEFTbrk {\WEFTsep}\WEFTendcode
+\begin{lstlisting}[escapeinside={(*<}{>*)}]
+int n = mangle(in, out);
+
+for (int i = 0; i < n; i++)
+   printf("%02x", out[i]);
+printf("\n");
+\end{lstlisting}
+{\WEFTsep}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}

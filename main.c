@@ -13,26 +13,26 @@ int main(int argc, char **argv)
   int arg = 1;
   /* Interpret command-line arguments */
   
-#line 197 "literate/main.weft"
-  /* {23: literate/main.weft:197} */
+#line 200 "literate/main.weft"
+  /* {23: literate/main.weft:200} */
 command_name = argv[0];
   /* {:23} */
 
-#line 203 "literate/main.weft"
-  /* {24: literate/main.weft:203} */
+#line 206 "literate/main.weft"
+  /* {24: literate/main.weft:206} */
 while (arg < argc) {
     char *s = argv[arg];
     if (*s++ == '-') {
       /* Check for long options */
       
-#line 230 "literate/main.weft"
-      /* {25: literate/main.weft:230} */
+#line 233 "literate/main.weft"
+      /* {25: literate/main.weft:233} */
 if (*s == '-') {
         if (strcmp(s + 1, "help") == 0) {
           /* Print help message */
           
-#line 278 "literate/main.weft"
-          /* {26: literate/main.weft:278} */
+#line 281 "literate/main.weft"
+          /* {26: literate/main.weft:281} */
 printf("weft %s -- A Literate Programming Tool\n\n", WEFT_VERSION);
           printf("USAGE\n");
           printf("  %s [options] file...\n\n", command_name);
@@ -88,7 +88,7 @@ printf("weft %s -- A Literate Programming Tool\n\n", WEFT_VERSION);
           printf("  LaTeX:\n");
           printf("    -r              Enable hyperref cross-reference links\n");
           printf("    -h options      Pass options to hyperref package\n");
-          printf("    -l              Use listings package for scrap formatting\n");
+          printf("    -l              Deprecated no-op (listings is always used)\n");
           printf("    -d              List dangling identifier references\n\n");
           printf("  General:\n");
           printf("    -V string       Set version string (expands @v in source)\n");
@@ -194,7 +194,7 @@ printf("weft %s -- A Literate Programming Tool\n\n", WEFT_VERSION);
           printf("    Reads section markers in the tangled output -- needs NO .weft files.\n");
           printf("    Fix errors in the .weft source, then re-tangle (step 4).\n");/* {:26} */
 
-#line 232 "literate/main.weft"
+#line 235 "literate/main.weft"
 
           exit(0);
         }
@@ -234,12 +234,12 @@ printf("weft %s -- A Literate Programming Tool\n\n", WEFT_VERSION);
         }
       }/* {:25} */
 
-#line 206 "literate/main.weft"
+#line 209 "literate/main.weft"
 
       /* Interpret the argument string \verb|s| */
       
-#line 447 "literate/main.weft"
-      /* {27: literate/main.weft:447} */
+#line 450 "literate/main.weft"
+      /* {27: literate/main.weft:450} */
 {
         char c = *s++;
         while (c) {
@@ -320,13 +320,13 @@ HasWeaveFormat:
 HasValue:;
       }/* {:27} */
 
-#line 207 "literate/main.weft"
+#line 210 "literate/main.weft"
 
       arg++;
       /* Perhaps get the prepend path */
       
-#line 529 "literate/main.weft"
-      /* {28: literate/main.weft:529} */
+#line 532 "literate/main.weft"
+      /* {28: literate/main.weft:532} */
 if (prepend_flag)
       {
         if (*s == '\0')
@@ -336,12 +336,12 @@ if (prepend_flag)
       }
       /* {:28} */
 
-#line 209 "literate/main.weft"
+#line 212 "literate/main.weft"
 
       /* Perhaps get the version info string */
       
-#line 557 "literate/main.weft"
-      /* {30: literate/main.weft:557} */
+#line 560 "literate/main.weft"
+      /* {30: literate/main.weft:560} */
 if (version_info_flag)
       {
          if (*s == '\0')
@@ -351,12 +351,12 @@ if (version_info_flag)
       }
       /* {:30} */
 
-#line 210 "literate/main.weft"
+#line 213 "literate/main.weft"
 
       /* Perhaps get the hyperref options */
       
-#line 567 "literate/main.weft"
-      /* {31: literate/main.weft:567} */
+#line 570 "literate/main.weft"
+      /* {31: literate/main.weft:570} */
 if (hyperopt_flag)
       {
         if (*s == '\0')
@@ -367,12 +367,12 @@ if (hyperopt_flag)
       }
       /* {:31} */
 
-#line 211 "literate/main.weft"
+#line 214 "literate/main.weft"
 
       /* Perhaps add an include path */
       
-#line 539 "literate/main.weft"
-      /* {29: literate/main.weft:539} */
+#line 542 "literate/main.weft"
+      /* {29: literate/main.weft:542} */
 if (includepath_flag)
       {
          struct incl * le
@@ -390,29 +390,29 @@ if (includepath_flag)
       }
       /* {:29} */
 
-#line 212 "literate/main.weft"
+#line 215 "literate/main.weft"
 
       /* Perhaps get the extract name */
       
-#line 578 "literate/main.weft"
-      /* {32: literate/main.weft:578} */
+#line 581 "literate/main.weft"
+      /* {32: literate/main.weft:581} */
 if (extract_flag) {
         extract_name = (*s != '\0') ? s : argv[arg++];
         extract_flag = FALSE;
       }/* {:32} */
 
-#line 213 "literate/main.weft"
+#line 216 "literate/main.weft"
 
       /* Perhaps get the reverse map argument */
       
-#line 584 "literate/main.weft"
-      /* {33: literate/main.weft:584} */
+#line 587 "literate/main.weft"
+      /* {33: literate/main.weft:587} */
 if (reverse_map_flag) {
         reverse_map_arg = (*s != '\0') ? s : argv[arg++];
         reverse_map_flag = FALSE;
       }/* {:33} */
 
-#line 214 "literate/main.weft"
+#line 217 "literate/main.weft"
 
     }
     else break;
@@ -422,8 +422,8 @@ if (reverse_map_flag) {
 
   /* Set locale information */
   
-#line 608 "literate/main.weft"
-/* {35: literate/main.weft:608} */
+#line 611 "literate/main.weft"
+/* {35: literate/main.weft:611} */
 
   {
     /* try to get locale information */
@@ -441,8 +441,8 @@ if (reverse_map_flag) {
 
   /* Handle reverse map mode */
   
-#line 593 "literate/main.weft"
-  /* {34: literate/main.weft:593} */
+#line 596 "literate/main.weft"
+  /* {34: literate/main.weft:596} */
 if (errors_flag) {
     write_error_annotator();
     exit(0);
@@ -457,8 +457,8 @@ if (errors_flag) {
   initialise_delimit_scrap_array();
   /* Process the remaining arguments (file names) */
   
-#line 627 "literate/main.weft"
-  /* {36: literate/main.weft:627} */
+#line 630 "literate/main.weft"
+  /* {36: literate/main.weft:630} */
 {
     if (arg >= argc) {
       fprintf(stderr, "%s: expected a file name.\n"
@@ -470,8 +470,8 @@ if (errors_flag) {
     do {
       /* Handle the file name in \verb|argv[arg]| */
       
-#line 651 "literate/main.weft"
-      /* {37: literate/main.weft:651} */
+#line 654 "literate/main.weft"
+      /* {37: literate/main.weft:654} */
 {
         char source_name[FILENAME_MAX];
         char tex_name[FILENAME_MAX];
@@ -480,8 +480,8 @@ if (errors_flag) {
         char *dot;
         /* Build \verb|source_name| and \verb|tex_name| */
         
-#line 675 "literate/main.weft"
-        /* {38: literate/main.weft:675} */
+#line 678 "literate/main.weft"
+        /* {38: literate/main.weft:678} */
 {
           char *p = argv[arg];
           char *q = source_name;
@@ -501,8 +501,8 @@ if (errors_flag) {
           }
           /* Add the source path to the include path list */
           
-#line 721 "literate/main.weft"
-          /* {39: literate/main.weft:721} */
+#line 724 "literate/main.weft"
+          /* {39: literate/main.weft:724} */
 if (trim != source_name) {
              struct incl * le
                 = (struct incl *)arena_getmem(sizeof(struct incl));
@@ -519,7 +519,7 @@ if (trim != source_name) {
           }
           /* {:39} */
 
-#line 692 "literate/main.weft"
+#line 695 "literate/main.weft"
 
           *q = '\0';
           if (!dot) {
@@ -543,12 +543,12 @@ if (trim != source_name) {
           }
         }/* {:38} */
 
-#line 657 "literate/main.weft"
+#line 660 "literate/main.weft"
 
         /* Process a file */
         
-#line 753 "literate/main.weft"
-        /* {40: literate/main.weft:753} */
+#line 756 "literate/main.weft"
+        /* {40: literate/main.weft:756} */
 {
           int do_weave = FALSE;
           int effective_format = 0;
@@ -618,11 +618,11 @@ if (trim != source_name) {
           arena_free();
         }/* {:40} */
 
-#line 658 "literate/main.weft"
+#line 661 "literate/main.weft"
 
       }/* {:37} */
 
-#line 636 "literate/main.weft"
+#line 639 "literate/main.weft"
 
       arg++;
     } while (arg < argc);

@@ -1,0 +1,39 @@
+\chapter{Api}\label{chap:api}
+
+The Api concept is the surface a person touches. For the walking skeleton it
+is a single \texttt{main} that tells the whole story: open the demo accounts,
+post the demo transaction, print the balances, and then --- the proof that the
+invariant is real --- try to post an \emph{unbalanced} transaction and show it
+is refused. Api depends on both other concepts; nothing depends on Api.
+
+\section{The walking skeleton}
+
+\texttt{main} composes the two seed snippets its neighbours own, then reports.
+After the balanced posting, \texttt{cash} holds \$100.00 and \texttt{revenue}
+holds \(-\)\$100.00; their sum is zero, which is the invariant made visible on
+the last line. The deliberately unbalanced transaction (a lone \$5.00 debit)
+must be rejected --- if it were ever accepted, the final sum would drift from
+zero and the program would say so.
+
+@d Api: main @{#include <stdio.h>
+#include "accounts.h"
+#include "ledger.h"
+
+int main(void) {
+    @<Accounts: demo accounts@>
+    @<Ledger: demo posting@>
+
+    printf("posted transaction: %s\n", rc == 0 ? "OK" : "REJECTED");
+    printf("  %-8s %8.2f\n", acc_name(cash),    acc_balance(cash)    / 100.0);
+    printf("  %-8s %8.2f\n", acc_name(revenue), acc_balance(revenue) / 100.0);
+
+    /* The invariant, demonstrated: an unbalanced transaction is refused. */
+    Entry bad[] = { { cash, +500 } };                 /* sums to 500, not zero */
+    printf("unbalanced transaction: %s\n",
+           ledger_post(bad, 1) == 0 ? "ACCEPTED (bug!)" : "REJECTED (correct)");
+
+    long total = acc_balance(cash) + acc_balance(revenue);
+    printf("sum of all balances: %ld cents (must be 0)\n", total);
+    return 0;
+}
+@}

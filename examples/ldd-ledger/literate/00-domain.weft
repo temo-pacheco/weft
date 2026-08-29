@@ -1,0 +1,36 @@
+\chapter{The domain: money that must always balance}
+
+A \emph{ledger} records movements of value between accounts. Its one
+inviolable law is \emph{double entry}: every transaction posts equal and
+opposite amounts, so the sum of all balances never changes. A system that
+can violate this law is not a ledger with a bug --- it is not a ledger.
+
+\section{The problem}
+
+We want the smallest honest core of a ledger: open accounts, post
+transactions between them, read balances --- with the double-entry invariant
+enforced \emph{at write time}, so an unbalanced transaction cannot be
+committed at all. Nightly reconciliation against a spreadsheet is exactly the
+failure mode we refuse: by the time a mismatch is found, wrong numbers have
+already been read and acted upon. The invariant belongs in the code that
+writes, not in a report that reads.
+
+\section{Vocabulary}
+
+Every term below becomes part of the system's language --- the \emph{domain}
+prefix of a chunk name, and an entry in the glossary. If a later chunk name
+uses a word, that word is defined here.
+
+\begin{description}
+  \item[Account] a named store of value. Its \textbf{balance} is an integer
+    number of \textbf{cents}; we never use floating point, because in a
+    ledger rounding is not cosmetic but a correctness failure.
+  \item[Posting] a single movement of a signed amount (in cents) into one
+    account. A positive amount is a debit to that account's balance, a
+    negative one a credit.
+  \item[Transaction] an ordered set of postings that \textbf{must sum to
+    zero}. This is double entry stated arithmetically.
+  \item[Invariant] the property the system guarantees at all times: the sum
+    of every account balance equals zero, because it started at zero and only
+    balanced transactions were ever applied.
+\end{description}

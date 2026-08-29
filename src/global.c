@@ -26,8 +26,8 @@
 
 /* Global variable definitions */
 
-#line 137 "literate/main.weft"
-/* {18: literate/main.weft:137} */
+#line 140 "literate/main.weft"
+/* {18: literate/main.weft:140} */
 int tex_flag = TRUE;
 int output_flag = TRUE;
 int compare_flag = TRUE;
@@ -66,13 +66,13 @@ int lint_flag = FALSE;
 int errors_flag = FALSE;
 /* {:18} */
 
-#line 181 "literate/main.weft"
-/* {20: literate/main.weft:181} */
+#line 184 "literate/main.weft"
+/* {20: literate/main.weft:184} */
 int nw_char='@';
 /* {:20} */
 
-#line 192 "literate/main.weft"
-/* {22: literate/main.weft:192} */
+#line 195 "literate/main.weft"
+/* {22: literate/main.weft:195} */
 char *command_name = NULL;
 /* {:22} */
 
@@ -87,37 +87,37 @@ unsigned char prev_sector = 1;
 char blockBuff[6400];
 /* {:69} */
 
-#line 452 "literate/latex-output.weft"
-/* {105: literate/latex-output.weft:452} */
+#line 486 "literate/latex-output.weft"
+/* {105: literate/latex-output.weft:486} */
 int extra_scraps = 0;
  /* {:105} */
 
 #line 24 "literate/source-io.weft"
-/* {238: literate/source-io.weft:24} */
+/* {241: literate/source-io.weft:24} */
 char *source_name = NULL;
 int source_line = 0;
-/* {:238} */
+/* {:241} */
 
 #line 165 "literate/scraps.weft"
-/* {266: literate/scraps.weft:165} */
+/* {269: literate/scraps.weft:165} */
 int already_warned = 0;
-/* {:266} */
+/* {:269} */
 
 #line 69 "literate/names.weft"
-/* {330: literate/names.weft:69} */
+/* {333: literate/names.weft:69} */
 Name *file_names = NULL;
 Name *macro_names = NULL;
 Name *user_names = NULL;
 int scrap_name_has_parameters;
 int scrap_ended_with;
 char pending_lang[64] = "";
-/* {:330} */
+/* {:333} */
 
 #line 173 "literate/architecture.weft"
 
 /* {:14} */
 
 #line 2 "literate/arena.weft"
-/* {420: literate/arena.weft:2} */
+/* {423: literate/arena.weft:2} */
 label_node * label_tab = NULL;
-/* {:420} */
+/* {:423} */
