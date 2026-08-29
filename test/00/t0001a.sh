@@ -59,37 +59,49 @@ EOF
 cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtarget}[2]{#2}
 \newcommand{\WEFTlink}[2]{#2}
-\newcommand{\WEFTtxtMacroDefBy}{Fragment defined by}
-\newcommand{\WEFTtxtMacroRefIn}{Fragment referenced in}
-\newcommand{\WEFTtxtMacroNoRef}{Fragment never referenced}
-\newcommand{\WEFTtxtDefBy}{Defined by}
-\newcommand{\WEFTtxtRefIn}{Referenced in}
-\newcommand{\WEFTtxtNoRef}{Not referenced}
-\newcommand{\WEFTtxtFileDefBy}{File defined by}
-\newcommand{\WEFTtxtIdentsUsed}{Uses:}
-\newcommand{\WEFTtxtIdentsNotUsed}{Never used}
-\newcommand{\WEFTtxtIdentsDefed}{Defines:}
-\newcommand{\WEFTsep}{${\diamond}$}
+\newcommand{\WEFTtxtMacroDefBy}{defined at}
+\newcommand{\WEFTtxtMacroRefIn}{used in}
+\newcommand{\WEFTtxtMacroNoRef}{unreferenced}
+\newcommand{\WEFTtxtDefBy}{defined at}
+\newcommand{\WEFTtxtRefIn}{used in}
+\newcommand{\WEFTtxtNoRef}{unreferenced}
+\newcommand{\WEFTtxtFileDefBy}{defined at}
+\newcommand{\WEFTtxtIdentsUsed}{uses}
+\newcommand{\WEFTtxtIdentsNotUsed}{never used}
+\newcommand{\WEFTtxtIdentsDefed}{defines}
+\newcommand{\WEFTsep}{}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
-\newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
+\newcommand{\WEFTtint}[1]{}
+\newcommand{\WEFTtintOn}[1]{\color{#1}}
+\newcommand{\WEFTlangle}{{\WEFTtint{weftcom}$\langle$}\,}
+\newcommand{\WEFTrangle}{\,{\WEFTtint{weftcom}$\rangle$}}
+\newcommand{\WEFTeq}{\ {\WEFTtint{weftcom}$\equiv$}}
+\newcommand{\WEFTpluseq}{\ {\WEFTtint{weftcom}$\mathord{+}\equiv$}}
+\newcommand{\WEFTdot}{\ {\WEFTtint{weftcom}\textperiodcentered}\ }
+\newcommand{\WEFTmetabegin}[1]{\par\vspace{3pt}\begingroup\footnotesize\WEFTtint{weftcom}#1}
+\newcommand{\WEFTmetaend}{\endgroup\par}
+\newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\raggedright}
 \newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
-\providecommand{\WEFTlstsetup}{\lstset{basicstyle=\ttfamily\small,breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true,showstringspaces=false,keywordstyle=\bfseries,commentstyle=\itshape,tabsize=8,xleftmargin=1.5em}}
+\providecommand{\WEFTlstsetup}{\lstset{basicstyle=\ttfamily\fontsize{10pt}{10.8pt}\selectfont,keywordstyle={\WEFTtint{weftkw}\bfseries},commentstyle={\WEFTtint{weftcom}\itshape},stringstyle={\WEFTtint{weftstr}},breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true,showstringspaces=false,tabsize=8,frame=none,xleftmargin=0pt,aboveskip=0pt,belowskip=0pt}}
 \newcommand{\WEFTuseHyperlinks}{}
+\AtBeginDocument{%
+\ifdefined\definecolor
+\definecolor{weftaccent}{rgb}{0.184,0.435,0.922}%
+\definecolor{weftkw}{rgb}{0.020,0.314,0.682}%
+\definecolor{weftstr}{rgb}{0.067,0.388,0.161}%
+\definecolor{weftcom}{rgb}{0.431,0.467,0.506}%
+\let\WEFTtint\WEFTtintOn
+\fi
+\ifdefined\lstset\WEFTlstsetup\fi
+}
 \WEFTbegin
 \label{scrap1}
-\WEFTtarget{weft?}{} $\langle\,${\itshape Test with parameter}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
+\WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Test with parameter}\nobreak\,{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 Try @1 parameter.
 
 \end{lstlisting}
-{\WEFTsep}
-\vspace{-1.5ex}
-\footnotesize
-\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item {\WEFTtxtMacroNoRef}.
-
-\item{}
-\end{list}
+\WEFTmetabegin{?}\WEFTdot {\WEFTtxtMacroNoRef}\WEFTmetaend
 \WEFTend
 EOF
 

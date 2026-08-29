@@ -90,119 +90,101 @@ EOF
 cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtarget}[2]{#2}
 \newcommand{\WEFTlink}[2]{#2}
-\newcommand{\WEFTtxtMacroDefBy}{Fragment defined by}
-\newcommand{\WEFTtxtMacroRefIn}{Fragment referenced in}
-\newcommand{\WEFTtxtMacroNoRef}{Fragment never referenced}
-\newcommand{\WEFTtxtDefBy}{Defined by}
-\newcommand{\WEFTtxtRefIn}{Referenced in}
-\newcommand{\WEFTtxtNoRef}{Not referenced}
-\newcommand{\WEFTtxtFileDefBy}{File defined by}
-\newcommand{\WEFTtxtIdentsUsed}{Uses:}
-\newcommand{\WEFTtxtIdentsNotUsed}{Never used}
-\newcommand{\WEFTtxtIdentsDefed}{Defines:}
-\newcommand{\WEFTsep}{${\diamond}$}
+\newcommand{\WEFTtxtMacroDefBy}{defined at}
+\newcommand{\WEFTtxtMacroRefIn}{used in}
+\newcommand{\WEFTtxtMacroNoRef}{unreferenced}
+\newcommand{\WEFTtxtDefBy}{defined at}
+\newcommand{\WEFTtxtRefIn}{used in}
+\newcommand{\WEFTtxtNoRef}{unreferenced}
+\newcommand{\WEFTtxtFileDefBy}{defined at}
+\newcommand{\WEFTtxtIdentsUsed}{uses}
+\newcommand{\WEFTtxtIdentsNotUsed}{never used}
+\newcommand{\WEFTtxtIdentsDefed}{defines}
+\newcommand{\WEFTsep}{}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
-\newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\small\raggedright}
+\newcommand{\WEFTtint}[1]{}
+\newcommand{\WEFTtintOn}[1]{\color{#1}}
+\newcommand{\WEFTlangle}{{\WEFTtint{weftcom}$\langle$}\,}
+\newcommand{\WEFTrangle}{\,{\WEFTtint{weftcom}$\rangle$}}
+\newcommand{\WEFTeq}{\ {\WEFTtint{weftcom}$\equiv$}}
+\newcommand{\WEFTpluseq}{\ {\WEFTtint{weftcom}$\mathord{+}\equiv$}}
+\newcommand{\WEFTdot}{\ {\WEFTtint{weftcom}\textperiodcentered}\ }
+\newcommand{\WEFTmetabegin}[1]{\par\vspace{3pt}\begingroup\footnotesize\WEFTtint{weftcom}#1}
+\newcommand{\WEFTmetaend}{\endgroup\par}
+\newcommand{\WEFTbegin}{\par\addvspace{2.3ex plus .6ex}\begingroup\raggedright}
 \newcommand{\WEFTend}{\par\endgroup\addvspace{2.3ex plus .6ex}}
-\providecommand{\WEFTlstsetup}{\lstset{basicstyle=\ttfamily\small,breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true,showstringspaces=false,keywordstyle=\bfseries,commentstyle=\itshape,tabsize=8,xleftmargin=1.5em}}
+\providecommand{\WEFTlstsetup}{\lstset{basicstyle=\ttfamily\fontsize{10pt}{10.8pt}\selectfont,keywordstyle={\WEFTtint{weftkw}\bfseries},commentstyle={\WEFTtint{weftcom}\itshape},stringstyle={\WEFTtint{weftstr}},breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true,showstringspaces=false,tabsize=8,frame=none,xleftmargin=0pt,aboveskip=0pt,belowskip=0pt}}
 \newcommand{\WEFTuseHyperlinks}{}
+\AtBeginDocument{%
+\ifdefined\definecolor
+\definecolor{weftaccent}{rgb}{0.184,0.435,0.922}%
+\definecolor{weftkw}{rgb}{0.020,0.314,0.682}%
+\definecolor{weftstr}{rgb}{0.067,0.388,0.161}%
+\definecolor{weftcom}{rgb}{0.431,0.467,0.506}%
+\let\WEFTtint\WEFTtintOn
+\fi
+\ifdefined\lstset\WEFTlstsetup\fi
+}
 \documentclass{article}
 \usepackage{listings}
 \begin{document}
 \WEFTbegin
 \label{scrap1}
-\WEFTtarget{weft1a}{} \verb@"test.c"@\nobreak\ {\footnotesize {1a}}$\equiv$
+\WEFTtarget{weft1a}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.c@}\nobreak\,{\footnotesize\WEFTtint{weftcom}1a}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
 Begin
 Define abc cba
-(*<\hbox{\normalfont $\langle\,${\itshape Outer abc and def retuO}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}, \ldots\ }$\,\rangle$}>*)
-(*<\hbox{\normalfont $\langle\,${\itshape Outer cba and fed retuO}\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}, \ldots\ }$\,\rangle$}>*)
+(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Outer abc and def retuO}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}, \ldots\ }\WEFTrangle}>*)
+(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Outer cba and fed retuO}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}, \ldots\ }\WEFTrangle}>*)
 End
 
 \end{lstlisting}
-{\WEFTsep}
-\vspace{-1.5ex}
-\footnotesize
-\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}.
-\item \WEFTtxtIdentsDefed\nobreak\  \verb@abc@\nobreak\ \WEFTlink{weft1b}{1b}, \verb@cba@\nobreak\ \WEFTlink{weft1b}{1b}.\item \WEFTtxtIdentsUsed\nobreak\  \verb@def@\nobreak\ \WEFTlink{weft1b}{1b}, \verb@fed@\nobreak\ \WEFTlink{weft1b}{1b}.
-\item{}
-\end{list}
+\WEFTmetabegin{1a}\WEFTdot \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTdot \WEFTtxtIdentsDefed\nobreak\  {\WEFTtint{weftkw}\verb@abc@}\nobreak\ \WEFTlink{weft1b}{1b}, {\WEFTtint{weftkw}\verb@cba@}\nobreak\ \WEFTlink{weft1b}{1b}\WEFTdot \WEFTtxtIdentsUsed\nobreak\  {\WEFTtint{weftkw}\verb@def@}\nobreak\ \WEFTlink{weft1b}{1b}, {\WEFTtint{weftkw}\verb@fed@}\nobreak\ \WEFTlink{weft1b}{1b}\WEFTmetaend
 \WEFTend
 \WEFTbegin
 \label{scrap2}
-\WEFTtarget{weft1b}{} $\langle\,${\itshape Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO}\nobreak\ {\footnotesize {1b}}$\,\rangle\equiv$
+\WEFTtarget{weft1b}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO}\nobreak\,{\footnotesize\WEFTtint{weftcom}1b}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 Start
 Define def fed
 Use abc cba
-(*<\hbox{\normalfont $\langle\,${\itshape Inner \hbox{\ttfamily xArg1yArg2z} rennI}\nobreak\ {\footnotesize \WEFTlink{weft1c}{1c}}$\,\rangle$}>*)
+(*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Inner \hbox{\ttfamily xArg1yArg2z} rennI}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1c}{1c}}\WEFTrangle}>*)
 Finish
 
 \end{lstlisting}
-{\WEFTsep}
-\vspace{-1.5ex}
-\footnotesize
-\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTtxtMacroDefBy\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1e}{e}.
-\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}.
-\item \WEFTtxtIdentsDefed\nobreak\  \verb@def@\nobreak\ \WEFTlink{weft1a}{1a}, \verb@fed@\nobreak\ \WEFTlink{weft1a}{1a}.\item \WEFTtxtIdentsUsed\nobreak\  \verb@abc@\nobreak\ \WEFTlink{weft1a}{1a}, \verb@cba@\nobreak\ \WEFTlink{weft1a}{1a}.
-\item{}
-\end{list}
+\WEFTmetabegin{1b}\WEFTdot \WEFTtxtMacroDefBy\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1e}{e}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTdot \WEFTtxtIdentsDefed\nobreak\  {\WEFTtint{weftkw}\verb@def@}\nobreak\ \WEFTlink{weft1a}{1a}, {\WEFTtint{weftkw}\verb@fed@}\nobreak\ \WEFTlink{weft1a}{1a}\WEFTdot \WEFTtxtIdentsUsed\nobreak\  {\WEFTtint{weftkw}\verb@abc@}\nobreak\ \WEFTlink{weft1a}{1a}, {\WEFTtint{weftkw}\verb@cba@}\nobreak\ \WEFTlink{weft1a}{1a}\WEFTmetaend
 \WEFTend
 \WEFTbegin
 \label{scrap4}
-\WEFTtarget{weft1c}{} $\langle\,${\itshape Inner \hbox{\slshape\sffamily Stuff\/} rennI}\nobreak\ {\footnotesize {1c}}$\,\rangle\equiv$
+\WEFTtarget{weft1c}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Inner \hbox{\slshape\sffamily Stuff\/} rennI}\nobreak\,{\footnotesize\WEFTtint{weftcom}1c}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 XX>>(*<\hbox{\slshape\sffamily Stuff\/}>*)<<YY
 \end{lstlisting}
-{\WEFTsep}
-\vspace{-1.5ex}
-\footnotesize
-\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1b}{1b}.
-
-\item{}
-\end{list}
+\WEFTmetabegin{1c}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft1b}{1b}\WEFTmetaend
 \WEFTend
 \WEFTbegin
 \label{scrap5}
-\WEFTtarget{weft1d}{} \verb@"test.c"@\nobreak\ {\footnotesize {1d}}$\equiv$
+\WEFTtarget{weft1d}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.c@}\nobreak\,{\footnotesize\WEFTtint{weftcom}1d}\WEFTrangle\WEFTpluseq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
 More stuff
 
 \end{lstlisting}
-{\WEFTsep}
-\vspace{-1.5ex}
-\footnotesize
-\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}.
-
-\item{}
-\end{list}
+\WEFTmetabegin{1d}\WEFTdot \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTmetaend
 \WEFTend
 \WEFTbegin
 \label{scrap6}
-\WEFTtarget{weft1e}{} $\langle\,${\itshape Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO}\nobreak\ {\footnotesize {1e}}$\,\rangle\equiv$
+\WEFTtarget{weft1e}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO}\nobreak\,{\footnotesize\WEFTtint{weftcom}1e}\WEFTrangle\WEFTpluseq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 Added stuff to force fragment defined
 cross-reference entry.
 
 \end{lstlisting}
-{\WEFTsep}
-\vspace{-1.5ex}
-\footnotesize
-\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \WEFTtxtMacroDefBy\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1e}{e}.
-\item \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}.
-
-\item{}
-\end{list}
+\WEFTmetabegin{1e}\WEFTdot \WEFTtxtMacroDefBy\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1e}{e}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTmetaend
 \WEFTend
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item $\langle\,$Inner \hbox{\slshape\sffamily Stuff\/} rennI\nobreak\ {\footnotesize \WEFTlink{weft1c}{1c}}$\,\rangle$ {\footnotesize {\WEFTtxtRefIn} \WEFTlink{weft1b}{1b}.}
-\item $\langle\,$Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO\nobreak\ {\footnotesize \WEFTlink{weft1b}{1b}\WEFTlink{weft1e}{e}}$\,\rangle$ {\footnotesize {\WEFTtxtRefIn} \WEFTlink{weft1a}{1a}.}
+\item \WEFTlangle{\WEFTtint{weftaccent}\itshape Inner \hbox{\slshape\sffamily Stuff\/} rennI}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1c}{1c}}\WEFTrangle\ {\footnotesize\WEFTtint{weftcom} {\WEFTtxtRefIn} \WEFTlink{weft1b}{1b}}
+\item \WEFTlangle{\WEFTtint{weftaccent}\itshape Outer \hbox{\slshape\sffamily Arg1\/} and \hbox{\slshape\sffamily Arg2\/} retuO}\nobreak\,{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}\WEFTlink{weft1e}{e}}\WEFTrangle\ {\footnotesize\WEFTtint{weftcom} {\WEFTtxtRefIn} \WEFTlink{weft1a}{1a}}
 \end{list}}
 
 \end{document}
