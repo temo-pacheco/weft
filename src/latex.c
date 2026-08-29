@@ -419,19 +419,36 @@ current_sector = 1;
 
                         break;
               case '<': {
-                           Parameters local_parameters = 0;
-                           int changed;
-                           char indent_chars[MAX_INDENT];
-                           Arglist *a;
-                           Name *name;
-                           Arglist * args;
-                           a = collect_scrap_name(0);
-                           name = a->name;
-                           args = instance(a->args, NULL, NULL, &changed);
-                           name->mark = TRUE;
-                           write_scraps(tex_file, tex_name, name->defs, 0, indent_chars, 0, 0, 1, 0, 0,
-                                 args, name->arg, local_parameters, tex_name);
-                           name->mark = FALSE;
+                           Arglist *a = collect_scrap_name(0);
+                           Name *name = a->name;
+                           char *p = name->spelling;
+                           int i = 0;
+                           fputs("\\WEFTlangle{\\WEFTtint{weftaccent}\\itshape ", tex_file);
+                           while (*p != '\000') {
+                             if (*p == ARG_CHR) {
+                               write_arg(tex_file, name->arg[i++]);
+                               p++;
+                             }
+                             else
+                               fputc(*p++, tex_file);
+                           }
+                           fputs("}\\nobreak\\,{\\footnotesize\\WEFTtint{weftcom}", tex_file);
+                           if (name->defs) {
+                             Scrap_Node *q = name->defs;
+                             fputs("\\WEFTlink{weft", tex_file);
+                             write_single_scrap_ref(tex_file, q->scrap);
+                             fputs("}{", tex_file);
+                             write_single_scrap_ref(tex_file, q->scrap);
+                             fputs("}", tex_file);
+                             if (q->next)
+                               fputs(", \\ldots\\ ", tex_file);
+                           }
+                           else {
+                             putc('?', tex_file);
+                             fprintf(stderr, "%s: never defined <%s>\n",
+                                     command_name, name->spelling);
+                           }
+                           fputs("}\\WEFTrangle", tex_file);
                            c = source_get();
                         }
                         
@@ -569,8 +586,8 @@ current_sector = 1;
 }
 /* {:85} */
 
-#line 467 "literate/latex-output.weft"
-/* {99: literate/latex-output.weft:467} */
+#line 497 "literate/latex-output.weft"
+/* {99: literate/latex-output.weft:497} */
 static void write_arg(FILE * tex_file, char * p)
 {
    fputs("\\hbox{\\slshape\\sffamily ", tex_file);
@@ -595,8 +612,8 @@ static void write_arg(FILE * tex_file, char * p)
 }
 /* {:99} */
 
-#line 676 "literate/latex-output.weft"
-/* {114: literate/latex-output.weft:676} */
+#line 706 "literate/latex-output.weft"
+/* {114: literate/latex-output.weft:706} */
 static void print_scrap_numbers(FILE *tex_file, Scrap_Node *scraps)
 {
   int page;
@@ -617,8 +634,8 @@ static void print_scrap_numbers(FILE *tex_file, Scrap_Node *scraps)
 }
 /* {:114} */
 
-#line 715 "literate/latex-output.weft"
-/* {115: literate/latex-output.weft:715} */
+#line 745 "literate/latex-output.weft"
+/* {115: literate/latex-output.weft:745} */
 static char *orig_delimit_scrap[3][5] = {
   /* {} mode (code): begin, end, insert nw_char, prefix, suffix.
      All empty: listings copies the body verbatim, one raw line per
@@ -633,8 +650,8 @@ static char *orig_delimit_scrap[3][5] = {
 static char *delimit_scrap[3][5];
 /* {:115} */
 
-#line 733 "literate/latex-output.weft"
-/* {116: literate/latex-output.weft:733} */
+#line 763 "literate/latex-output.weft"
+/* {116: literate/latex-output.weft:763} */
 void initialise_delimit_scrap_array(void) {
   int i,j;
   for(i = 0; i < 3; i++) {
@@ -648,8 +665,8 @@ void initialise_delimit_scrap_array(void) {
 }
 /* {:116} */
 
-#line 757 "literate/latex-output.weft"
-/* {117: literate/latex-output.weft:757} */
+#line 787 "literate/latex-output.weft"
+/* {117: literate/latex-output.weft:787} */
 static void latex_code_putc(FILE *file, int c)
 {
   switch (c) {
@@ -668,8 +685,8 @@ static void latex_code_putc(FILE *file, int c)
 }
 /* {:117} */
 
-#line 782 "literate/latex-output.weft"
-/* {118: literate/latex-output.weft:782} */
+#line 812 "literate/latex-output.weft"
+/* {118: literate/latex-output.weft:812} */
 static const char *latex_language(const char *lang)
 {
   static const struct { const char *tag, *lst; } map[] = {
@@ -709,13 +726,13 @@ static const char *latex_language(const char *lang)
 }
 /* {:118} */
 
-#line 826 "literate/latex-output.weft"
-/* {120: literate/latex-output.weft:826} */
+#line 856 "literate/latex-output.weft"
+/* {120: literate/latex-output.weft:856} */
 int scrap_type = 0;
 /* {:120} */
 
-#line 830 "literate/latex-output.weft"
-/* {121: literate/latex-output.weft:830} */
+#line 860 "literate/latex-output.weft"
+/* {121: literate/latex-output.weft:860} */
 static void write_literal(FILE * tex_file, char * p, int mode)
 {
    fputs(delimit_scrap[mode][0], tex_file);
@@ -732,8 +749,8 @@ static void write_literal(FILE * tex_file, char * p, int mode)
 }
 /* {:121} */
 
-#line 864 "literate/latex-output.weft"
-/* {122: literate/latex-output.weft:864} */
+#line 894 "literate/latex-output.weft"
+/* {122: literate/latex-output.weft:894} */
 int code_inline = FALSE;
 
 static void begin_tex_escape(FILE *file)  /* leave the verbatim body */
@@ -748,8 +765,8 @@ static void end_tex_escape(FILE *file)      /* re-enter the verbatim body */
 }
 /* {:122} */
 
-#line 879 "literate/latex-output.weft"
-/* {123: literate/latex-output.weft:879} */
+#line 909 "literate/latex-output.weft"
+/* {123: literate/latex-output.weft:909} */
 static void copy_scrap(FILE *file, int prefix, Name *name)
 {
   int indent = 0;
@@ -784,7 +801,7 @@ static void copy_scrap(FILE *file, int prefix, Name *name)
                      delta--;
                    }
                  }
-#line 905 "literate/latex-output.weft"
+#line 935 "literate/latex-output.weft"
 
                  break;
       default:
@@ -792,8 +809,8 @@ static void copy_scrap(FILE *file, int prefix, Name *name)
            {
              /* Check at-sequence for end-of-scrap */
              
-#line 978 "literate/latex-output.weft"
-             /* {128: literate/latex-output.weft:978} */
+#line 1008 "literate/latex-output.weft"
+             /* {128: literate/latex-output.weft:1008} */
 {
                c = source_get();
                switch (c) {
@@ -803,7 +820,7 @@ static void copy_scrap(FILE *file, int prefix, Name *name)
                              end_tex_escape(file);
                            }
                            
-#line 981 "literate/latex-output.weft"
+#line 1011 "literate/latex-output.weft"
 
                            break;
                  case 'x': {
@@ -816,12 +833,12 @@ static void copy_scrap(FILE *file, int prefix, Name *name)
                               
                               write_label(label_name, file);
                            }
-#line 983 "literate/latex-output.weft"
+#line 1013 "literate/latex-output.weft"
 
                            break;
                  case 'v': fputs(version_string, file);
                            
-#line 985 "literate/latex-output.weft"
+#line 1015 "literate/latex-output.weft"
 
                  case 's':
                            break;
@@ -836,7 +853,7 @@ static void copy_scrap(FILE *file, int prefix, Name *name)
                                c = source_get();
                              } while (c != '}' && c != ']' && c != ')' );
                            }
-#line 991 "literate/latex-output.weft"
+#line 1021 "literate/latex-output.weft"
 
                            FALLTHROUGH;
                  case ',':
@@ -935,7 +952,7 @@ static void copy_scrap(FILE *file, int prefix, Name *name)
                                 fputs("}", file);
                              end_tex_escape(file);
                            }
-#line 998 "literate/latex-output.weft"
+#line 1028 "literate/latex-output.weft"
 
                            break;
                  case '%': {
@@ -943,7 +960,7 @@ static void copy_scrap(FILE *file, int prefix, Name *name)
                                            c = source_get();
                                    while (c != '\n');
                            }
-#line 1000 "literate/latex-output.weft"
+#line 1030 "literate/latex-output.weft"
 
                            break;
                  case '_': {
@@ -958,7 +975,7 @@ static void copy_scrap(FILE *file, int prefix, Name *name)
                              fprintf(file, "}");
                              end_tex_escape(file);
                            }
-#line 1002 "literate/latex-output.weft"
+#line 1032 "literate/latex-output.weft"
 
                            break;
                  case 't': {
@@ -966,7 +983,7 @@ static void copy_scrap(FILE *file, int prefix, Name *name)
                              fprintf(file, "\\hbox{\\sffamily\\slshape fragment title}");
                              end_tex_escape(file);
                            }
-#line 1004 "literate/latex-output.weft"
+#line 1034 "literate/latex-output.weft"
 
                            break;
                  case 'f': {
@@ -974,7 +991,7 @@ static void copy_scrap(FILE *file, int prefix, Name *name)
                              fprintf(file, "\\hbox{\\sffamily\\slshape file name}");
                              end_tex_escape(file);
                            }
-#line 1006 "literate/latex-output.weft"
+#line 1036 "literate/latex-output.weft"
 
                            break;
                  case '1': case '2': case '3':
@@ -1002,7 +1019,7 @@ static void copy_scrap(FILE *file, int prefix, Name *name)
                }
              }/* {:128} */
 
-#line 910 "literate/latex-output.weft"
+#line 940 "literate/latex-output.weft"
 
              break;
            }
@@ -1011,8 +1028,8 @@ static void copy_scrap(FILE *file, int prefix, Name *name)
          else {
            /* Note a delimiter collision */
            
-#line 963 "literate/latex-output.weft"
-           /* {127: literate/latex-output.weft:963} */
+#line 993 "literate/latex-output.weft"
+           /* {127: literate/latex-output.weft:993} */
 if (scrap_type == 0) {
              if ((coll_h2 == '(' && coll_h1 == '*' && c == '<') ||
                  (coll_h2 == '>' && coll_h1 == '*' && c == ')')) {
@@ -1027,7 +1044,7 @@ if (scrap_type == 0) {
              coll_h1 = c;
            }/* {:127} */
 
-#line 916 "literate/latex-output.weft"
+#line 946 "literate/latex-output.weft"
 
            putc(c, file);
          }
@@ -1039,8 +1056,8 @@ if (scrap_type == 0) {
 }
 /* {:123} */
 
-#line 931 "literate/latex-output.weft"
-/* {124: literate/latex-output.weft:931} */
+#line 961 "literate/latex-output.weft"
+/* {124: literate/latex-output.weft:961} */
 void update_delimit_scrap(void)
 {
   /* Every mode's "insert nw_char" string is the single character that
@@ -1052,8 +1069,8 @@ void update_delimit_scrap(void)
 }
 /* {:124} */
 
-#line 1185 "literate/latex-output.weft"
-/* {140: literate/latex-output.weft:1185} */
+#line 1215 "literate/latex-output.weft"
+/* {140: literate/latex-output.weft:1215} */
 static void
 write_ArglistElement(FILE * file, Arglist * args, char ** params)
 {
@@ -1071,8 +1088,8 @@ write_ArglistElement(FILE * file, Arglist * args, char ** params)
   } else if (name == (Name *)1) {
     /* Emit a quoted scrap argument inline */
     
-#line 1160 "literate/latex-output.weft"
-    /* {139: literate/latex-output.weft:1160} */
+#line 1190 "literate/latex-output.weft"
+    /* {139: literate/latex-output.weft:1190} */
 {
       Scrap_Node * qq = (Scrap_Node *)q;
       char *buf = NULL;
@@ -1097,7 +1114,7 @@ write_ArglistElement(FILE * file, Arglist * args, char ** params)
       qq->quoted = FALSE;
     }/* {:139} */
 
-#line 1200 "literate/latex-output.weft"
+#line 1230 "literate/latex-output.weft"
 
   } else {
     char * p = name->spelling;
@@ -1156,15 +1173,15 @@ write_ArglistElement(FILE * file, Arglist * args, char ** params)
          }
       /* {:82} */
 
-#line 1217 "literate/latex-output.weft"
+#line 1247 "literate/latex-output.weft"
 
     }
     fprintf(file, "{\\footnotesize ");
     if (name->defs)
       /* Write abbreviated definition list */
       
-#line 1136 "literate/latex-output.weft"
-      /* {138: literate/latex-output.weft:1136} */
+#line 1166 "literate/latex-output.weft"
+      /* {138: literate/latex-output.weft:1166} */
 {
         Scrap_Node *p = name->defs;
         fputs("\\WEFTlink{weft", file);
@@ -1177,7 +1194,7 @@ write_ArglistElement(FILE * file, Arglist * args, char ** params)
           fputs(", \\ldots\\ ", file);
       }/* {:138} */
 
-#line 1221 "literate/latex-output.weft"
+#line 1251 "literate/latex-output.weft"
 
     else {
       putc('?', file);
@@ -1189,23 +1206,23 @@ write_ArglistElement(FILE * file, Arglist * args, char ** params)
 }
 /* {:140} */
 
-#line 1258 "literate/latex-output.weft"
-/* {142: literate/latex-output.weft:1258} */
+#line 1288 "literate/latex-output.weft"
+/* {142: literate/latex-output.weft:1288} */
 static void format_file_entry(Name *name, FILE *tex_file)
 {
   while (name) {
     format_file_entry(name->llink, tex_file);
     /* Format a file index entry */
     
-#line 1269 "literate/latex-output.weft"
-    /* {143: literate/latex-output.weft:1269} */
+#line 1299 "literate/latex-output.weft"
+    /* {143: literate/latex-output.weft:1299} */
 fputs("\\item ", tex_file);
     fprintf(tex_file, "{\\WEFTtint{weftaccent}\\verb%c%s%c}\\ ",
             nw_char, name->spelling, nw_char);
     /* Write file's defining scrap numbers */
 
-#line 1276 "literate/latex-output.weft"
-    /* {144: literate/latex-output.weft:1276} */
+#line 1306 "literate/latex-output.weft"
+    /* {144: literate/latex-output.weft:1306} */
     {
       Scrap_Node *p = name->defs;
       fputs("{\\footnotesize\\WEFTtint{weftcom} {\\WEFTtxtDefBy}", tex_file);
@@ -1223,19 +1240,19 @@ fputs("\\item ", tex_file);
       putc('}', tex_file);
     }/* {:144} */
 
-#line 1272 "literate/latex-output.weft"
+#line 1302 "literate/latex-output.weft"
 
     putc('\n', tex_file);/* {:143} */
 
-#line 1262 "literate/latex-output.weft"
+#line 1292 "literate/latex-output.weft"
 
     name = name->rlink;
   }
 }
 /* {:142} */
 
-#line 1315 "literate/latex-output.weft"
-/* {146: literate/latex-output.weft:1315} */
+#line 1345 "literate/latex-output.weft"
+/* {146: literate/latex-output.weft:1345} */
 static int load_entry(Name * name, Name ** nms, int n)
 {
    while (name) {
@@ -1247,8 +1264,8 @@ static int load_entry(Name * name, Name ** nms, int n)
 }
 /* {:146} */
 
-#line 1327 "literate/latex-output.weft"
-/* {147: literate/latex-output.weft:1327} */
+#line 1357 "literate/latex-output.weft"
+/* {147: literate/latex-output.weft:1357} */
 static void format_entry(Name *name, FILE *tex_file, unsigned char sector)
 {
   Name ** nms = malloc(num_scraps()*sizeof(Name *));
@@ -1257,8 +1274,8 @@ static void format_entry(Name *name, FILE *tex_file, unsigned char sector)
 
   /* Sort 'nms' of size 'n' for <Rob's ordering> */
   
-#line 1347 "literate/latex-output.weft"
-  /* {149: literate/latex-output.weft:1347} */
+#line 1377 "literate/latex-output.weft"
+  /* {149: literate/latex-output.weft:1377} */
 int j;
   for (j = 1; j < n; j++)
   {
@@ -1270,8 +1287,8 @@ int j;
         Name * ki = nms[i];
 
         if (
-#line 1344 "literate/latex-output.weft"
-            /* {148: literate/latex-output.weft:1344} */
+#line 1374 "literate/latex-output.weft"
+            /* {148: literate/latex-output.weft:1374} */
 robs_strcmp(ki->spelling, kj->spelling) < 0/* {:148} */
 )
            break;
@@ -1282,7 +1299,7 @@ robs_strcmp(ki->spelling, kj->spelling) < 0/* {:148} */
   }
   /* {:149} */
 
-#line 1333 "literate/latex-output.weft"
+#line 1363 "literate/latex-output.weft"
 
   for (i = 0; i < n; i++)
   {
@@ -1290,15 +1307,15 @@ robs_strcmp(ki->spelling, kj->spelling) < 0/* {:148} */
 
      /* Format an index entry */
      
-#line 1367 "literate/latex-output.weft"
-     /* {150: literate/latex-output.weft:1367} */
+#line 1397 "literate/latex-output.weft"
+     /* {150: literate/latex-output.weft:1397} */
 if (name->sector == sector){
        fputs("\\item ", tex_file);
        fputs("\\WEFTlangle{\\WEFTtint{weftaccent}\\itshape ", tex_file);
        /* Write the macro's name */
        
-#line 452 "literate/latex-output.weft"
-       /* {98: literate/latex-output.weft:452} */
+#line 482 "literate/latex-output.weft"
+       /* {98: literate/latex-output.weft:482} */
 {
          char * p = name->spelling;
          int i = 0;
@@ -1313,13 +1330,13 @@ if (name->sector == sector){
          }
        }/* {:98} */
 
-#line 1370 "literate/latex-output.weft"
+#line 1400 "literate/latex-output.weft"
 
        fputs("}\\nobreak\\,{\\footnotesize\\WEFTtint{weftcom}", tex_file);
        /* Write defining scrap numbers */
        
-#line 1379 "literate/latex-output.weft"
-       /* {151: literate/latex-output.weft:1379} */
+#line 1409 "literate/latex-output.weft"
+       /* {151: literate/latex-output.weft:1409} */
 {
          Scrap_Node *p = name->defs;
          if (p) {
@@ -1343,13 +1360,13 @@ if (name->sector == sector){
            putc('?', tex_file);
        }/* {:151} */
 
-#line 1372 "literate/latex-output.weft"
+#line 1402 "literate/latex-output.weft"
 
        fputs("}\\WEFTrangle\\ ", tex_file);
        /* Write referencing scrap numbers */
        
-#line 1403 "literate/latex-output.weft"
-       /* {152: literate/latex-output.weft:1403} */
+#line 1433 "literate/latex-output.weft"
+       /* {152: literate/latex-output.weft:1433} */
 {
          Scrap_Node *p = name->uses;
          fputs("{\\footnotesize\\WEFTtint{weftcom} ", tex_file);
@@ -1372,19 +1389,19 @@ if (name->sector == sector){
          putc('}', tex_file);
        }/* {:152} */
 
-#line 1374 "literate/latex-output.weft"
+#line 1404 "literate/latex-output.weft"
 
        putc('\n', tex_file);
      }/* {:150} */
 
-#line 1338 "literate/latex-output.weft"
+#line 1368 "literate/latex-output.weft"
 
   }
 }
 /* {:147} */
 
-#line 1430 "literate/latex-output.weft"
-/* {154: literate/latex-output.weft:1430} */
+#line 1460 "literate/latex-output.weft"
+/* {154: literate/latex-output.weft:1460} */
 int has_sector(Name * name, unsigned char sector)
 {
   while(name) {
@@ -1398,16 +1415,16 @@ int has_sector(Name * name, unsigned char sector)
 }
 /* {:154} */
 
-#line 1462 "literate/latex-output.weft"
-/* {156: literate/latex-output.weft:1462} */
+#line 1492 "literate/latex-output.weft"
+/* {156: literate/latex-output.weft:1492} */
 static void format_user_entry(Name *name, FILE *tex_file, unsigned char sector)
 {
   while (name) {
     format_user_entry(name->llink, tex_file, sector);
     /* Format a user index entry */
     
-#line 1474 "literate/latex-output.weft"
-    /* {157: literate/latex-output.weft:1474} */
+#line 1504 "literate/latex-output.weft"
+    /* {157: literate/latex-output.weft:1504} */
 if (name->sector == sector){
       Scrap_Node *uses = name->uses;
       if ( uses || dangling_flag ) {
@@ -1476,7 +1493,7 @@ if (name->sector == sector){
       }
     }/* {:157} */
 
-#line 1466 "literate/latex-output.weft"
+#line 1496 "literate/latex-output.weft"
 
     name = name->rlink;
   }

@@ -313,21 +313,51 @@ an eye peeled for \verb|@@|~characters, which signal a command sequence.
 c = source_get();
 @}
 
+A fragment reference \verb|@@<name@@>| written in the \emph{documentation}
+text (outside any scrap) is a \emph{cross-reference}, not an inclusion.
+weft renders it exactly like a reference in the middle of code --- the
+grey \(\langle\ \rangle\) brackets, the accent-tinted name, and a link to
+the fragment's first defining scrap --- only without the \verb|listings|
+escape, since prose is already ordinary \LaTeX\ text.  This is a
+deliberate change from the old nuweb behaviour, which \emph{expanded} the
+fragment's whole body inline into the prose: a chunk name mentioned in a
+sentence would dump code into the middle of it.  Referencing, not
+expanding, is what a literate narrative wants (``as we saw in
+\hbox{\tt @@<Say hello@@>}'').  To show a fragment's \emph{code} in the
+prose, define and reference it as a scrap in the usual way.
+
 @d Expand macro into @'file@'
 @{{
-   Parameters local_parameters = 0;
-   int changed;
-   char indent_chars[MAX_INDENT];
-   Arglist *a;
-   Name *name;
-   Arglist * args;
-   a = collect_scrap_name(0);
-   name = a->name;
-   args = instance(a->args, NULL, NULL, &changed);
-   name->mark = TRUE;
-   write_scraps(@1, tex_name, name->defs, 0, indent_chars, 0, 0, 1, 0, 0,
-         args, name->arg, local_parameters, tex_name);
-   name->mark = FALSE;
+   Arglist *a = collect_scrap_name(0);
+   Name *name = a->name;
+   char *p = name->spelling;
+   int i = 0;
+   fputs("\\WEFTlangle{\\WEFTtint{weftaccent}\\itshape ", @1);
+   while (*p != '\000') {
+     if (*p == ARG_CHR) {
+       write_arg(@1, name->arg[i++]);
+       p++;
+     }
+     else
+       fputc(*p++, @1);
+   }
+   fputs("}\\nobreak\\,{\\footnotesize\\WEFTtint{weftcom}", @1);
+   if (name->defs) {
+     Scrap_Node *q = name->defs;
+     fputs("\\WEFTlink{weft", @1);
+     write_single_scrap_ref(@1, q->scrap);
+     fputs("}{", @1);
+     write_single_scrap_ref(@1, q->scrap);
+     fputs("}", @1);
+     if (q->next)
+       fputs(", \\ldots\\ ", @1);
+   }
+   else {
+     putc('?', @1);
+     fprintf(stderr, "%s: never defined <%s>\n",
+             command_name, name->spelling);
+   }
+   fputs("}\\WEFTrangle", @1);
    c = source_get();
 }
 @}

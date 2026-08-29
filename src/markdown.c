@@ -799,8 +799,8 @@ static void md_format_entry(Name *name, FILE *md_file, unsigned char sector)
 
   /* Sort 'nms' of size 'n' for <Rob's ordering> */
   
-#line 1347 "literate/latex-output.weft"
-  /* {149: literate/latex-output.weft:1347} */
+#line 1377 "literate/latex-output.weft"
+  /* {149: literate/latex-output.weft:1377} */
 int j;
   for (j = 1; j < n; j++)
   {
@@ -812,8 +812,8 @@ int j;
         Name * ki = nms[i];
 
         if (
-#line 1344 "literate/latex-output.weft"
-            /* {148: literate/latex-output.weft:1344} */
+#line 1374 "literate/latex-output.weft"
+            /* {148: literate/latex-output.weft:1374} */
 robs_strcmp(ki->spelling, kj->spelling) < 0/* {:148} */
 )
            break;
