@@ -5,14 +5,14 @@
 /* {:7} */
 
 #line 21 "literate/parser.weft"
-/* {43: literate/parser.weft:21} */
+/* {44: literate/parser.weft:21} */
 static char prose_buf[4096];
 static int prose_len = 0;
 static char *pending_prose = NULL;
-/* {:43} */
+/* {:44} */
 
 #line 27 "literate/parser.weft"
-/* {44: literate/parser.weft:27} */
+/* {45: literate/parser.weft:27} */
 void pass1(char *file_name)
 {
   if (verbose_flag)
@@ -27,7 +27,7 @@ void pass1(char *file_name)
   /* Scan the source file, looking for at-sequences */
   
 #line 49 "literate/parser.weft"
-  /* {45: literate/parser.weft:49} */
+  /* {46: literate/parser.weft:49} */
 {
     int c = source_get();
     while (c != EOF) {
@@ -35,7 +35,7 @@ void pass1(char *file_name)
         /* Scan at-sequence */
         
 #line 148 "literate/parser.weft"
-        /* {52: literate/parser.weft:148} */
+        /* {53: literate/parser.weft:148} */
 {
           char quoted = 0;
 
@@ -117,12 +117,12 @@ void pass1(char *file_name)
                       /* Step to next sector */
                       
 #line 202 "literate/parser.weft"
-/* {53: literate/parser.weft:202} */
+/* {54: literate/parser.weft:202} */
 
                       prev_sector += 1;
                       current_sector = prev_sector;
                       c = source_get();
-                      /* {:53} */
+                      /* {:54} */
 
 #line 168 "literate/parser.weft"
 
@@ -131,10 +131,10 @@ void pass1(char *file_name)
                       /* Close the current sector */
                       
 #line 209 "literate/parser.weft"
-                      /* {54: literate/parser.weft:209} */
+                      /* {55: literate/parser.weft:209} */
 current_sector = 1;
                       c = source_get();
-                      /* {:54} */
+                      /* {:55} */
 
 #line 171 "literate/parser.weft"
 
@@ -309,7 +309,7 @@ current_sector = 1;
                               command_name, nw_char, source_name, source_line);
                       break;
           }
-        }/* {:52} */
+        }/* {:53} */
 
 #line 53 "literate/parser.weft"
 
@@ -317,17 +317,17 @@ current_sector = 1;
         /* Accumulate prose character */
         
 #line 62 "literate/parser.weft"
-        /* {46: literate/parser.weft:62} */
+        /* {47: literate/parser.weft:62} */
 if (prose_len < (int)sizeof(prose_buf) - 1)
           prose_buf[prose_len++] = c;
-        /* {:46} */
+        /* {:47} */
 
 #line 55 "literate/parser.weft"
 
       }
       c = source_get();
     }
-  }/* {:45} */
+  }/* {:46} */
 
 #line 38 "literate/parser.weft"
 
@@ -336,14 +336,14 @@ if (prose_len < (int)sizeof(prose_buf) - 1)
   /* Reverse cross-reference lists */
   
 #line 522 "literate/parser.weft"
-  /* {78: literate/parser.weft:522} */
+  /* {79: literate/parser.weft:522} */
 {
     reverse_lists(file_names);
     reverse_lists(macro_names);
     reverse_lists(user_names);
-  }/* {:78} */
+  }/* {:79} */
 
 #line 41 "literate/parser.weft"
 
 }
-/* {:44} */
+/* {:45} */

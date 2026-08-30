@@ -225,6 +225,7 @@ work supported by ARPA, through ONR grant N00014-91-J-1989.}
 @i literate/parser.weft
 @i literate/latex-output.weft
 @i literate/markdown-output.weft
+@i literate/html-output.weft
 @i literate/map-output.weft
 @i literate/output-files.weft
 @i literate/source-io.weft

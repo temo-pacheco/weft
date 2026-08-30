@@ -1,27 +1,27 @@
 
-#line 146 "literate/architecture.weft"
-/* {11: literate/architecture.weft:146} */
+#line 153 "literate/architecture.weft"
+/* {12: literate/architecture.weft:153} */
 #include "global.h"
-/* {:11} */
+/* {:12} */
 
 #line 32 "literate/source-io.weft"
-/* {245: literate/source-io.weft:32} */
+/* {267: literate/source-io.weft:32} */
 static FILE *source_file;  /* the current input file */
 static int double_at;
 static int include_depth;
-/* {:245} */
+/* {:267} */
 
 #line 39 "literate/source-io.weft"
-/* {246: literate/source-io.weft:39} */
+/* {268: literate/source-io.weft:39} */
 static struct {
   FILE *file;
   char *name;
   int line;
 } stack[10];
-/* {:246} */
+/* {:268} */
 
 #line 56 "literate/source-io.weft"
-/* {247: literate/source-io.weft:56} */
+/* {269: literate/source-io.weft:56} */
 
 int source_peek;
 int source_last;
@@ -50,7 +50,7 @@ int source_get(void)
                /* Handle an ``at'' character */
                
 #line 104 "literate/source-io.weft"
-               /* {250: literate/source-io.weft:104} */
+               /* {272: literate/source-io.weft:104} */
 {
                  c = getc(source_file);
                  if (double_at) {
@@ -143,7 +143,7 @@ int source_get(void)
                                     command_name, nw_char, c, c, source_name, source_line);
                             exit(-1);
                    }
-               }/* {:250} */
+               }/* {:272} */
 
 #line 71 "literate/source-io.weft"
 
@@ -153,10 +153,10 @@ int source_get(void)
                return c;
   }
 }
-/* {:247} */
+/* {:269} */
 
 #line 88 "literate/source-io.weft"
-/* {249: literate/source-io.weft:88} */
+/* {271: literate/source-io.weft:88} */
 void source_ungetc(int *c)
 {
   ungetc(source_peek, source_file);
@@ -164,10 +164,10 @@ void source_ungetc(int *c)
     source_line--;
   source_peek=*c;
 }
-/* {:249} */
+/* {:271} */
 
 #line 227 "literate/source-io.weft"
-/* {254: literate/source-io.weft:227} */
+/* {276: literate/source-io.weft:227} */
 void source_open(char *name)
 {
   source_file = fopen(name, "r");
@@ -182,4 +182,4 @@ void source_open(char *name)
   double_at = FALSE;
   include_depth = 0;
 }
-/* {:254} */
+/* {:276} */

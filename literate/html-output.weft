@@ -1,0 +1,370 @@
+\section{Writing the HTML File} \label{html-file}
+
+This section implements the native HTML weave, activated by \verb|-w html|
+(or \verb|@@W html|). It produces a complete, self-contained
+\verb|.html| document --- doctype, an embedded style sheet, and body ---
+so a literate web becomes a browsable page with clickable cross-references
+and no external tooling.
+
+It is a close sibling of the Markdown weave (Section~\ref{markdown-file}):
+the two share the parts that are already HTML --- scrap bodies, inline
+fragment references, and the \verb|<a href="#weftN">| cross-reference
+links --- through the reused \verb|md_copy_scrap| and
+\verb|md_print_scrap_numbers|. What this file adds is the document
+wrapper, the HTML scrap headers (with the \(\equiv\)/\(+\!\equiv\)
+markers), the one-line metadata footers, and the indices. The prose is
+copied verbatim: an HTML weave expects HTML prose, just as the \LaTeX\
+weave expects \LaTeX\ and the Markdown weave expects Markdown.
+
+@d Function...
+@{extern void write_html(char *file_name, char *html_name, unsigned char sector);
+@}
+
+\subsection{HTML escaping helpers}
+
+A handful of small helpers escape the three HTML-special characters and
+render a fragment name (expanding embedded parameters to their default
+arguments) and a linked fragment reference.
+
+@o html.c
+@{static void html_esc(FILE *f, int c)
+{
+  if (c == '<') fputs("&lt;", f);
+  else if (c == '>') fputs("&gt;", f);
+  else if (c == '&') fputs("&amp;", f);
+  else putc(c, f);
+}
+
+static void html_puts(FILE *f, const char *s)
+{
+  while (s && *s)
+    html_esc(f, (unsigned char)*s++);
+}
+
+static void html_emit_name(FILE *f, Name *name)
+{
+  char *p = name->spelling;
+  int i = 0;
+  while (*p != '\0') {
+    if (*p == ARG_CHR) { html_puts(f, name->arg[i++]); p++; }
+    else html_esc(f, (unsigned char)*p++);
+  }
+}
+
+static void html_ref(FILE *f, Name *name)
+{
+  fputs("&lt;<a href=\"#weft", f);
+  if (name->defs) write_single_scrap_ref(f, name->defs->scrap);
+  else putc('?', f);
+  fputs("\"><i>", f);
+  html_emit_name(f, name);
+  fputs("</i> ", f);
+  if (name->defs) {
+    write_single_scrap_ref(f, name->defs->scrap);
+    if (name->defs->next) fputs(", ...", f);
+  } else putc('?', f);
+  fputs("</a>&gt;", f);
+}
+@| html_esc html_puts html_emit_name html_ref @}
+
+\subsection{The driver}
+
+@o html.c
+@{static void html_format_file_entry(Name *name, FILE *f);
+static void html_format_entry(Name *name, FILE *f, unsigned char sector);
+static void html_format_user_entry(Name *name, FILE *f, unsigned char sector);
+
+void write_html(char *file_name, char *html_name, unsigned char sector)
+{
+  (void)sector;
+  FILE *html_file = fopen(html_name, "w");
+  if (html_file) {
+    if (verbose_flag)
+      fprintf(stderr, "writing %s\n", html_name);
+    @<Write the HTML document head@>
+    source_open(file_name);
+    @<Copy source into html_file@>
+    @<Write the HTML document tail@>
+    fclose(html_file);
+  }
+  else
+    fprintf(stderr, "%s: can't open %s\n", command_name, html_name);
+}
+@| write_html @}
+
+The document skeleton carries an embedded style sheet so the page needs
+no external files. The look mirrors the modern \LaTeX\ weave: grey
+angle-bracketed fragment names in an accent colour, soft code blocks,
+accent links, and a small grey metadata line --- and it adapts to the
+reader's light or dark theme.
+
+@d Write the HTML document head
+@{fputs(
+"<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n"
+"<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n"
+"<title>weft</title>\n<style>\n"
+":root{--acc:#2f6feb;--kw:#0550ae;--com:#6e7781;--bg:#f6f8fa;--rule:#d0d7de}\n"
+"body{max-width:820px;margin:2rem auto;padding:0 1.2rem;color:#1f2328;\n"
+" font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}\n"
+"h1,h2,h3{font-weight:700;line-height:1.25;margin:1.8rem 0 .6rem}\n"
+"a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}\n"
+".weft-name{margin:1.4rem 0 .1rem;font-size:1.02rem}\n"
+".weft-name .b{color:var(--com)} .weft-name i{color:var(--acc);font-style:italic}\n"
+".weft-name .f{color:var(--acc);font-family:ui-monospace,Menlo,Consolas,monospace}\n"
+".weft-name .n{color:var(--com);font-size:.85em} .weft-name .eq{color:var(--com)}\n"
+"pre{background:var(--bg);border:1px solid var(--rule);border-radius:8px;\n"
+" padding:.8rem 1rem;overflow:auto;margin:.2rem 0}\n"
+"pre code{font:0.86em/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}\n"
+"pre code i{color:var(--acc);font-style:italic} pre code a{color:var(--acc)}\n"
+".weft-meta{color:var(--com);font-size:.82rem;margin:.15rem 0 .6rem}\n"
+".weft-meta a{color:var(--acc)} .weft-meta code{color:var(--kw)}\n"
+"code{background:var(--bg);padding:.1em .35em;border-radius:5px;\n"
+" font:0.9em ui-monospace,Menlo,Consolas,monospace}\n"
+"@@media(prefers-color-scheme:dark){body{background:#0d1117;color:#e6edf3}\n"
+" :root{--bg:#161b22;--rule:#30363d;--com:#8b949e}}\n"
+"</style>\n</head>\n<body>\n", html_file);
+@}
+
+@d Write the HTML document tail
+@{fputs("</body>\n</html>\n", html_file);
+@}
+
+We make our second pass over the source, copying prose straight through
+(it is already HTML) and acting on at-sequences.
+
+@d Copy source into html_file
+@{{
+  int c = source_get();
+  while (c != EOF) {
+    if (c == nw_char)
+      {
+      @<Interpret html at-sequence@>
+      }
+    else {
+      putc(c, html_file);
+      c = source_get();
+    }
+  }
+}@}
+
+@d Interpret html at-sequence
+@{{
+  int big_definition = FALSE;
+  c = source_get();
+  switch (c) {
+    case 'r': c = source_get(); nw_char = c; update_delimit_scrap(); break;
+    case 'O': big_definition = TRUE; FALLTHROUGH;
+    case 'o': @<Write html output file definition@> break;
+    case 'Q':
+    case 'D': big_definition = TRUE; FALLTHROUGH;
+    case 'q':
+    case 'd': @<Write html macro definition@> break;
+    case 's': @<Step to next sector@> break;
+    case 'S': @<Close the current sector@> break;
+    case '{':
+    case '[':
+    case '(': md_copy_scrap(html_file, FALSE, NULL); c = source_get(); break;
+    case '<': { Arglist *a = collect_scrap_name(0);
+                html_ref(html_file, a->name); c = source_get(); } break;
+    case 'x': @<Copy label from source into@(html_file@)@> c = source_get(); break;
+    case 'c': c = source_get(); break;
+    case 'f': @<Write html index of file names@> break;
+    case 'm': @<Write html index of macro names@> break;
+    case 'u': @<Write html index of user names@> break;
+    case 'v': fputs(version_string, html_file); c = source_get(); break;
+    case 'l':
+    case 'L': @<Skip at-L language definition line@> break;
+    case 'W': @<Skip at-L language definition line@> break;
+    default:
+      if (c==nw_char) putc(c, html_file);
+      c = source_get();
+      break;
+  }
+}@}
+
+\subsection{HTML scrap definitions}
+
+A file or fragment definition writes an anchor, a header line naming the
+scrap (with the definition/continuation marker), the code in a
+\verb|<pre><code>| block, and a one-line metadata footer.
+
+@d Write html output file definition
+@{{
+  Name *name = collect_file_name();
+  int additive = (name->defs && name->defs->scrap != scraps);
+  (void)big_definition;
+  fputs("<div class=\"weft-name\"><a id=\"weft", html_file);
+  write_single_scrap_ref(html_file, scraps);
+  fputs("\"></a><span class=\"b\">&lt;</span> <span class=\"f\">", html_file);
+  html_puts(html_file, name->spelling);
+  fputs("</span> <span class=\"n\">", html_file);
+  write_single_scrap_ref(html_file, scraps);
+  fputs("</span> <span class=\"b\">&gt;</span> ", html_file);
+  fputs(additive ? "<span class=\"eq\">+&equiv;</span>"
+                 : "<span class=\"eq\">&equiv;</span>", html_file);
+  fputs("</div>\n", html_file);
+  @<Fill in the html scrap@>
+  @<Write html file footer@>
+  @<Finish html scrap@>
+}@}
+
+@d Write html macro definition
+@{{
+  Name *name = collect_macro_name();
+  int additive = (name->defs && name->defs->scrap != scraps);
+  (void)big_definition;
+  fputs("<div class=\"weft-name\"><a id=\"weft", html_file);
+  write_single_scrap_ref(html_file, scraps);
+  fputs("\"></a><span class=\"b\">&lt;</span> <i>", html_file);
+  html_emit_name(html_file, name);
+  fputs("</i> <span class=\"n\">", html_file);
+  write_single_scrap_ref(html_file, scraps);
+  fputs("</span> <span class=\"b\">&gt;</span> ", html_file);
+  fputs(additive ? "<span class=\"eq\">+&equiv;</span>"
+                 : "<span class=\"eq\">&equiv;</span>", html_file);
+  fputs("</div>\n", html_file);
+  @<Fill in the html scrap@>
+  @<Write html macro footer@>
+  @<Finish html scrap@>
+}@}
+
+@d Fill in the html scrap
+@{{
+  if (name->lang[0] != '\0')
+    fprintf(html_file, "<pre><code class=\"language-%s\">", name->lang);
+  else
+    fputs("<pre><code>", html_file);
+  extra_scraps = 0;
+  md_copy_scrap(html_file, TRUE, name);
+  fputs("</code></pre>\n", html_file);
+}@}
+
+@d Finish html scrap
+@{{
+  scraps += extra_scraps;
+  do c = source_get(); while (isspace(c));
+}@}
+
+The footer is a single grey line: the scrap number, then where else the
+fragment is defined (for a multi-part definition) and where it is used,
+each a clickable link.
+
+@d Write html file footer
+@{{
+  fputs("<div class=\"weft-meta\">", html_file);
+  write_single_scrap_ref(html_file, scraps);
+  if (scrap_flag && name->defs && name->defs->next) {
+    fputs(" &middot; also at ", html_file);
+    md_print_scrap_numbers(html_file, name->defs);
+  }
+  fputs("</div>\n", html_file);
+  scraps++;
+}@}
+
+@d Write html macro footer
+@{{
+  fputs("<div class=\"weft-meta\">", html_file);
+  write_single_scrap_ref(html_file, scraps);
+  if (name->defs && name->defs->next) {
+    fputs(" &middot; also at ", html_file);
+    md_print_scrap_numbers(html_file, name->defs);
+  }
+  if (name->uses) {
+    fputs(" &middot; used in ", html_file);
+    md_print_scrap_numbers(html_file, name->uses);
+  } else {
+    fputs(" &middot; unreferenced", html_file);
+  }
+  fputs("</div>\n", html_file);
+  scraps++;
+}@}
+
+\subsection{HTML indices}
+
+The \verb|@@f|, \verb|@@m|, and \verb|@@u| indices become HTML lists with
+links to the defining and referencing scraps.
+
+@d Write html index of file names
+@{{
+  if (file_names) {
+    fputs("<ul class=\"weft-index\">\n", html_file);
+    html_format_file_entry(file_names, html_file);
+    fputs("</ul>\n", html_file);
+  }
+  c = source_get();
+}@}
+
+@o html.c
+@{static void html_format_file_entry(Name *name, FILE *f)
+{
+  while (name) {
+    html_format_file_entry(name->llink, f);
+    fputs("<li><span class=\"f\">", f);
+    html_puts(f, name->spelling);
+    fputs("</span> ", f);
+    if (name->defs) md_print_scrap_numbers(f, name->defs);
+    fputs("</li>\n", f);
+    name = name->rlink;
+  }
+}
+@| html_format_file_entry @}
+
+@d Write html index of macro names
+@{{
+  unsigned char sector = current_sector;
+  int cc = source_get();
+  if (cc == '+') sector = 0; else source_ungetc(&cc);
+  if (has_sector(macro_names, sector)) {
+    fputs("<ul class=\"weft-index\">\n", html_file);
+    html_format_entry(macro_names, html_file, sector);
+    fputs("</ul>\n", html_file);
+  }
+  c = source_get();
+}@}
+
+@o html.c
+@{static void html_format_entry(Name *name, FILE *f, unsigned char sector)
+{
+  while (name) {
+    html_format_entry(name->llink, f, sector);
+    if (name->sector == sector) {
+      fputs("<li><span class=\"b\">&lt;</span> <i>", f);
+      html_emit_name(f, name);
+      fputs("</i> <span class=\"b\">&gt;</span> ", f);
+      if (name->defs) md_print_scrap_numbers(f, name->defs);
+      else putc('?', f);
+      fputs("</li>\n", f);
+    }
+    name = name->rlink;
+  }
+}
+@| html_format_entry @}
+
+@d Write html index of user names
+@{{
+  unsigned char sector = current_sector;
+  c = source_get();
+  if (c == '+') { sector = 0; c = source_get(); }
+  if (has_sector(user_names, sector)) {
+    fputs("<ul class=\"weft-index\">\n", html_file);
+    html_format_user_entry(user_names, html_file, sector);
+    fputs("</ul>\n", html_file);
+  }
+}@}
+
+@o html.c
+@{static void html_format_user_entry(Name *name, FILE *f, unsigned char sector)
+{
+  while (name) {
+    html_format_user_entry(name->llink, f, sector);
+    if (name->sector == sector && (name->uses || dangling_flag)) {
+      fputs("<li><code>", f);
+      html_puts(f, name->spelling);
+      fputs("</code>: ", f);
+      if (name->uses) md_print_scrap_numbers(f, name->uses);
+      fputs("</li>\n", f);
+    }
+    name = name->rlink;
+  }
+}
+@| html_format_user_entry @}

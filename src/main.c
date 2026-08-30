@@ -5,7 +5,7 @@
 /* {:6} */
 
 #line 7 "literate/main.weft"
-/* {16: literate/main.weft:7} */
+/* {17: literate/main.weft:7} */
 
 #include <stdlib.h>
 int main(int argc, char **argv)
@@ -14,25 +14,25 @@ int main(int argc, char **argv)
   /* Interpret command-line arguments */
   
 #line 200 "literate/main.weft"
-  /* {24: literate/main.weft:200} */
+  /* {25: literate/main.weft:200} */
 command_name = argv[0];
-  /* {:24} */
+  /* {:25} */
 
 #line 206 "literate/main.weft"
-  /* {25: literate/main.weft:206} */
+  /* {26: literate/main.weft:206} */
 while (arg < argc) {
     char *s = argv[arg];
     if (*s++ == '-') {
       /* Check for long options */
       
 #line 233 "literate/main.weft"
-      /* {26: literate/main.weft:233} */
+      /* {27: literate/main.weft:233} */
 if (*s == '-') {
         if (strcmp(s + 1, "help") == 0) {
           /* Print help message */
           
 #line 281 "literate/main.weft"
-          /* {27: literate/main.weft:281} */
+          /* {28: literate/main.weft:281} */
 printf("weft %s -- A Literate Programming Tool\n\n", WEFT_VERSION);
           printf("USAGE\n");
           printf("  %s [options] file...\n\n", command_name);
@@ -60,7 +60,7 @@ printf("weft %s -- A Literate Programming Tool\n\n", WEFT_VERSION);
           printf("    -I path         Add directory to include search path (repeatable)\n");
           printf("    -x              Include cross-reference numbers in section markers\n\n");
           printf("  Weave control:\n");
-          printf("    -w [format]     Weave documentation (format: md or tex)\n");
+          printf("    -w [format]     Weave documentation (format: md, tex, or html)\n");
           printf("                    Without format, uses @W directive from source\n");
           printf("    -t              Suppress weave output (even if -w given)\n");
           printf("    -n              Sequential scrap numbering (auto for Markdown)\n");
@@ -145,7 +145,7 @@ printf("weft %s -- A Literate Programming Tool\n\n", WEFT_VERSION);
           printf("  Sections and structure:\n");
           printf("    @s                            Start a new sector (section boundary)\n");
           printf("    @S                            Close current sector (return to base)\n");
-          printf("    @W fmt                        Declare weave format: md or tex\n\n");
+          printf("    @W fmt                        Declare weave format: md, tex, or html\n\n");
           printf("  Language and formatting:\n");
           printf("    @l tag                        Set language for next @o or @d\n");
           printf("    @L name style [+d]            Define custom language (// # -- /* <!--)\n");
@@ -157,6 +157,7 @@ printf("weft %s -- A Literate Programming Tool\n\n", WEFT_VERSION);
           printf("  %s project.weft                        Tangle (default)\n", command_name);
           printf("  %s -w md project.weft                  Weave to Markdown\n", command_name);
           printf("  %s -w tex project.weft                 Weave to LaTeX\n", command_name);
+          printf("  %s -w html project.weft                Weave to HTML\n", command_name);
           printf("  %s -m project.weft | jq '.files'       JSON structure map\n", command_name);
           printf("  %s -e \"Validate\" project.weft           Extract fragment\n", command_name);
           printf("  %s -R server.js:47                     Reverse map line\n", command_name);
@@ -192,7 +193,7 @@ printf("weft %s -- A Literate Programming Tool\n\n", WEFT_VERSION);
           printf("    %s -R output.c:42          Find .weft source for line 42\n", command_name);
           printf("    %s -R output.c             Show ALL .weft regions in file\n", command_name);
           printf("    Reads section markers in the tangled output -- needs NO .weft files.\n");
-          printf("    Fix errors in the .weft source, then re-tangle (step 4).\n");/* {:27} */
+          printf("    Fix errors in the .weft source, then re-tangle (step 4).\n");/* {:28} */
 
 #line 235 "literate/main.weft"
 
@@ -232,14 +233,14 @@ printf("weft %s -- A Literate Programming Tool\n\n", WEFT_VERSION);
           arg++;
           continue;
         }
-      }/* {:26} */
+      }/* {:27} */
 
 #line 209 "literate/main.weft"
 
       /* Interpret the argument string \verb|s| */
       
-#line 450 "literate/main.weft"
-      /* {28: literate/main.weft:450} */
+#line 451 "literate/main.weft"
+      /* {29: literate/main.weft:451} */
 {
         char c = *s++;
         while (c) {
@@ -296,7 +297,8 @@ HasWeaveFormat:
           else if (arg + 1 < argc && argv[arg + 1][0] != '-') {
             /* Peek: only consume next arg if it looks like a format token */
             char *candidate = argv[arg + 1];
-            if (strcmp(candidate, "md") == 0 || strcmp(candidate, "tex") == 0) {
+            if (strcmp(candidate, "md") == 0 || strcmp(candidate, "tex") == 0
+                || strcmp(candidate, "html") == 0) {
               fmt = candidate;
               ++arg;
             }
@@ -309,8 +311,12 @@ HasWeaveFormat:
             } else if (strcmp(fmt, "tex") == 0) {
               weave_format = 1;
               weave_format_from_cli = TRUE;
+            } else if (strcmp(fmt, "html") == 0) {
+              weave_format = 3;
+              weave_format_from_cli = TRUE;
             } else {
-              fprintf(stderr, "%s: unknown weave format '%s'. Use 'md' or 'tex'.\n",
+              fprintf(stderr,
+                      "%s: unknown weave format '%s'. Use 'md', 'tex', or 'html'.\n",
                       command_name, fmt);
             }
           }
@@ -318,15 +324,15 @@ HasWeaveFormat:
           s = "";
         }
 HasValue:;
-      }/* {:28} */
+      }/* {:29} */
 
 #line 210 "literate/main.weft"
 
       arg++;
       /* Perhaps get the prepend path */
       
-#line 532 "literate/main.weft"
-      /* {29: literate/main.weft:532} */
+#line 538 "literate/main.weft"
+      /* {30: literate/main.weft:538} */
 if (prepend_flag)
       {
         if (*s == '\0')
@@ -334,14 +340,14 @@ if (prepend_flag)
         dirpath = s;
         prepend_flag = FALSE;
       }
-      /* {:29} */
+      /* {:30} */
 
 #line 212 "literate/main.weft"
 
       /* Perhaps get the version info string */
       
-#line 560 "literate/main.weft"
-      /* {31: literate/main.weft:560} */
+#line 566 "literate/main.weft"
+      /* {32: literate/main.weft:566} */
 if (version_info_flag)
       {
          if (*s == '\0')
@@ -349,14 +355,14 @@ if (version_info_flag)
          version_string = s;
          version_info_flag = FALSE;
       }
-      /* {:31} */
+      /* {:32} */
 
 #line 213 "literate/main.weft"
 
       /* Perhaps get the hyperref options */
       
-#line 570 "literate/main.weft"
-      /* {32: literate/main.weft:570} */
+#line 576 "literate/main.weft"
+      /* {33: literate/main.weft:576} */
 if (hyperopt_flag)
       {
         if (*s == '\0')
@@ -365,14 +371,14 @@ if (hyperopt_flag)
         hyperopt_flag = FALSE;
         hyperref_flag = TRUE;
       }
-      /* {:32} */
+      /* {:33} */
 
 #line 214 "literate/main.weft"
 
       /* Perhaps add an include path */
       
-#line 542 "literate/main.weft"
-      /* {30: literate/main.weft:542} */
+#line 548 "literate/main.weft"
+      /* {31: literate/main.weft:548} */
 if (includepath_flag)
       {
          struct incl * le
@@ -388,42 +394,42 @@ if (includepath_flag)
          *p = le;
          includepath_flag = FALSE;
       }
-      /* {:30} */
+      /* {:31} */
 
 #line 215 "literate/main.weft"
 
       /* Perhaps get the extract name */
       
-#line 581 "literate/main.weft"
-      /* {33: literate/main.weft:581} */
+#line 587 "literate/main.weft"
+      /* {34: literate/main.weft:587} */
 if (extract_flag) {
         extract_name = (*s != '\0') ? s : argv[arg++];
         extract_flag = FALSE;
-      }/* {:33} */
+      }/* {:34} */
 
 #line 216 "literate/main.weft"
 
       /* Perhaps get the reverse map argument */
       
-#line 587 "literate/main.weft"
-      /* {34: literate/main.weft:587} */
+#line 593 "literate/main.weft"
+      /* {35: literate/main.weft:593} */
 if (reverse_map_flag) {
         reverse_map_arg = (*s != '\0') ? s : argv[arg++];
         reverse_map_flag = FALSE;
-      }/* {:34} */
+      }/* {:35} */
 
 #line 217 "literate/main.weft"
 
     }
     else break;
-  }/* {:25} */
+  }/* {:26} */
 
 #line 12 "literate/main.weft"
 
   /* Set locale information */
   
-#line 611 "literate/main.weft"
-/* {36: literate/main.weft:611} */
+#line 617 "literate/main.weft"
+/* {37: literate/main.weft:617} */
 
   {
     /* try to get locale information */
@@ -435,14 +441,14 @@ if (reverse_map_flag) {
       if(setlocale(LC_CTYPE, s)==NULL)
         fprintf(stderr, "Setting locale failed\n");
   }
-  /* {:36} */
+  /* {:37} */
 
 #line 13 "literate/main.weft"
 
   /* Handle reverse map mode */
   
-#line 596 "literate/main.weft"
-  /* {35: literate/main.weft:596} */
+#line 602 "literate/main.weft"
+  /* {36: literate/main.weft:602} */
 if (errors_flag) {
     write_error_annotator();
     exit(0);
@@ -450,15 +456,15 @@ if (errors_flag) {
   if (reverse_map_arg) {
     write_reverse_map(reverse_map_arg);
     exit(0);
-  }/* {:35} */
+  }/* {:36} */
 
 #line 14 "literate/main.weft"
 
   initialise_delimit_scrap_array();
   /* Process the remaining arguments (file names) */
   
-#line 630 "literate/main.weft"
-  /* {37: literate/main.weft:630} */
+#line 636 "literate/main.weft"
+  /* {38: literate/main.weft:636} */
 {
     if (arg >= argc) {
       fprintf(stderr, "%s: expected a file name.\n"
@@ -470,8 +476,8 @@ if (errors_flag) {
     do {
       /* Handle the file name in \verb|argv[arg]| */
       
-#line 654 "literate/main.weft"
-      /* {38: literate/main.weft:654} */
+#line 660 "literate/main.weft"
+      /* {39: literate/main.weft:660} */
 {
         char source_name[FILENAME_MAX];
         char tex_name[FILENAME_MAX];
@@ -480,8 +486,8 @@ if (errors_flag) {
         char *dot;
         /* Build \verb|source_name| and \verb|tex_name| */
         
-#line 678 "literate/main.weft"
-        /* {39: literate/main.weft:678} */
+#line 684 "literate/main.weft"
+        /* {40: literate/main.weft:684} */
 {
           char *p = argv[arg];
           char *q = source_name;
@@ -501,8 +507,8 @@ if (errors_flag) {
           }
           /* Add the source path to the include path list */
           
-#line 724 "literate/main.weft"
-          /* {40: literate/main.weft:724} */
+#line 730 "literate/main.weft"
+          /* {41: literate/main.weft:730} */
 if (trim != source_name) {
              struct incl * le
                 = (struct incl *)arena_getmem(sizeof(struct incl));
@@ -517,9 +523,9 @@ if (trim != source_name) {
              *p = le;
              *trim = sv;
           }
-          /* {:40} */
+          /* {:41} */
 
-#line 695 "literate/main.weft"
+#line 701 "literate/main.weft"
 
           *q = '\0';
           if (!dot) {
@@ -541,14 +547,14 @@ if (trim != source_name) {
               t++;
             }
           }
-        }/* {:39} */
+        }/* {:40} */
 
-#line 660 "literate/main.weft"
+#line 666 "literate/main.weft"
 
         /* Process a file */
         
-#line 756 "literate/main.weft"
-        /* {41: literate/main.weft:756} */
+#line 762 "literate/main.weft"
+        /* {42: literate/main.weft:762} */
 {
           int do_weave = FALSE;
           int effective_format = 0;
@@ -590,7 +596,8 @@ if (trim != source_name) {
 
             if (do_weave) {
               /* Compute weave output name now that format is known */
-              const char *weave_ext = (effective_format == 2) ? ".md" : ".tex";
+              const char *weave_ext = (effective_format == 2) ? ".md"
+                                    : (effective_format == 3) ? ".html" : ".tex";
               if (dot) {
                 *dot = '\0';
                 sprintf(tex_name, "%s%s%s%s", dirpath, path_sep, trim, weave_ext);
@@ -606,6 +613,10 @@ if (trim != source_name) {
                 number_flag = TRUE;
                 collect_numbers(aux_name);
                 write_md(source_name, tex_name, 0);
+              } else if (effective_format == 3) {
+                number_flag = TRUE;
+                collect_numbers(aux_name);
+                write_html(source_name, tex_name, 0);
               } else {
                 collect_numbers(aux_name);
                 write_tex(source_name, tex_name, 0);
@@ -616,20 +627,20 @@ if (trim != source_name) {
               write_files(file_names);
           }
           arena_free();
-        }/* {:41} */
+        }/* {:42} */
 
-#line 661 "literate/main.weft"
+#line 667 "literate/main.weft"
 
-      }/* {:38} */
+      }/* {:39} */
 
-#line 639 "literate/main.weft"
+#line 645 "literate/main.weft"
 
       arg++;
     } while (arg < argc);
-  }/* {:37} */
+  }/* {:38} */
 
 #line 16 "literate/main.weft"
 
   exit(0);
 }
-/* {:16} */
+/* {:17} */

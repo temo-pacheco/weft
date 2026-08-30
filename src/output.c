@@ -1,11 +1,11 @@
 
-#line 135 "literate/architecture.weft"
-/* {10: literate/architecture.weft:135} */
+#line 142 "literate/architecture.weft"
+/* {11: literate/architecture.weft:142} */
 #include "global.h"
-/* {:10} */
+/* {:11} */
 
 #line 37 "literate/map-output.weft"
-/* {212: literate/map-output.weft:37} */
+/* {234: literate/map-output.weft:37} */
 static void json_puts(FILE *f, const char *s)
 {
   fputc('"', f);
@@ -26,10 +26,10 @@ static void json_puts(FILE *f, const char *s)
   }
   fputc('"', f);
 }
-/* {:212} */
+/* {:234} */
 
 #line 67 "literate/map-output.weft"
-/* {213: literate/map-output.weft:67} */
+/* {235: literate/map-output.weft:67} */
 static void emit_name_json(FILE *f, Name *name, int is_file, int *first)
 {
   Scrap_Node *sn;
@@ -114,10 +114,10 @@ static void emit_name_json(FILE *f, Name *name, int is_file, int *first)
 
   emit_name_json(f, name->rlink, is_file, first);
 }
-/* {:213} */
+/* {:235} */
 
 #line 154 "literate/map-output.weft"
-/* {214: literate/map-output.weft:154} */
+/* {236: literate/map-output.weft:154} */
 void write_map(Name *files, Name *macros)
 {
   int first;
@@ -130,10 +130,10 @@ void write_map(Name *files, Name *macros)
   emit_name_json(stdout, macros, 0, &first);
   fputs("\n  ]\n}\n", stdout);
 }
-/* {:214} */
+/* {:236} */
 
 #line 181 "literate/map-output.weft"
-/* {215: literate/map-output.weft:181} */
+/* {237: literate/map-output.weft:181} */
 static Name *find_name(Name *node, const char *spelling)
 {
   Name *found;
@@ -144,10 +144,10 @@ static Name *find_name(Name *node, const char *spelling)
   if (found) return found;
   return find_name(node->rlink, spelling);
 }
-/* {:215} */
+/* {:237} */
 
 #line 198 "literate/map-output.weft"
-/* {216: literate/map-output.weft:198} */
+/* {238: literate/map-output.weft:198} */
 static void extract_fragment(FILE *f, Name *name, Name *files, Name *macros)
 {
   Scrap_Node *sn;
@@ -198,10 +198,10 @@ static void extract_fragment(FILE *f, Name *name, Name *files, Name *macros)
     }
   }
 }
-/* {:216} */
+/* {:238} */
 
 #line 253 "literate/map-output.weft"
-/* {217: literate/map-output.weft:253} */
+/* {239: literate/map-output.weft:253} */
 static void clear_marks(Name *node)
 {
   if (!node) return;
@@ -209,10 +209,10 @@ static void clear_marks(Name *node)
   node->mark = FALSE;
   clear_marks(node->rlink);
 }
-/* {:217} */
+/* {:239} */
 
 #line 271 "literate/map-output.weft"
-/* {218: literate/map-output.weft:271} */
+/* {240: literate/map-output.weft:271} */
 static int is_file_name(Name *root, Name *target)
 {
   if (!root) return 0;
@@ -220,10 +220,10 @@ static int is_file_name(Name *root, Name *target)
   if (is_file_name(root->llink, target)) return 1;
   return is_file_name(root->rlink, target);
 }
-/* {:218} */
+/* {:240} */
 
 #line 281 "literate/map-output.weft"
-/* {219: literate/map-output.weft:281} */
+/* {241: literate/map-output.weft:281} */
 static void print_callers(Name *name, Name *file_names, int depth)
 {
   Scrap_Node *usn;
@@ -244,10 +244,10 @@ static void print_callers(Name *name, Name *file_names, int depth)
       print_callers(owner, file_names, depth + 1);
   }
 }
-/* {:219} */
+/* {:241} */
 
 #line 304 "literate/map-output.weft"
-/* {220: literate/map-output.weft:304} */
+/* {242: literate/map-output.weft:304} */
 void write_callers(char *name, Name *files, Name *macros)
 {
   Name *found = find_name(macros, name);
@@ -270,10 +270,10 @@ void write_callers(char *name, Name *files, Name *macros)
   clear_marks(files);
   clear_marks(macros);
 }
-/* {:220} */
+/* {:242} */
 
 #line 329 "literate/map-output.weft"
-/* {221: literate/map-output.weft:329} */
+/* {243: literate/map-output.weft:329} */
 void write_extract(char *name, Name *files, Name *macros)
 {
   Name *found = NULL;
@@ -295,10 +295,10 @@ void write_extract(char *name, Name *files, Name *macros)
   clear_marks(files);
   clear_marks(macros);
 }
-/* {:221} */
+/* {:243} */
 
 #line 368 "literate/map-output.weft"
-/* {222: literate/map-output.weft:368} */
+/* {244: literate/map-output.weft:368} */
 static int levenshtein(const char *a, const char *b)
 {
   int la = (int)strlen(a), lb = (int)strlen(b);
@@ -319,10 +319,10 @@ static int levenshtein(const char *a, const char *b)
   }
   return prev[lb];
 }
-/* {:222} */
+/* {:244} */
 
 #line 391 "literate/map-output.weft"
-/* {223: literate/map-output.weft:391} */
+/* {245: literate/map-output.weft:391} */
 
 #define MAX_LINT_NAMES 4096
 static Name *lint_names[MAX_LINT_NAMES];
@@ -350,10 +350,10 @@ static const char *find_closest(const char *target)
   }
   return best;
 }
-/* {:223} */
+/* {:245} */
 
 #line 421 "literate/map-output.weft"
-/* {224: literate/map-output.weft:421} */
+/* {246: literate/map-output.weft:421} */
 static int lint_name(Name *node, int check_unused, int *issues)
 {
   if (!node) return 0;
@@ -384,10 +384,10 @@ static int lint_name(Name *node, int check_unused, int *issues)
   lint_name(node->rlink, check_unused, issues);
   return 0;
 }
-/* {:224} */
+/* {:246} */
 
 #line 454 "literate/map-output.weft"
-/* {225: literate/map-output.weft:454} */
+/* {247: literate/map-output.weft:454} */
 void write_lint(Name *file_names, Name *macro_names)
 {
   int issues = 0;
@@ -405,20 +405,20 @@ void write_lint(Name *file_names, Name *macro_names)
   else
     fprintf(stderr, "lint: no issues found\n");
 }
-/* {:225} */
+/* {:247} */
 
 #line 499 "literate/map-output.weft"
-/* {226: literate/map-output.weft:499} */
+/* {248: literate/map-output.weft:499} */
 typedef struct {
   int scrap;
   char file[FILENAME_MAX];
   int line;
   int start_line;  /* line in the tangled file where this marker opened */
 } MarkerFrame;
-/* {:226} */
+/* {:248} */
 
 #line 513 "literate/map-output.weft"
-/* {227: literate/map-output.weft:513} */
+/* {249: literate/map-output.weft:513} */
 static int parse_open_marker(const char *line, MarkerFrame *mf)
 {
   const char *p = line;
@@ -465,10 +465,10 @@ static int parse_open_marker(const char *line, MarkerFrame *mf)
   }
   return 0;
 }
-/* {:227} */
+/* {:249} */
 
 #line 565 "literate/map-output.weft"
-/* {228: literate/map-output.weft:565} */
+/* {250: literate/map-output.weft:565} */
 static int parse_close_marker(const char *line)
 {
   const char *p = line;
@@ -486,10 +486,10 @@ static int parse_close_marker(const char *line)
   }
   return -1;
 }
-/* {:228} */
+/* {:250} */
 
 #line 598 "literate/map-output.weft"
-/* {229: literate/map-output.weft:598} */
+/* {251: literate/map-output.weft:598} */
 void write_reverse_map(const char *arg)
 {
   char filename[FILENAME_MAX];
@@ -602,10 +602,10 @@ void write_reverse_map(const char *arg)
     fputs("\n]}\n", stdout);
   }
 }
-/* {:229} */
+/* {:251} */
 
 #line 723 "literate/map-output.weft"
-/* {230: literate/map-output.weft:723} */
+/* {252: literate/map-output.weft:723} */
 static int reverse_lookup_in_file(const char *filename, int target_line,
                                    MarkerFrame *result)
 {
@@ -651,10 +651,10 @@ static int reverse_lookup_in_file(const char *filename, int target_line,
   fclose(fp);
   return 0;
 }
-/* {:230} */
+/* {:252} */
 
 #line 771 "literate/map-output.weft"
-/* {231: literate/map-output.weft:771} */
+/* {253: literate/map-output.weft:771} */
 void write_error_annotator(void)
 {
   char line[8192];
@@ -707,10 +707,10 @@ void write_error_annotator(void)
     }
   }
 }
-/* {:231} */
+/* {:253} */
 
 #line 17 "literate/output-files.weft"
-/* {234: literate/output-files.weft:17} */
+/* {256: literate/output-files.weft:17} */
 void write_files(Name *files)
 {
   while (files) {
@@ -718,7 +718,7 @@ void write_files(Name *files)
     /* Write out \verb|files->spelling| */
     
 #line 42 "literate/output-files.weft"
-    /* {236: literate/output-files.weft:42} */
+    /* {258: literate/output-files.weft:42} */
 {
       static char temp_name[FILENAME_MAX];
       static char real_name[FILENAME_MAX];
@@ -729,7 +729,7 @@ void write_files(Name *files)
       /* Find a free temporary file */
       
 #line 63 "literate/output-files.weft"
-/* {237: literate/output-files.weft:63} */
+/* {259: literate/output-files.weft:63} */
 
       for( temp_name_count = 0; temp_name_count < 10000; temp_name_count++) {
         sprintf(temp_name,"%s%snw%06d", dirpath, path_sep, temp_name_count);
@@ -754,7 +754,7 @@ void write_files(Name *files)
                 command_name, temp_name);
         exit(-1);
       }
-      /* {:237} */
+      /* {:259} */
 
 #line 49 "literate/output-files.weft"
 
@@ -771,13 +771,13 @@ void write_files(Name *files)
       /* Move the temporary file to the target, if required */
       
 #line 93 "literate/output-files.weft"
-/* {238: literate/output-files.weft:93} */
+/* {260: literate/output-files.weft:93} */
 
       if (diff_flag) {
         /* Show diff of temp file vs real file */
         
 #line 105 "literate/output-files.weft"
-        /* {239: literate/output-files.weft:105} */
+        /* {261: literate/output-files.weft:105} */
 {
           FILE *old_file = fopen(real_name, "r");
           if (!old_file) {
@@ -804,7 +804,7 @@ void write_files(Name *files)
             }
           }
           remove(temp_name);
-        }/* {:239} */
+        }/* {:261} */
 
 #line 95 "literate/output-files.weft"
 
@@ -812,7 +812,7 @@ void write_files(Name *files)
         /* Compare the temp file and the old file */
         
 #line 135 "literate/output-files.weft"
-        /* {240: literate/output-files.weft:135} */
+        /* {262: literate/output-files.weft:135} */
 {
           FILE *old_file = fopen(real_name, "r");
           if (old_file) {
@@ -831,13 +831,13 @@ void write_files(Name *files)
               /* Rename the temporary file to the target */
               
 #line 157 "literate/output-files.weft"
-/* {241: literate/output-files.weft:157} */
+/* {263: literate/output-files.weft:157} */
 
               if (0 != rename(temp_name, real_name)) {
                 fprintf(stderr, "%s: can't rename output file to %s\n",
                         command_name, real_name);
               }
-              /* {:241} */
+              /* {:263} */
 
 #line 150 "literate/output-files.weft"
 
@@ -847,17 +847,17 @@ void write_files(Name *files)
             /* Rename the temporary file to the target */
             
 #line 157 "literate/output-files.weft"
-/* {241: literate/output-files.weft:157} */
+/* {263: literate/output-files.weft:157} */
 
             if (0 != rename(temp_name, real_name)) {
               fprintf(stderr, "%s: can't rename output file to %s\n",
                       command_name, real_name);
             }
-            /* {:241} */
+            /* {:263} */
 
 #line 154 "literate/output-files.weft"
 
-        }/* {:240} */
+        }/* {:262} */
 
 #line 97 "literate/output-files.weft"
 
@@ -866,26 +866,26 @@ void write_files(Name *files)
         /* Rename the temporary file to the target */
         
 #line 157 "literate/output-files.weft"
-/* {241: literate/output-files.weft:157} */
+/* {263: literate/output-files.weft:157} */
 
         if (0 != rename(temp_name, real_name)) {
           fprintf(stderr, "%s: can't rename output file to %s\n",
                   command_name, real_name);
         }
-        /* {:241} */
+        /* {:263} */
 
 #line 100 "literate/output-files.weft"
 
       }
-      /* {:238} */
+      /* {:260} */
 
 #line 60 "literate/output-files.weft"
 
-    }/* {:236} */
+    }/* {:258} */
 
 #line 21 "literate/output-files.weft"
 
     files = files->rlink;
   }
 }
-/* {:234} */
+/* {:256} */

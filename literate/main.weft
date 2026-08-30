@@ -114,7 +114,7 @@ extern struct incl{char * name; struct incl * next;} * include_list;
                        /* The list of include paths */
 extern int markdown_flag; /* if TRUE, generate Markdown instead of LaTeX */
 extern int weave_flag;          /* if TRUE, weave was requested via -w */
-extern int weave_format;        /* 0=none, 1=tex, 2=md */
+extern int weave_format;        /* 0=none, 1=tex, 2=md, 3=html */
 extern int weave_format_from_cli; /* if TRUE, CLI override of @@W */
 extern int map_flag;       /* if TRUE, emit JSON map to stdout */
 extern int extract_flag;   /* if TRUE, next arg is extract name */
@@ -305,7 +305,7 @@ printf("    -p path         Prepend path to all output file names\n");
 printf("    -I path         Add directory to include search path (repeatable)\n");
 printf("    -x              Include cross-reference numbers in section markers\n\n");
 printf("  Weave control:\n");
-printf("    -w [format]     Weave documentation (format: md or tex)\n");
+printf("    -w [format]     Weave documentation (format: md, tex, or html)\n");
 printf("                    Without format, uses @@W directive from source\n");
 printf("    -t              Suppress weave output (even if -w given)\n");
 printf("    -n              Sequential scrap numbering (auto for Markdown)\n");
@@ -390,7 +390,7 @@ printf("    @@( ... @@)                    Math mode\n\n");
 printf("  Sections and structure:\n");
 printf("    @@s                            Start a new sector (section boundary)\n");
 printf("    @@S                            Close current sector (return to base)\n");
-printf("    @@W fmt                        Declare weave format: md or tex\n\n");
+printf("    @@W fmt                        Declare weave format: md, tex, or html\n\n");
 printf("  Language and formatting:\n");
 printf("    @@l tag                        Set language for next @@o or @@d\n");
 printf("    @@L name style [+d]            Define custom language (// # -- /* <!--)\n");
@@ -402,6 +402,7 @@ printf("EXAMPLES\n");
 printf("  %s project.weft                        Tangle (default)\n", command_name);
 printf("  %s -w md project.weft                  Weave to Markdown\n", command_name);
 printf("  %s -w tex project.weft                 Weave to LaTeX\n", command_name);
+printf("  %s -w html project.weft                Weave to HTML\n", command_name);
 printf("  %s -m project.weft | jq '.files'       JSON structure map\n", command_name);
 printf("  %s -e \"Validate\" project.weft           Extract fragment\n", command_name);
 printf("  %s -R server.js:47                     Reverse map line\n", command_name);
@@ -503,7 +504,8 @@ and also avoids ambiguity about which value goes with which flag.
     else if (arg + 1 < argc && argv[arg + 1][0] != '-') {
       /* Peek: only consume next arg if it looks like a format token */
       char *candidate = argv[arg + 1];
-      if (strcmp(candidate, "md") == 0 || strcmp(candidate, "tex") == 0) {
+      if (strcmp(candidate, "md") == 0 || strcmp(candidate, "tex") == 0
+          || strcmp(candidate, "html") == 0) {
         fmt = candidate;
         ++arg;
       }
@@ -516,8 +518,12 @@ and also avoids ambiguity about which value goes with which flag.
       } else if (strcmp(fmt, "tex") == 0) {
         weave_format = 1;
         weave_format_from_cli = TRUE;
+      } else if (strcmp(fmt, "html") == 0) {
+        weave_format = 3;
+        weave_format_from_cli = TRUE;
       } else {
-        fprintf(stderr, "%s: unknown weave format '%s'. Use 'md' or 'tex'.\n",
+        fprintf(stderr,
+                "%s: unknown weave format '%s'. Use 'md', 'tex', or 'html'.\n",
                 command_name, fmt);
       }
     }
@@ -794,7 +800,8 @@ error and exits.  The \verb|-t| flag suppresses weaving even if
 
     if (do_weave) {
       /* Compute weave output name now that format is known */
-      const char *weave_ext = (effective_format == 2) ? ".md" : ".tex";
+      const char *weave_ext = (effective_format == 2) ? ".md"
+                            : (effective_format == 3) ? ".html" : ".tex";
       if (dot) {
         *dot = '\0';
         sprintf(tex_name, "%s%s%s%s", dirpath, path_sep, trim, weave_ext);
@@ -810,6 +817,10 @@ error and exits.  The \verb|-t| flag suppresses weaving even if
         number_flag = TRUE;
         collect_numbers(aux_name);
         write_md(source_name, tex_name, 0);
+      } else if (effective_format == 3) {
+        number_flag = TRUE;
+        collect_numbers(aux_name);
+        write_html(source_name, tex_name, 0);
       } else {
         collect_numbers(aux_name);
         write_tex(source_name, tex_name, 0);

@@ -129,6 +129,13 @@ The Markdown output is created by the code in \verb|markdown.c|
 static int scraps = 1;
 @}
 
+The HTML output is created by the code in \verb|html.c|
+(see Section~\ref{html-file}).
+@o html.c
+@{#include "global.h"
+static int scraps = 1;
+@}
+
 The code controlling the creation of the output files is in \verb|output.c|
 (see Section~\ref{output-files}).
 @o output.c

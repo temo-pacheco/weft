@@ -10,13 +10,24 @@ fragment references inside code can be clickable links).
 @{extern void write_md(char *file_name, char *md_name, unsigned char sector);
 @}
 
+The HTML weaver (Section~\ref{html-file}) reuses two format-agnostic
+helpers from here, so they are declared \verb|extern| rather than
+\verb|static|: \verb|md_copy_scrap| copies a scrap body emitting
+HTML-escaped code and clickable inline fragment references, and
+\verb|md_print_scrap_numbers| emits a comma-separated list of
+\verb|<a href="#weftN">| cross-reference links. Both are pure HTML and
+identical to what the HTML output needs.
+
+@d Function...
+@{extern void md_copy_scrap(FILE *file, int prefix, Name *name);
+extern void md_print_scrap_numbers(FILE *md_file, Scrap_Node *scraps);
+@}
+
 We need a few local function declarations before we get into the body
 of \verb|write_md|.
 
 @o markdown.c
-@{static void md_copy_scrap(FILE *file, int prefix, Name *name);
-static void md_print_scrap_numbers(FILE *md_file, Scrap_Node *scraps);
-static void md_format_entry(Name *name, FILE *md_file, unsigned char sector);
+@{static void md_format_entry(Name *name, FILE *md_file, unsigned char sector);
 static void md_format_file_entry(Name *name, FILE *md_file);
 static void md_format_user_entry(Name *name, FILE *md_file, unsigned char sector);
 static void md_write_arg(FILE *md_file, char *p);
@@ -373,7 +384,7 @@ Cross-references appear as blockquotes after each scrap.
 }@}
 
 @o markdown.c
-@{static void md_print_scrap_numbers(FILE *md_file, Scrap_Node *scraps)
+@{void md_print_scrap_numbers(FILE *md_file, Scrap_Node *scraps)
 {
   int page;
   fputs("<a href=\"#weft", md_file);
@@ -404,7 +415,7 @@ HTML markup directly.
 @o markdown.c
 @{static int md_scrap_type = 0;
 
-static void md_copy_scrap(FILE *file, int prefix, Name *name)
+void md_copy_scrap(FILE *file, int prefix, Name *name)
 {
   int indent = 0;
   int c;

@@ -4,7 +4,7 @@ CFLAGS ?= -g -O2 -std=c11 -Wall -Wextra -pedantic
 SRCDIR  = src
 BUILDDIR = build
 
-SRCS = main.c pass1.c latex.c markdown.c output.c input.c scraps.c names.c \
+SRCS = main.c pass1.c latex.c markdown.c html.c output.c input.c scraps.c names.c \
        arena.c global.c
 OBJS = $(patsubst %.c,$(BUILDDIR)/%.o,$(SRCS))
 HDRS = $(SRCDIR)/global.h
