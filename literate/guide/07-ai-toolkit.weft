@@ -1,0 +1,120 @@
+\chapter{weft for AI and Introspection}
+\label{ch:ai}
+
+A literate web is a graph: output files are built from fragments,
+fragments reference other fragments, and every line of tangled code came
+from a known place in the source. weft exposes that graph through a small
+set of flags designed for scripts, editors, and AI agents --- so a tool
+can navigate a web precisely instead of reading it top to bottom. None of
+these commands weave or tangle; they only report.
+
+\section{The project map: \texttt{-m}}
+
+\verb|weft -m project.weft| prints a JSON description of the whole web to
+standard output: every output file and the fragments that compose it,
+every fragment definition with its source location, every use
+(cross-reference), and transitive dependencies. Pipe it through
+\verb|jq| to answer structural questions:
+
+\begin{quote}
+\begin{verbatim}
+weft -m project.weft | jq '.files["server.js"]'      # what builds this file?
+weft -m project.weft | jq '.fragments["Validate input"]'  # where defined?
+\end{verbatim}
+\end{quote}
+
+Two flags enrich the map. \verb|--bodies| adds each scrap's raw source
+code; \verb|--prose| adds the paragraph of documentation that introduces
+each fragment. Together they let a tool read a fragment's code \emph{and}
+its rationale without opening the file:
+
+\begin{quote}
+\begin{verbatim}
+weft -m --bodies --prose project.weft \
+  | jq '.fragments["Validate input"].defs[0] | {prose, body}'
+\end{verbatim}
+\end{quote}
+
+\section{Extract one fragment: \texttt{-e}}
+
+\verb|weft -e "Validate input" project.weft| emits just that fragment and
+all the fragments it depends on, as a self-contained Markdown document ---
+the exact code a tool needs for one task, with syntax highlighting and
+source locations, and nothing else. The name matches with the same prefix
+logic as \hbox{\tt @@<name...@@>}.
+
+Add \verb|--callers| to see the other direction --- who uses this
+fragment, transitively, as an indented tree from the \verb|@@o| roots
+down:
+
+\begin{quote}
+\begin{verbatim}
+weft -e "Validate input" --callers project.weft
+\end{verbatim}
+\end{quote}
+
+\section{Reverse map: \texttt{-R}}
+
+Given a line in a \emph{tangled} file, \verb|-R| tells you where it came
+from --- by reading the section markers already embedded in that file. No
+\verb|.weft| sources are consulted, so it works in CI and on shipped
+output:
+
+\begin{quote}
+\begin{verbatim}
+weft -R server.js:47
+  {"scrap": 3, "file": "routes.weft", "line": 42}
+
+weft -R server.js            # every scrap region in the file
+\end{verbatim}
+\end{quote}
+
+\section{Lint the graph: \texttt{--lint}}
+
+\verb|weft --lint project.weft| runs a post-parse check and reports
+\emph{unused} fragments (defined but never referenced by any \verb|@@o| or
+\verb|@@d|), \emph{undefined} references (used in a \hbox{\tt @@<name@@>}
+but never defined), and, for an undefined reference with a close match, a
+fuzzy suggestion of the name you probably meant.
+
+\section{Preview and translate}
+
+\verb|weft --diff project.weft| tangles to temporary files and shows a
+unified diff of what \emph{would} change on disk --- a safe preview, and a
+CI check that the committed output is up to date.
+
+\verb|--errors| closes the loop with your compiler. Pipe a build log in,
+and every \textit{file:line} it recognises is annotated with the matching
+\verb|.weft| location (again, read from section markers --- no sources
+needed):
+
+\begin{quote}
+\begin{verbatim}
+make 2>&1 | weft --errors
+  src/output.c:42: error: undeclared identifier
+    [weft: literate/map-output.weft:77, scrap 204]
+\end{verbatim}
+\end{quote}
+
+\section{A directed workflow}
+
+These commands compose into a fast loop for navigating a web you did not
+write --- the pattern an AI agent (or a careful human) can follow:
+
+\begin{enumerate}
+\item \textbf{Orient} --- \verb|weft --help|, then
+  \verb|weft -m --prose| for the structure and rationale.
+\item \textbf{Locate} --- find the fragment relevant to the task in the map.
+\item \textbf{Extract} --- \verb|weft -e "name"| for exactly that code;
+  \verb|--callers| to see its impact.
+\item \textbf{Edit} --- change the \verb|.weft| source at the reported
+  location (never the tangled output).
+\item \textbf{Preview} --- \verb|weft --diff| to see what tangling changes.
+\item \textbf{Verify} --- re-tangle, build, and pipe errors through
+  \verb|weft --errors| to map any failure back to source.
+\item \textbf{Check} --- \verb|weft --lint| for orphans and typos.
+\end{enumerate}
+
+\noindent The map and reverse map are complementary: \verb|-m| goes from
+source to structure, \verb|-R|/\verb|--errors| go from tangled output
+back to source. A tool never has to guess.

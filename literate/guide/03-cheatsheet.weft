@@ -1,0 +1,145 @@
+\chapter{Cheatsheet}
+\label{ch:cheatsheet}
+
+Everything on one card. Every command begins with the escape character
+\verb|@@| (changeable with \verb|@@r|); a file with no \verb|@@| is copied
+through untouched. In these tables a literal at-sign is shown as it is
+typed in your source.
+
+\section{Define and reference}
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|@@o| \textit{file flags scrap} & Open an output file (tangle target). \\
+\verb|@@d| \textit{name scrap}       & Define a fragment. \\
+\verb|@@q| \textit{name scrap}       & Define a \emph{quoted} fragment (not expanded on output). \\
+\verb|@@<|\textit{name}\verb|@@>|    & Reference a fragment; its body is spliced in. \\
+\verb|@@i| \textit{file}             & Include another \texttt{.weft} file. \\
+\verb|@@@@|                          & A literal \verb|@@| in the output. \\
+\verb|@@_|\textit{text}\verb|@@_|    & Bold the enclosed text (keywords). \\
+\end{tabular}
+\end{quote}
+
+\noindent A file or fragment may be defined in several pieces; they are
+emitted in source order. Capital forms \verb|@@O| / \verb|@@D| / \verb|@@Q|
+are identical but force a page break before the definition when weaving.
+
+\section{Scrap delimiters}
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|@@{| \textit{code} \verb|@@}| & Code scrap (verbatim; the usual form). \\
+\verb|@@[| \textit{text} \verb|@@]| & Paragraph-mode scrap (typeset \TeX). \\
+\verb|@@(| \textit{math} \verb|@@)| & Math-mode scrap (a formula). \\
+\end{tabular}
+\end{quote}
+
+\section{Inside a scrap}
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|@@<|\textit{name}\verb|@@>|      & Expand a fragment inline. \\
+\verb|@@1| \ldots \verb|@@9|           & Substitute the $n$th argument. \\
+\verb|@@f|                             & The current output file name. \\
+\verb|@@t|                             & The current fragment title (with arguments). \\
+\verb|@@x|\textit{label}\verb|@@x|      & Mark a place; refer to it from prose. \\
+\verb|@@#|                             & At line start: suppress this line's indentation. \\
+\verb|@@s|                             & Suppress indentation of the next fragment expansion. \\
+\verb|@@%|                             & Comment out the rest of the line (like \LaTeX\ \verb|%|). \\
+\verb+@@|+ \textit{ids} \verb|@@}|      & At scrap end: index these identifiers (\verb|@@u|). \\
+\end{tabular}
+\end{quote}
+
+\section{Fragment names with parameters}
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|@@'|\textit{value}\verb|@@'| & A named parameter in a \verb|@@d| name / an argument at a use. \\
+\verb|@@1|\ldots\verb|@@9|         & Refer to those parameters inside the body. \\
+\textit{name}\verb|...|            & Abbreviate a long name (unique prefix). \\
+\end{tabular}
+\end{quote}
+
+\noindent At each argument position of a reference you may pass:
+a literal \verb|@@'string@@'|, a fragment \hbox{\tt @@<name@@>}, an
+anonymous scrap \verb|@@{text@@}|, or a forwarded argument
+\verb|@@1|\ldots\verb|@@9|.
+
+\section{Sectioning (scoped names)}
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|@@s| / \verb|@@S|             & Start / close a local section (isolates names). \\
+\verb|@@d+| \textit{name}           & Define a fragment visible in \emph{all} sections. \\
+\verb|@@<+|\textit{name}\verb|@@>|  & Reference a global fragment. \\
+\verb|@@+| / \verb|@@-|             & Export / import indexed identifiers across sections. \\
+\end{tabular}
+\end{quote}
+
+\section{Indices, language, and format}
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|@@f| / \verb|@@m| / \verb|@@u| & Index of files / fragments / identifiers. \\
+\verb|@@l| \textit{tag}              & Set the language for the next \verb|@@o|/\verb|@@d|. \\
+\verb|@@L| \textit{name style} \verb|[+d]| & Define a new language (preamble). \\
+\verb|@@W| \textit{tex} or \textit{md}  & Declare the weave format for this file. \\
+\verb|@@r|\textit{x}                 & Change the escape character from \verb|@@| to \textit{x}. \\
+\verb|@@v|                           & The version string (defaults to weft's version; \verb|-V| overrides). \\
+\verb|@@c|                           & Define / expand a block comment. \\
+\end{tabular}
+\end{quote}
+
+\section{Command line: what to produce}
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|weft f.weft|      & Tangle only (the default): write the output files. \\
+\verb|weft -w f.weft|   & Tangle + weave, format from \verb|@@W|. \\
+\verb|weft -w tex f|    & Weave \LaTeX\ (\verb|.tex|). \\
+\verb|weft -w md f|     & Weave Markdown (\verb|.md|). \\
+\verb|-t|               & Suppress weaving. \\
+\verb|-o|               & Suppress tangling (weave only). \\
+\verb|-p| \textit{path} & Prefix output file names with \textit{path}. \\
+\verb|-I| \textit{dir}  & Add a directory to the \verb|@@i| include search path. \\
+\verb|-V| \textit{str}  & Set the \verb|@@v| version string. \\
+\verb|-n|               & Number scraps 1,2,3\ldots\ instead of by page. \\
+\verb|-r|               & Emit hyperlinks (needs \verb|hyperref| in the preamble). \\
+\verb|-v|               & Verbose progress on \verb|stderr|. \\
+\end{tabular}
+\end{quote}
+
+\section{Command line: introspection \& AI}
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|-m|                & Emit a JSON map of the whole project. \\
+\verb|-m --bodies|       & \ldots\ include each scrap's source code. \\
+\verb|-m --prose|        & \ldots\ include the prose introducing each fragment. \\
+\verb|-e| \textit{name}  & Extract one fragment (+ its dependencies) as Markdown. \\
+\verb|-e| \textit{name} \verb|--callers| & \ldots\ show who references it, transitively. \\
+\verb|-R| \textit{file}\verb|:|\textit{line} & Reverse-map a tangled line to its \verb|.weft| source. \\
+\verb|--lint|            & Report unused fragments and undefined references. \\
+\verb|--diff|            & Show what tangling would change, without writing. \\
+\verb|--errors|          & Translate \textit{file:line} compiler errors (from stdin) to source. \\
+\verb|--help|            & Full usage, directives, and AI workflow. \\
+\end{tabular}
+\end{quote}
+
+\section{Per-file flags (on \texttt{@@o})}
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|-d| & Emit \verb|#line| directives (C/C++/Fortran debugging). \\
+\verb|-i| & Do not indent expanded fragments. \\
+\verb|-t| & Do not expand tabs to spaces. \\
+\verb|-c|\textit{x} & Comment each fragment in the code (\verb|c| = \verb|/* */|, \verb|+| = \verb|//|, \verb|p| = \verb|#|). \\
+\verb|-s| & Suppress section markers and \verb|#line| for this file. \\
+\end{tabular}
+\end{quote}
+
+\section{Escaping, in one line}
+
+Every literal at-sign in your desired output is doubled: write \verb|@@@@|
+to get one \verb|@|. So a Python decorator is \verb|@@@@property|, a
+Java annotation \verb|@@@@Override|, and an email \verb|user@@@@host.com|.

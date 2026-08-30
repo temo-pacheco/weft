@@ -59,7 +59,16 @@
 \begin{document}
 \maketitle
 \tableofcontents
-@i literate/introduction.weft
+@i literate/guide/01-what-is-weft.weft
+@i literate/guide/02-quickstart.weft
+@i literate/guide/03-cheatsheet.weft
+@i literate/guide/04-language.weft
+@i literate/guide/05-languages.weft
+@i literate/guide/06-running.weft
+@i literate/guide/07-ai-toolkit.weft
+@i literate/guide/08-debugging.weft
+@i literate/guide/09-examples.weft
+@i literate/guide/10-reference.weft
 \bibliographystyle{amsplain}
 \bibliography{litprog,master,misc}
 \end{document}

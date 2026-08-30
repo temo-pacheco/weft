@@ -1,0 +1,285 @@
+\chapter{The weft Language}
+\label{ch:language}
+
+The whole of weft is a handful of commands that all begin with the escape
+character \verb|@@|. Everything else in a \verb|.weft| file --- \LaTeX\ or
+Markdown prose --- is copied through untouched. This chapter is the
+complete reference: defining files and fragments, the scraps that hold
+code, parameters, the minor utility commands, and section scoping.
+
+\section{Output files and fragments}
+
+Two commands produce all of weft's structure. \verb|@@o| names an
+\emph{output file} --- a tangle target written to disk. \verb|@@d| names a
+\emph{fragment} --- a reusable, named piece of code that is spliced into
+files (or other fragments) by reference.
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|@@o| \textit{file flags scrap} & Output a file. The name ends at whitespace. \\
+\verb|@@d| \textit{name scrap}       & Define a fragment. The name ends at a return or a scrap. \\
+\verb|@@q| \textit{name scrap}       & Define a \emph{quoted} fragment (see below). \\
+\end{tabular}
+\end{quote}
+
+A file or a fragment may be defined in \emph{several pieces}: repeat the
+\verb|@@o| or \verb|@@d| with the same name and weft concatenates the
+parts, in source order, into one file or one fragment. This is what lets
+you grow a definition across the narrative --- add to a header here,
+extend a function there --- and is shown in the woven output by the
+\hbox{$+\!\equiv$} continuation marker.
+
+The capital forms \verb|@@O|, \verb|@@D|, and \verb|@@Q| behave exactly
+like their lowercase counterparts but force a page break before the
+definition when weaving, which is handy for keeping a large scrap
+together on one page.
+
+\subsection{Quoted fragments}
+
+A \emph{quoted} fragment (\verb|@@q|) is defined but \emph{not expanded}
+when tangling: instead of splicing its body, weft writes it out as a
+fragment \emph{use}, so the output file can itself be valid \verb|.weft|
+source. This lets you generate weft files that undergo further processing
+before their fragments are expanded, while still describing and
+documenting them in one place. Inside a quoted fragment, \verb|@@f| (the
+file name) is quoted too, so it refers to the finally produced file, not
+an intermediate one. You may mix \verb|@@q| and \verb|@@d| definitions of
+the same name; each part is emitted in order, quoted or expanded as
+declared.
+
+\section{Scraps and what lives inside them}
+
+A \emph{scrap} is the body of code (or text) attached to a definition.
+Its delimiters are chosen so you can hold any content exactly, including
+every blank, tab, and carriage return:
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|@@{| \textit{code} \verb|@@}| & Verbatim code. The usual form; typeset with \texttt{listings}. \\
+\verb|@@[| \textit{text} \verb|@@]| & Paragraph mode: a piece of typeset \TeX. \\
+\verb|@@(| \textit{math} \verb|@@)| & Math mode: a formula, typeset nicely. \\
+\end{tabular}
+\end{quote}
+
+Any amount of whitespace (including newlines) may sit between a name and
+the start of its scrap. A scrap may also appear in the running prose,
+where it is typeset like a definition but contributes no code to any
+output file --- useful for talking about fragments in the text.
+
+\subsection{Inside a scrap}
+
+Within a scrap body, weft recognises a few sequences:
+
+\begin{description}
+\item[\tt @@<\textit{name}@@>] Expand the named fragment inline (recursion
+is an error). When the reference appears \emph{mid-line} --- after at
+least one visible character --- section markers, \verb|#line| directives,
+and name comments are suppressed and the fragment is spliced seamlessly;
+at the start of a line they are emitted normally
+(Chapter~\ref{ch:languages}).
+\item[\tt @@1 \ldots @@9] Substitute the $n$th argument of the enclosing
+fragment (empty if not supplied). See \S\ref{sec:params}.
+\item[\tt @@f] The current output file's name.
+\item[\tt @@t] The current fragment's title, with parameters replaced by
+their actual arguments.
+\item[\tt @@x\textit{label}@@x] Mark a place inside the scrap and bind it
+to \textit{label} (any text without an \verb|@@|). Expands to the scrap's
+reference number, so prose elsewhere can point at a spot within a scrap.
+\item[\tt @@\#] At the start of a line, suppress that line's indentation
+--- write \verb|@@#| before a \verb|#ifdef| so it sits flush left instead
+of following the surrounding indentation.
+\item[\tt @@s] Suppress the indentation of the \emph{next} fragment
+expansion.
+\item[\tt @@\%] Comment out the rest of the line, exactly like \verb|%| in
+ordinary \LaTeX. Handy for disabling a line of code during testing
+without disturbing real comments.
+\item[{\tt @@| \textit{ids} @@\}}] At the very end of a scrap, list
+identifiers to record in the \verb|@@u| index (\S\ref{sec:minor}).
+\end{description}
+
+\subsection{Abbreviating long names}
+
+A fragment name may be \emph{abbreviated} at a definition or a use: type a
+unique prefix followed by \verb|...|. So
+
+\begin{quote}
+\verb|@@d Check for terminating at-sequence and return name if found|
+\end{quote}
+
+\noindent can later be written
+
+\begin{quote}
+\verb|@@d Check for terminating...|
+\end{quote}
+
+\noindent weft keeps the longest form it sees, and the abbreviation may
+even appear before the full name. Blanks and tabs inside a name are
+insignificant --- each run collapses to a single space.
+
+\subsection{Tabs and indentation}
+
+When a scrap is written out, tabs are expanded to spaces by default (tab
+stops every eight columns), and an expanded fragment is indented to match
+the indentation of its \hbox{\tt @@<\ldots@@>} reference. Take care with
+layout-sensitive languages (Fortran, Python); the per-file flags below
+let you turn either behaviour off.
+
+\subsection{Per-file flags}
+\label{sec:fileflags}
+
+An \verb|@@o| directive may carry flags that tune how \emph{that one}
+file is tangled --- introducing a little language-specific behaviour
+without affecting the rest of the document:
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|-d| & Emit \verb|#line| directives (C/C++/Fortran source debugging). \\
+\verb|-i| & Do not indent expanded fragments (useful for Fortran). \\
+\verb|-t| & Do not expand tabs (useful for \texttt{make}files). \\
+\verb|-c|\textit{x} & Comment each fragment in the code: \verb|c|=\verb|/* */|, \verb|+|=\verb|//|, \verb|p|=\verb|#|. \\
+\verb|-s| & Suppress section markers and \verb|#line| for this file. \\
+\end{tabular}
+\end{quote}
+
+\noindent In most cases the automatic language detection of
+Chapter~\ref{ch:languages} is more convenient than these flags, but they
+remain for explicit control --- for example, \verb|-s| keeps bootstrap or
+generated files free of tangle annotations.
+
+\section{Fragment names with parameters}
+\label{sec:params}
+
+Fragment names can carry \emph{parameters}: placeholder values written
+into the name with the \verb|@@'value@@'| syntax. Inside the body,
+\verb|@@1| \ldots \verb|@@9| refer to them in order of appearance. A
+reusable validation fragment, for instance:
+
+\begin{quote}
+\begin{verbatim}
+@@d Validate field @@'name@@' type @@'string@@'
+@@{if (!data.@@1) throw new Error("Missing @@1");
+if (typeof data.@@1 !== '@@2')
+  throw new TypeError("@@1 must be @@2");
+@@}
+\end{verbatim}
+\end{quote}
+
+\noindent Each use supplies its own arguments:
+
+\begin{quote}
+\begin{verbatim}
+@@<Validate field @@'email@@' type @@'string@@'@@>
+@@<Validate field @@'age@@'   type @@'number@@'@@>
+\end{verbatim}
+\end{quote}
+
+\noindent so the first expands to \verb|if (!data.email) ...|. Three
+things to note: the values in the \emph{definition} act as default
+arguments and as documentation (they make the name readable); a
+\emph{use} may substitute different values; and if a name is abbreviated
+with \verb|...|, any missing arguments fall back to the definition's
+defaults.
+
+At each argument position of a use, four forms are accepted:
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|@@'string@@'|          & A literal string (only \verb|@@@@| is interpreted). Most common. \\
+\verb|@@<|\textit{name}\verb|@@>| & A fragment; its expansion becomes the argument. \\
+\verb|@@{|\textit{text}\verb|@@}| & An anonymous scrap (inherits the caller's arguments). \\
+\verb|@@1| \ldots \verb|@@9| & Forward an argument from the calling fragment. \\
+\end{tabular}
+\end{quote}
+
+\section{Minor commands}
+\label{sec:minor}
+
+These low-level utilities may appear anywhere in a web:
+
+\begin{description}
+\item[\tt @@@@] Copy a single \verb|@@| to the output. (Every literal
+at-sign in your desired output is doubled in the source.)
+\item[\tt @@\_\textit{text}@@\_] Set the enclosed text bold --- for
+keywords in a scrap.
+\item[\tt @@i \textit{file}] Include another file (nested up to 10 deep).
+The name is taken literally (no extension appended) and ends at a
+newline. The current directory is searched, plus any directories given
+with \verb|-I|, in order.
+\item[\tt @@r\textit{x}] Change the escape character from \verb|@@| to
+\textit{x}. Must precede any scrap definitions.
+\item[\tt @@v] The version string --- the value set by \verb|-V|, or, by
+default, weft's own version. Use it to stamp generated files.
+\item[\tt @@l \textit{tag}] Set the language for the next \verb|@@o| or
+\verb|@@d| (Chapter~\ref{ch:languages}). Place it on the line before the
+directive.
+\item[\tt @@L \textit{name style} {\rm[}+d{\rm]}] Define a new language
+mapping. Must appear in the preamble, before any directive that uses it.
+\item[\tt @@W \textit{format}] Declare this file's weave format,
+\verb|tex| or \verb|md|; used by \verb|-w| when no format is given on the
+command line. Put it in the preamble.
+\item[\tt @@c] Outside a scrap, define a block comment (all text up to the
+next command); inside a scrap, expand the last block comment at the
+current indentation, wrapping lines past 60 columns.
+\end{description}
+
+\subsection{Indices}
+
+Three commands generate back-of-document indices, usually each in its own
+section:
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|@@f| & Index of output file names. \\
+\verb|@@m| & Index of fragment names. \\
+\verb|@@u| & Index of user-specified identifiers. \\
+\end{tabular}
+\end{quote}
+
+\noindent The identifier index is opt-in: you \emph{mark} each identifier
+at the end of a scrap with \hbox{\tt @@| FOO BAR @@\}}. All \emph{uses} of
+those identifiers inside scraps are then found automatically. Any string
+without whitespace or \verb|@@| works, so even \verb|<<=| can be indexed;
+an identifier may be marked in more than one scrap. In the index each
+identifier lists the scraps that use and define it, with defining scraps
+underlined. (An identifier need not literally appear in the scrap that
+declares it --- it only has to be in that scrap's closing list.)
+
+\section{Sectioning: scoped names}
+
+In a large web the indices and name spaces grow unwieldy, and it becomes
+easy to reuse a fragment name by accident. \emph{Sections} give each part
+of the document its own scope: a fragment named in one section is
+unrelated to a same-named fragment in another, and identifiers do not
+leak between them. (Scraps in successive sections can still target the
+same output file.)
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|@@s| & Start a new local section. \\
+\verb|@@S| & Close the current section (following text is the base section). \\
+\verb|@@d+| \textit{name} & Define a \emph{global} fragment, visible in all sections. \\
+\verb|@@D+| / \verb|@@q+| / \verb|@@Q+| & The page-break / quoted variants. \\
+\verb|@@m+| / \verb|@@u+| & Index the global fragments / identifiers. \\
+\end{tabular}
+\end{quote}
+
+There are two kinds of section: the \emph{base} section, where everything
+normally lives, and \emph{local} sections introduced by \verb|@@s| and
+ended by \verb|@@S| (or the next \verb|@@s|). Base-section fragments are
+not global --- they are reachable only within the base section, but from
+anywhere in it regardless of intervening local sections. When you really
+do need to cross a boundary, within a scrap:
+
+\begin{description}
+\item[\tt @@<+\textit{name}@@>] Expand the \emph{global} fragment of that
+name rather than a local one.
+\item[\tt @@+] Like \hbox{\tt @@|} but \emph{exports} the identifiers to
+the global realm (not referenced from any single scrap).
+\item[\tt @@-] Like \hbox{\tt @@|} but \emph{imports} global identifiers
+into the local realm; uses within the section point here, and the
+cross-references show where the globals are defined.
+\end{description}
+
+\noindent The \verb|+| is part of the command, not the name: to define a
+fragment whose name begins with \verb|+|, leave a space after the
+command.

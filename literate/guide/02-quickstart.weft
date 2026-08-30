@@ -1,0 +1,147 @@
+\chapter{Quick Start}
+\label{ch:quickstart}
+
+This chapter walks through a complete literate program from a blank file
+to a running binary and a typeset document. It uses C for concreteness,
+but nothing here is C-specific.
+
+\section{Get weft}
+
+If you have the source tree, build the binary once:
+
+\begin{quote}
+\begin{verbatim}
+make            # tangle the .weft sources and compile ./weft
+./weft --help   # sanity check: prints usage and a directives summary
+\end{verbatim}
+\end{quote}
+
+\noindent That leaves a \verb|weft| executable in the current directory.
+Put it on your \verb|PATH| if you like.
+
+\section{Write your first \texttt{.weft}}
+
+Create \verb|hello.weft|. A weft file is mostly ordinary prose (\LaTeX\ or
+Markdown); the only special tokens are the \emph{at-commands}. Type this
+in verbatim:
+
+\begin{quote}
+\begin{verbatim}
+\documentclass{article}
+\usepackage{listings}
+\usepackage{color}
+\begin{document}
+
+We are going to greet the world. The greeting itself is a small
+reusable fragment, so the main routine reads like a sentence:
+
+@@d Say hello @@{
+printf("hello, %s\n", name);
+@@}
+
+The program picks a name and hands it to that greeting:
+
+@@o hello.c @@{
+#include <stdio.h>
+int main(void) {
+    const char *name = "world";
+    @@<Say hello@@>
+    return 0;
+}
+@@}
+
+\end{document}
+\end{verbatim}
+\end{quote}
+
+Three commands do all the work: \verb|@@d| \emph{defines} a named
+fragment, \verb|@@o| \emph{opens} an output file, and
+\hbox{\tt @@<name@@>} \emph{references} a fragment so its code is spliced
+in where the reference sits. The \verb|@@{...@@}| braces delimit the code
+(a \emph{scrap}); everything outside them is prose.
+
+\section{Tangle: get the code}
+
+Run weft with no flags. That is the default job --- tangle:
+
+\begin{quote}
+\begin{verbatim}
+weft hello.weft
+\end{verbatim}
+\end{quote}
+
+\noindent weft writes \verb|hello.c|, assembling the file exactly as the
+\verb|@@o hello.c| scrap describes, with \hbox{\tt @@<Say hello@@>}
+replaced by its fragment body:
+
+\begin{quote}
+\begin{verbatim}
+#include <stdio.h>
+int main(void) {
+    const char *name = "world";
+    printf("hello, %s\n", name);
+    return 0;
+}
+\end{verbatim}
+\end{quote}
+
+\noindent (weft also inserts \emph{section markers} --- small comments
+that map each line back to \verb|hello.weft|. They are covered in
+Chapter~\ref{ch:debug}; ignore them for now.) Compile and run it like any
+C program:
+
+\begin{quote}
+\begin{verbatim}
+cc -o hello hello.c && ./hello
+hello, world
+\end{verbatim}
+\end{quote}
+
+\section{Weave: get the document}
+
+Now ask for the document with \verb|-w|:
+
+\begin{quote}
+\begin{verbatim}
+weft -w tex hello.weft      # produces hello.tex
+pdflatex hello.tex          # produces hello.pdf
+\end{verbatim}
+\end{quote}
+
+\noindent The PDF shows your prose with the code set beneath each
+heading: \hbox{$\langle$\,\textit{Say hello}\,$\rangle$} and
+\hbox{$\langle$\,\texttt{hello.c}\,$\rangle$} as linked headers, syntax
+highlighted, with automatic ``used in'' / ``defines'' cross-references. To
+resolve the scrap numbers you run weft once more after \LaTeX\ (weft reads
+them back from the \verb|.aux| file):
+
+\begin{quote}
+\begin{verbatim}
+weft -w tex hello.weft && pdflatex hello.tex
+\end{verbatim}
+\end{quote}
+
+Prefer Markdown? Swap the format --- no \TeX\ needed:
+
+\begin{quote}
+\begin{verbatim}
+weft -w md hello.weft        # produces hello.md, renders on GitHub
+\end{verbatim}
+\end{quote}
+
+\section{What just happened}
+
+You wrote \emph{one} file and got two artifacts from it:
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|weft hello.weft|        & $\rightarrow$ \verb|hello.c| (tangle, the default) \\
+\verb|weft -w tex hello.weft| & $\rightarrow$ \verb|hello.tex| $\rightarrow$ PDF (weave) \\
+\verb|weft -w md hello.weft|  & $\rightarrow$ \verb|hello.md| (weave) \\
+\end{tabular}
+\end{quote}
+
+\noindent That is the whole loop. From here: keep the Cheatsheet
+(Chapter~\ref{ch:cheatsheet}) next to you, learn the full command set in
+Chapter~\ref{ch:language}, and see bigger programs in
+Chapter~\ref{ch:examples}.

@@ -1,0 +1,111 @@
+\chapter{Running weft}
+\label{ch:running}
+
+weft is a command-line tool. This chapter covers how it is invoked, how
+to choose between tangling and weaving, the two woven formats, and the
+full set of flags. (The introspection flags --- \verb|-m|, \verb|-e|,
+\verb|-R|, \verb|--lint|, and friends --- have their own chapter,
+Chapter~\ref{ch:ai}.)
+
+\section{Invocation and defaults}
+
+\begin{quote}
+{\tt weft} \textit{flags file}\ldots
+\end{quote}
+
+\noindent One or more files may be processed at once. A file name with no
+extension gets \verb|.weft| appended. The input may live in another
+directory, but the woven document is always written to the current
+directory. So \verb|weft /foo/bar/quux| reads \verb|/foo/bar/quux.weft|
+and, by default, writes only the tangled output files.
+
+That default is the important part: \textbf{weft only tangles unless you
+ask for a document.} It generates the files named by \verb|@@o| and
+nothing else, so it drops quietly into a normal build. Weaving happens
+only with \verb|-w|, and then tangling and weaving run in a single pass.
+
+\section{Choosing what to produce}
+
+Three flags select the work:
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|-t| & Suppress weaving (override a \verb|-w| in a script). \\
+\verb|-o| & Suppress tangling --- weave only. \\
+\verb|-c| & Skip the change-test before overwriting output files. \\
+\end{tabular}
+\end{quote}
+
+\noindent By default weft writes each output file to a temporary location
+and compares it with the existing file, replacing it only if it changed
+--- so \verb|make| does not rebuild untouched files. \verb|-c| skips that
+comparison. As an extreme, \verb|weft -to file| scans the input and
+produces nothing at all.
+
+\section{Weaving to \LaTeX}
+
+\verb|weft -w tex file.weft| produces \verb|file.tex|. Because scrap
+numbers depend on where things land on the page, they cannot be known
+until \LaTeX\ has run; weft resolves them by reading the \verb|.aux| file
+on a \emph{second} pass. The usual recipe is therefore:
+
+\begin{quote}
+\begin{verbatim}
+weft -w tex file.weft && pdflatex file.tex && \
+weft -w tex file.weft && pdflatex file.tex
+\end{verbatim}
+\end{quote}
+
+\noindent weft warns when a rerun is needed; if it cannot tell, \LaTeX\
+warns that labels may have changed. Add \verb|-r| to emit hyperlinks
+(your preamble must load \verb|hyperref|), and \verb|-n| to number scraps
+1, 2, 3\ldots\ sequentially instead of by page --- handy for small webs.
+
+\section{Weaving to Markdown}
+
+\verb|weft -w md file.weft| produces \verb|file.md|, readable on any
+platform that renders Markdown --- GitHub, GitLab, VS~Code --- with no
+\TeX\ installation. It keeps the essentials (scrap definitions,
+cross-references, indices) with Markdown-native conventions:
+
+\begin{description}
+\item[Headers] Files as \verb|**"name"** **N** =|, fragments as
+\verb|**<*Name* N>** =|.
+\item[Bodies] Code in \verb|<pre><code>| blocks (not fenced), so
+references inside code can be clickable links.
+\item[Cross-references] Each scrap has an HTML anchor \verb|<a id="weftN">|
+and links use \verb|<a href="#weftN">|; footers are blockquotes.
+\item[Numbering] Sequential (\verb|-n| is forced --- Markdown has no
+pages), no letter suffixes.
+\item[Highlighting] \verb|<code class="language-X">| when the language is
+known (Chapter~\ref{ch:languages}).
+\item[Fences] Cosmetic triple-backtick fences in the source are silently
+stripped.
+\end{description}
+
+\noindent Tangling is identical regardless of format; with \verb|-w| a
+single run produces both the document and the output files.
+
+\section{All command-line flags}
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|-w| {\rm[}\textit{fmt}{\rm]} & Weave. \verb|-w tex|, \verb|-w md|, or \verb|-w| alone (uses \verb|@@W|). \\
+\verb|-t| & Suppress weaving. \\
+\verb|-o| & Suppress tangling. \\
+\verb|-c| & Do not test output files for change before writing. \\
+\verb|-p| \textit{path} & Prepend \textit{path} to every output file name. \\
+\verb|-V| \textit{str} & Value for \verb|@@v| (defaults to weft's version). \\
+\verb|-n| & Number scraps sequentially instead of by page. \\
+\verb|-r| & Emit hyperlinks (needs \verb|hyperref|). \\
+\verb|-x| & Include cross-reference numbers in scrap comments. \\
+\verb|-h| \textit{opts} & Options for the \verb|hyperref| package. \\
+\verb|-v| & Verbose progress on \verb|stderr|. \\
+\verb|-s| & Do not list the scraps that make up each file. \\
+\verb|-d| & Print dangling identifiers (never referenced). \\
+\verb|--help| & Full usage, a directives summary, and the AI workflow. \\
+\end{tabular}
+\end{quote}
+
+\noindent For the project-map, extraction, reverse-map, lint, diff, and
+error-translation flags, see Chapter~\ref{ch:ai}.

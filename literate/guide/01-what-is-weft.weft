@@ -1,0 +1,106 @@
+\chapter{What is weft?}
+\pagenumbering{arabic}
+
+\textbf{weft} is a small, language-agnostic tool for \emph{literate
+programming}: you write one document that interleaves prose and code, and
+weft turns it into two things --- a program a compiler can build, and a
+document a human can read. It is a modern fork of Preston Briggs' nuweb,
+rewritten for clarity and extended with Markdown output, source-mapped
+section markers, and a toolkit for AI-assisted navigation.
+
+If you have five minutes, read the next two sections and the
+Quick Start (Chapter~\ref{ch:quickstart}); that is enough to write your
+first literate program. The later chapters are a reference you can dip
+into as needed.
+
+\section{The idea in 30 seconds}
+
+A literate program is a narrative. You explain \emph{what} you are
+building and \emph{why}, and you drop the code into that explanation in
+whatever order tells the best story --- not the order the compiler
+demands. Each piece of code is a named \emph{fragment}; you assemble
+fragments into files by reference.
+
+weft reads that one source file (extension \verb|.weft|) and does two
+independent jobs:
+
+\begin{quote}
+\begin{tabular}{@@{}lp{9.2cm}@@{}}
+\textbf{tangle} & extract the code --- write out the real source files a
+compiler or interpreter consumes. This is the default. \\[4pt]
+\textbf{weave} & typeset the document --- produce a \LaTeX\ (\verb|.tex|)
+or Markdown (\verb|.md|) file with the prose, the code, and automatic
+cross-references. Turned on with \verb|-w|. \\
+\end{tabular}
+\end{quote}
+
+\noindent The same source is both the program and its documentation, so
+the two can never drift apart.
+
+\section{Tangle and weave, side by side}
+
+One \verb|.weft| file fans out into everything else:
+
+\begin{quote}
+\begin{verbatim}
+                      weft hello.weft  (tangle, the default)
+                   +--------------------->  hello.c, util.c, ...
+  hello.weft ------+                         (real source, compiled as usual)
+  (prose + code)   |
+                   +--------------------->  hello.tex --> PDF
+                      weft -w tex ...        hello.md      (GitHub, ...)
+                      (weave)
+\end{verbatim}
+\end{quote}
+
+Tangling and weaving are independent: by default weft only tangles, so it
+fits quietly into a normal build. Ask for a document with \verb|-w|, and a
+single pass produces both.
+
+\section{Why literate programming}
+
+The premise, due to Knuth~\cite{Knuth:CJ-27-2-97}, is to stop writing
+code with documentation bolted on and instead write documentation with
+code woven in --- ``the difference between performing and exposing a
+magic trick.'' Three things follow:
+
+\begin{description}
+\item[Order for humans, not compilers.] Present a program top-down,
+bottom-up, or in ``stream of consciousness'' order --- whatever makes it
+easiest to understand. tangle re-assembles it for the machine.
+\item[Names instead of detail.] A fragment reference like
+\hbox{\tt @@<Validate the request@@>} replaces a screenful of code with a
+meaningful name, so structure is visible at every level.
+\item[One source of truth.] Prose and code live in the same file and are
+generated together; stale comments become impossible by construction.
+\end{description}
+
+\section{Why weft}
+
+weft keeps nuweb's best trait --- it works with \emph{any} language, or
+several at once --- and modernizes the rest:
+
+\begin{description}
+\item[Language-agnostic.] weft never parses your code, so C, Python,
+Rust, SQL, shell, Protobuf, or a mix all work the same way. What it gives
+up (automatic prettyprinting, a built-in identifier index) it trades for
+simplicity and total control over layout.
+\item[Two woven formats.] \LaTeX\ for a typeset book; Markdown
+(\verb|-w md|) for documentation that renders on GitHub with no \TeX\
+installation.
+\item[Source-mapped output.] Tangled files carry \emph{section markers}
+and \verb|#line| directives, so a compiler error in the generated code
+maps straight back to the \verb|.weft| source (Chapter~\ref{ch:debug}).
+\item[A toolkit for tools.] A JSON project map (\verb|-m|), single-fragment
+extraction (\verb|-e|), reverse source mapping (\verb|-R|), a linter
+(\verb|--lint|), and compiler-error translation (\verb|--errors|) make
+weft webs navigable by scripts and AI agents alike
+(Chapter~\ref{ch:ai}).
+\item[Small and fast.] The command set is tiny, and by default weft only
+tangles, so it stays out of the way of your build.
+\end{description}
+
+\noindent The rest of this guide is practical: write a first program
+(Chapter~\ref{ch:quickstart}), keep the Cheatsheet
+(Chapter~\ref{ch:cheatsheet}) at hand, and reach for the reference
+chapters when you need the details.

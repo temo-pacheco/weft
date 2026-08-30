@@ -1,0 +1,110 @@
+\chapter{Worked Examples}
+\label{ch:examples}
+
+Three complete webs, each showing a different strength: splitting one
+program across files, substituting a value inline, and driving several
+languages from a single narrative.
+
+\section{One program, several files}
+
+A tiny calculator split into a header and two source files, all from one
+web. The header fragment is defined once and referenced from both the
+header file and the implementation, so the declaration can never drift
+from its use:
+
+\begin{quote}
+\begin{verbatim}
+@@d add prototype @@{int add(int a, int b);@@}
+
+@@o calc.h @@{
+#ifndef CALC_H
+#define CALC_H
+@@<add prototype@@>
+#endif
+@@}
+
+@@o calc.c @@{
+#include "calc.h"
+@@<add prototype@@>
+{ return a + b; }
+@@}
+
+@@o main.c @@{
+#include <stdio.h>
+#include "calc.h"
+int main(void) { printf("%d\n", add(2, 3)); return 0; }
+@@}
+\end{verbatim}
+\end{quote}
+
+\noindent \verb|weft calc.weft| writes \verb|calc.h|, \verb|calc.c|, and
+\verb|main.c|; \hbox{\tt @@<add prototype@@>} expands to the same
+declaration in both the header (as a prototype) and the implementation
+(as the function head). Change the signature once and all three files
+follow.
+
+\section{Substituting a value inline}
+
+A fragment referenced \emph{mid-line} in a scrap is spliced in place,
+with no surrounding markers or line breaks --- so a fragment can act as a
+single reusable \emph{value}. This is how a version number, a port, or a
+host name lives in exactly one place:
+
+\begin{quote}
+\begin{verbatim}
+@@d port @@{4000@@}
+@@d host @@{"localhost"@@}
+
+@@o config.c @@{
+const char *host = @@<host@@>;
+int port = @@<port@@>;
+@@}
+\end{verbatim}
+\end{quote}
+
+\noindent tangles to a clean, compilable line each:
+
+\begin{quote}
+\begin{verbatim}
+const char *host = "localhost";
+int port = 4000;
+\end{verbatim}
+\end{quote}
+
+\noindent Because the references sit after visible text on the line, weft
+suppresses the usual section markers and \verb|#line| directives and
+splices the value seamlessly (see Chapter~\ref{ch:languages}). Define the
+value once; every \verb|@@<port@@>| picks it up.
+
+\section{One concept across languages}
+
+A web is not limited to one language. A single narrative can define a
+database schema, the code that uses it, and the script that deploys it,
+routing each to its own file:
+
+\begin{quote}
+\begin{verbatim}
+@@o schema.sql @@{
+CREATE TABLE users (id SERIAL PRIMARY KEY, email TEXT NOT NULL);
+@@}
+
+@@o app.py @@{
+import psycopg2
+def find_user(conn, uid):
+    cur = conn.cursor()
+    cur.execute("SELECT email FROM users WHERE id = %s", (uid,))
+    return cur.fetchone()
+@@}
+
+@@o deploy.sh @@{
+#!/bin/sh
+psql "$DATABASE_URL" -f schema.sql
+@@}
+\end{verbatim}
+\end{quote}
+
+\noindent One \verb|weft| run tangles all three files, each with the
+right comment style for its language in the section markers, while the
+prose explains the \emph{one} idea --- the users table --- that ties them
+together. The cross-language contract is documented exactly where the
+languages meet.

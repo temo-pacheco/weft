@@ -1,0 +1,54 @@
+\chapter{Restrictions and Acknowledgements}
+\label{ch:reference}
+
+\section{Restrictions}
+
+weft is meant to stay simple, so a few restrictions are deliberate. Some
+may be lifted over time; others seem fundamental.
+
+\begin{itemize}
+\item \textbf{Error handling is not uniform.} In some cases weft warns and
+continues; in others it halts. This should be regularised.
+\item \textbf{Undefined fragments warn but do not halt.} A reference to a
+fragment that is never defined is written into the output surrounded by
+\verb|<>|, which is convenient during development but may change.
+\item \textbf{No \texttt{@@} in file names or index entries.}
+\item \textbf{Fragment names are (almost) any \TeX.} You may switch fonts
+or use math mode in a name, but keep braces, brackets, and dollar signs
+balanced.
+\item \textbf{Scraps hold anything}, but very long scraps (wide or tall)
+may not typeset well. A long scrap can be allowed to break across a page
+if defined with \verb|@@O|/\verb|@@D| instead of \verb|@@o|/\verb|@@d|;
+this is a poor default (too many short scraps would break) but a useful
+per-scrap choice.
+\item \textbf{Output files share the current directory} with the
+temporary files weft writes for its change-test, so all outputs should be
+on the same file system --- or use \verb|-p| to redirect them.
+\item \textbf{\LaTeX\ needs two passes.} Page-based scrap numbers are not
+known until \LaTeX\ has run, so weft must be rerun afterwards for a clean
+document (much as \LaTeX\ itself is rerun for an up-to-date table of
+contents). weft warns when this is needed; otherwise \LaTeX\ warns that
+labels may have changed. This does not apply to Markdown output, which
+numbers sequentially and needs no extra passes.
+\end{itemize}
+
+\section{Acknowledgements}
+
+weft is a fork of nuweb, which was written by Preston Briggs and
+maintained over the years by Marc Mengel, Simon Wright, and Keith
+Harwood. It in turn drew its name and several features from Norman
+Ramsey's noweb, and stands on the foundation Donald Knuth laid with
+\verb|WEB|.
+
+Many people contributed time, ideas, and debugging to nuweb, among them
+Osman Buyukisik, Manuel Carriba, Adrian Clarke, Tim Harvey, Michael
+Lewis, Walter Ravenek, Rob Shillingsburg, Kayvan Sylvan, Dominique
+de~Waleffe, and Scott Warren --- and George Greenwade, without whose
+efforts most of them would never have heard of the tool. Later online
+contributions came from Walter Brown, Nicky van~Foreest, Javier Goizueta,
+and Alan Karp.
+
+weft carries that work forward with a modernized, concept-organized
+codebase, Markdown weave output, source-mapped section markers, and the
+introspection toolkit of Chapter~\ref{ch:ai} --- while keeping the
+simplicity that made nuweb worth forking.

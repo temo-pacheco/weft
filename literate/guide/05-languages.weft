@@ -1,0 +1,181 @@
+\chapter{Section Markers: Mapping Code to Source}
+\label{ch:languages}
+
+The code you compile is \emph{tangled output} --- files weft assembles
+from scraps scattered across many concept (\verb|.weft|) files. So a line
+in \verb|server.js| does not correspond to any file you wrote; it was
+built from fragments defined in \verb|routes.weft|, \verb|database.weft|,
+and others. To keep that connection, weft writes \emph{section markers}
+into the generated code: small comments that name the scrap and point at
+the exact source file and line it came from.
+
+These markers are the backbone of source mapping. They let the
+\textbf{programmer} browse generated code and jump back to the narrative;
+they let the \textbf{compiler and debugger} report against the
+\verb|.weft| source (via \verb|#line|); and they let \textbf{tools and AI
+agents} navigate mechanically between output and source (Chapter~\ref{ch:ai}).
+Because a marker is written as a \emph{comment}, weft must know each
+file's comment style --- and that is the one reason it detects the
+language.
+
+\section{What a marker looks like}
+
+Each scrap is wrapped in an opening marker (scrap number + source
+location) and a closing marker (number only), in the language's comment
+syntax. When fragments nest, each expansion gets its own pair, forming a
+clear hierarchy:
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|{|\,\ldots\ / \verb|{:|\,\ldots & Opening / closing delimiter. \\
+Number & Scrap ID, unique across the whole document. \\
+\verb|file:line| & Source \verb|.weft| file and line (opening only). \\
+\end{tabular}
+\end{quote}
+
+\noindent The same scrap, tangled to JavaScript, Python, and C:
+
+\begin{quote}
+\begin{verbatim}
+// {3: routes.weft:42}
+app.get("/api/users", handler);
+// {:3}
+
+# {5: models.weft:31}
+class User: ...
+# {:5}
+
+#line 12 "memory.weft"
+/* {2: memory.weft:12} */
+void *safe_malloc(size_t n) { ... }
+/* {:2} */
+\end{verbatim}
+\end{quote}
+
+\noindent For C-family languages weft also emits a \verb|#line| directive
+above the marker, so the compiler itself reports errors against the
+\verb|.weft| file. Scrap numbers are document-global and stable as long
+as you do not add or remove \verb|@@{...@@}| blocks before them.
+Chapter~\ref{ch:debug} shows how to \emph{use} all this while debugging.
+
+\section{How weft knows the comment style}
+
+To write a marker as a comment, weft needs the file's comment style. It
+finds it by a short chain:
+
+\begin{quote}
+file extension $\longrightarrow$ language $\longrightarrow$ comment style
+$\longrightarrow$ markers in the tangled output
+\end{quote}
+
+\noindent \verb|@@o server.js| has extension \verb|.js|; weft looks
+\verb|js| up in its language table, sees JavaScript uses \verb|//|, and
+wraps each scrap accordingly. \verb|@@o main.c| matches \verb|c|
+(\verb|/* */| plus \verb|#line|); \verb|@@o config.py| matches \verb|py|
+(\verb|#|). No flags are needed --- the extension alone is enough.
+
+\section{Overriding the language with \texttt{@@l}}
+
+When the extension is not enough --- a \verb|.txt| file that is really SQL
+--- put \verb|@@l| \textit{tag} on the line \emph{before} the directive:
+
+\begin{quote}
+\begin{verbatim}
+@@l sql
+@@o queries.txt
+@@{SELECT * FROM users;
+@@}
+\end{verbatim}
+\end{quote}
+
+\noindent Now the markers in \verb|queries.txt| use \verb|--| comments.
+\verb|@@l| works on \verb|@@d| fragments too, and the tag it sets drives
+both the section markers and the Markdown highlighting. When several
+sources of language information exist, weft resolves them in order:
+explicit per-file flags on \verb|@@o| win, then an \verb|@@l| tag, then
+the file extension.
+
+\section{Defining new languages with \texttt{@@L}}
+\label{sec:atL}
+
+The built-in table is large but cannot know every language or house
+style. \verb|@@L| registers a new mapping --- or overrides an existing one
+--- in the preamble:
+
+\begin{quote}
+{\tt @@L} \textit{name style} {\rm[}{\tt +d}{\rm]}
+\end{quote}
+
+\noindent where \textit{name} is the tag recognised in \verb|@@l| and file
+extensions, \textit{style} is the comment syntax (\verb|//|, \verb|#|,
+\verb|--|, \verb|/*|, or \verb|<!--|), and \verb|+d| optionally enables
+\verb|#line| directives. For example:
+
+\begin{quote}
+\begin{verbatim}
+@@L wgsl //       % WebGPU shading language: // comments
+@@L c //          % override the built-in: // instead of /* */
+\end{verbatim}
+\end{quote}
+
+\noindent User entries are searched \emph{before} the built-in table (up
+to 32 of them); \verb|@@L| is processed in pass~1 and skipped when weaving.
+
+\section{The language table}
+\label{sec:langtable}
+
+weft ships with over 250 entries --- languages, extensions, and aliases
+--- grouped by comment style. A tag is matched against \verb|@@l| tags and
+file extensions alike:
+
+\begin{quote}
+\small
+\begin{tabular}{lp{8.6cm}}
+\hline
+Comment style & Tags (representative) \\
+\hline
+\verb|/* */| + \verb|#line| & c, h, cpp, cc, cxx, hpp, objc, m, mm, cu, cuh \\[2pt]
+\verb|/* */| & css, scss, sass, less, cl \\[2pt]
+\verb|//| & js, ts, jsx, tsx, java, scala, kotlin, go, rust, rs, zig, swift, dart, php, graphql, proto, sol, glsl, wgsl \\[2pt]
+\verb|#| & python, py, sh, bash, perl, ruby, r, awk, makefile, cmake, julia, nim, elixir, yaml, toml, dockerfile, terraform, nix, ini \\[2pt]
+\verb|--| & lua, sql, psql, haskell, hs, elm, ada, vhdl, lean, agda, idris, erlang \\[2pt]
+\verb|<!-- -->| & html, xml, svg, xaml, erb, hbs, twig, md, rst, tex, latex \\[2pt]
+(none) & json, csv, tsv, txt, diff, patch \\
+\hline
+\end{tabular}
+\end{quote}
+
+\noindent If a tag is in neither table, weft falls back to \verb|//| with
+no \verb|#line|. Tags mapped to the ``none'' style (\verb|json|,
+\verb|txt|, \ldots) produce no markers at all.
+
+\section{Suppressing markers}
+\label{sec:suppress}
+
+Markers are a help, not an obligation. You suppress them when comments
+would be wrong or unwanted --- a data file, a format with no comment
+syntax, or generated output you want kept pristine:
+
+\begin{description}
+\item[Per file] Put \verb|-s| on the \verb|@@o| line
+(\S\ref{sec:fileflags}). The language is still detected (so Markdown
+highlighting works), but no section markers or \verb|#line| directives are
+written for that file.
+\item[Mid-line references] A fragment referenced \emph{after} visible text
+on a line is spliced with no markers at all, so it reads as inline text
+--- \verb|int port = @@<port@@>;| becomes \verb|int port = 4000;|. A
+reference at the start of a line is a block expansion and gets markers
+normally. This is what makes fragments usable as inline values; see
+Chapter~\ref{ch:examples}.
+\item[``none'' languages] Tags like \verb|json| and \verb|txt| have no
+comment style, so they never get markers.
+\end{description}
+
+\section{A note on highlighting}
+
+The language tag has a second, minor use: in the Markdown weave
+(\verb|-w md|), weft puts it on the code element ---
+\verb|<code class="language-python">| --- so GitHub and client-side
+highlighters (highlight.js, Prism) colour the code. In the \LaTeX\ weave,
+the \verb|listings| package highlights regardless. Highlighting is a
+by-product of knowing the language; the section markers are the point.

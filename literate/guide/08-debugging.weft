@@ -1,0 +1,90 @@
+\chapter{Debugging Tangled Code}
+\label{ch:debug}
+
+Chapter~\ref{ch:languages} explained \emph{what} section markers are and
+how weft produces them. This chapter is about \emph{using} them --- how a
+marker turns an error in generated code into a precise location in your
+\verb|.weft| source, for you, for the compiler, and for tools.
+
+\section{The four-step workflow}
+
+Tracing any error back to its source is the same short procedure:
+
+\begin{enumerate}
+\item \textbf{Locate} the failing line in the tangled file --- e.g.\
+\verb|server.js:47| from a stack trace.
+\item \textbf{Read upward} to the nearest opening marker,
+\verb|// {3: routes.weft:42}|, which names the scrap and its source.
+\item \textbf{Open} \verb|routes.weft:42|. The scrap is there, wrapped in
+the prose that explains its intent --- which often makes the bug obvious.
+\item \textbf{Fix, re-tangle, done.} Never edit the tangled file; the
+markers are there to remind you it is generated.
+\end{enumerate}
+
+\paragraph{Nested markers point most precisely.} When fragments invoke
+fragments, markers nest like parentheses. Read the \emph{innermost}
+enclosing pair --- it names the most specific source location:
+
+\begin{quote}
+\begin{verbatim}
+// {3: routes.weft:42}
+app.get("/api/users/:id", async (req, res) => {
+  // {7: database.weft:18}
+  const user = await db.query("SELECT ... WHERE id=$1", [req.params.id]);
+  // {:7}
+  res.json(user);
+});
+// {:3}
+\end{verbatim}
+\end{quote}
+
+\noindent If the bug is inside the \verb|{7:...{:7}| block, go to
+\verb|database.weft:18|, not \verb|routes.weft:42|.
+
+\paragraph{Let the compiler do it.} For C-family languages the
+\verb|#line| directive weft emits makes the compiler report against the
+source directly:
+
+\begin{quote}
+\begin{verbatim}
+parser.weft:84: error: 'token_type' undeclared
+\end{verbatim}
+\end{quote}
+
+\noindent instead of pointing at \verb|parser.c|. Go straight to
+\verb|parser.weft:84|; the prose around the scrap says what
+\verb|token_type| is and where it is defined.
+
+\section{Common situations}
+
+\begin{description}
+\item[Runtime error with a stack trace.] Open the file and line it names,
+read up to the nearest marker, open that \verb|.weft| location.
+\item[Wrong output, no error.] Search the tangled file for the suspect
+code; its marker tells you which scrap to examine. Often the prose says
+one thing (``triple each value'') and the code does another (\verb|* 2|)
+--- bug found.
+\item[Which definition produced this line?] Fragments defined in several
+pieces accumulate, but each piece has its own scrap number and source
+line, so the marker disambiguates them.
+\end{description}
+
+\paragraph{Handy habits.}
+\begin{itemize}
+\item \verb|grep -n '{[0-9]*: database.weft:' server.js| lists every scrap
+that came from one source file.
+\item A closing \verb|{:7}| with no visible \verb|{7:| above means the
+scrap is taller than your screen --- scroll up.
+\item If your test runner prints code on failure, the markers point
+straight at the literate source.
+\end{itemize}
+
+\section{Doing it automatically}
+
+You rarely need to trace by hand. weft reads the markers for you:
+\verb|weft -R server.js:47| returns the source location as JSON, and
+piping a build log through \verb|weft --errors| annotates every
+\textit{file:line} it recognises with its \verb|.weft| origin. Both work
+on the tangled output alone --- no \verb|.weft| sources needed --- which
+is what makes them ideal in CI and for AI agents. See
+Chapter~\ref{ch:ai}.
