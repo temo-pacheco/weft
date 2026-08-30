@@ -83,7 +83,7 @@ anonymous scrap \verb|@@{text@@}|, or a forwarded argument
 \verb|@@f| / \verb|@@m| / \verb|@@u| & Index of files / fragments / identifiers. \\
 \verb|@@l| \textit{tag}              & Set the language for the next \verb|@@o|/\verb|@@d|. \\
 \verb|@@L| \textit{name style} \verb|[+d]| & Define a new language (preamble). \\
-\verb|@@W| \textit{tex} or \textit{md}  & Declare the weave format for this file. \\
+\verb|@@W| \textit{tex}\,\textbar\,\textit{md}\,\textbar\,\textit{html}  & Declare the weave format for this file. \\
 \verb|@@r|\textit{x}                 & Change the escape character from \verb|@@| to \textit{x}. \\
 \verb|@@v|                           & The version string (defaults to weft's version; \verb|-V| overrides). \\
 \verb|@@c|                           & Define / expand a block comment. \\
@@ -98,6 +98,7 @@ anonymous scrap \verb|@@{text@@}|, or a forwarded argument
 \verb|weft -w f.weft|   & Tangle + weave, format from \verb|@@W|. \\
 \verb|weft -w tex f|    & Weave \LaTeX\ (\verb|.tex|). \\
 \verb|weft -w md f|     & Weave Markdown (\verb|.md|). \\
+\verb|weft -w html f|   & Weave a self-contained HTML page (\verb|.html|). \\
 \verb|-t|               & Suppress weaving. \\
 \verb|-o|               & Suppress tangling (weave only). \\
 \verb|-p| \textit{path} & Prefix output file names with \textit{path}. \\

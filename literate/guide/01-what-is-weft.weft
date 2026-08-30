@@ -28,9 +28,9 @@ independent jobs:
 \begin{tabular}{@@{}lp{9.2cm}@@{}}
 \textbf{tangle} & extract the code --- write out the real source files a
 compiler or interpreter consumes. This is the default. \\[4pt]
-\textbf{weave} & typeset the document --- produce a \LaTeX\ (\verb|.tex|)
-or Markdown (\verb|.md|) file with the prose, the code, and automatic
-cross-references. Turned on with \verb|-w|. \\
+\textbf{weave} & typeset the document --- produce a \LaTeX\ (\verb|.tex|),
+Markdown (\verb|.md|), or HTML (\verb|.html|) file with the prose, the
+code, and automatic cross-references. Turned on with \verb|-w|. \\
 \end{tabular}
 \end{quote}
 
@@ -85,9 +85,10 @@ several at once --- and modernizes the rest:
 Rust, SQL, shell, Protobuf, or a mix all work the same way. What it gives
 up (automatic prettyprinting, a built-in identifier index) it trades for
 simplicity and total control over layout.
-\item[Two woven formats.] \LaTeX\ for a typeset book; Markdown
+\item[Three woven formats.] \LaTeX\ for a typeset book; Markdown
 (\verb|-w md|) for documentation that renders on GitHub with no \TeX\
-installation.
+installation; and self-contained HTML (\verb|-w html|) for a browsable
+page that opens in any browser.
 \item[Source-mapped output.] Tangled files carry \emph{section markers}
 and \verb|#line| directives, so a compiler error in the generated code
 maps straight back to the \verb|.weft| source (Chapter~\ref{ch:debug}).

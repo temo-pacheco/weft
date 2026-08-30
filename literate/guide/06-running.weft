@@ -2,7 +2,7 @@
 \label{ch:running}
 
 weft is a command-line tool. This chapter covers how it is invoked, how
-to choose between tangling and weaving, the two woven formats, and the
+to choose between tangling and weaving, the three woven formats, and the
 full set of flags. (The introspection flags --- \verb|-m|, \verb|-e|,
 \verb|-R|, \verb|--lint|, and friends --- have their own chapter,
 Chapter~\ref{ch:ai}.)
@@ -86,11 +86,42 @@ stripped.
 \noindent Tangling is identical regardless of format; with \verb|-w| a
 single run produces both the document and the output files.
 
+\section{Weaving to HTML}
+
+\verb|weft -w html file.weft| produces \verb|file.html|: a complete,
+self-contained web page --- doctype, an embedded style sheet, and body ---
+that opens in any browser with no external tooling, no \TeX, and no
+Markdown processor. It is the quickest way to a browsable, cross-referenced
+rendering of a web.
+
+\begin{description}
+\item[Self-contained] The generated \verb|.html| carries its own CSS
+(fragment names in an accent colour, soft code blocks, accent links) and
+adapts to the reader's light or dark theme.
+\item[Prose is HTML] As with every weave, the prose is copied through
+verbatim, so in an HTML web you write HTML prose (\verb|<h1>|, \verb|<p>|,
+\ldots) around your scraps --- just as \verb|-w tex| expects \LaTeX\ and
+\verb|-w md| expects Markdown.
+\item[Headers] Fragment and file definitions render as
+\hbox{$\langle$\,\textit{Name} N\,$\rangle$} with the
+\(\equiv\)/\(+\!\equiv\) definition marker.
+\item[Cross-references] A fragment reference in the prose becomes a
+clickable link to its definition; scrap footers (``used in'', ``also
+at'') and the \verb|@@f|/\verb|@@m|/\verb|@@u| indices are clickable too,
+via \verb|#weftN| anchors within the page.
+\item[Numbering] Sequential (like Markdown --- a page has no page numbers).
+\item[Highlighting] \verb|<code class="language-X">| when the language is
+known (Chapter~\ref{ch:languages}).
+\end{description}
+
+\noindent The format can also be declared in the source with
+\verb|@@W html| and then invoked with a bare \verb|-w|.
+
 \section{All command-line flags}
 
 \begin{quote}
 \begin{tabular}{@@{}ll@@{}}
-\verb|-w| {\rm[}\textit{fmt}{\rm]} & Weave. \verb|-w tex|, \verb|-w md|, or \verb|-w| alone (uses \verb|@@W|). \\
+\verb|-w| {\rm[}\textit{fmt}{\rm]} & Weave. \verb|-w tex|, \verb|-w md|, \verb|-w html|, or \verb|-w| alone (uses \verb|@@W|). \\
 \verb|-t| & Suppress weaving. \\
 \verb|-o| & Suppress tangling. \\
 \verb|-c| & Do not test output files for change before writing. \\

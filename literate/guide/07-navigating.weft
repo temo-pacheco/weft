@@ -1,0 +1,94 @@
+\chapter{Navigating a Web}
+\label{ch:navigating}
+
+A literate web is a \emph{graph}. Output files are built from fragments;
+fragments reference other fragments; and each fragment may be defined in
+several pieces. The tangled code you compile is the result of walking that
+graph from the \verb|@@o| roots down. The woven document (\LaTeX, Markdown,
+or HTML) draws the graph for you --- around every scrap it prints the
+edges, so you can see how any line of generated code was assembled and
+jump to the fragments that produced it.
+
+This chapter reads that graph \emph{by eye}. The next one
+(Chapter~\ref{ch:ai}) queries the same graph \emph{mechanically}.
+
+\section{The scrap footer: a node's edges}
+
+Every scrap is followed by a one-line grey footer. It is the local view of
+the graph --- the current node and the edges leaving it:
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\textit{N} & The scrap's own number (the node's id). \\
+\(\equiv\) / \(+\!\equiv\) & A fresh \emph{definition} vs.\ a \emph{continuation} of one begun earlier. \\
+\textit{defined at} \ldots & The other scraps that define this same fragment. \\
+\textit{used in} \ldots & The scraps that \emph{reference} this fragment (its callers). \\
+\textit{defines} / \textit{uses} \ldots & The identifiers this scrap declares or consumes (from \verb|@@|\,\ldots\,\verb|@@}|). \\
+\end{tabular}
+\end{quote}
+
+\noindent So a footer reading \hbox{\it 7 $\cdot$ defined at 3, 7 $\cdot$
+used in 12} says: this is scrap~7, one of two pieces (3 and~7) of a
+fragment that is referenced from scrap~12. Follow \textit{used in} to go
+\emph{up} the graph (towards the files that need this code); follow
+\textit{defined at} to see the fragment's other pieces.
+
+\section{Following a fragment reference}
+
+Inside a scrap, and in the prose, a reference is drawn
+\hbox{$\langle$\,\textit{Name}\ \textit{N}\,$\rangle$}: the fragment's
+name followed by the number of its (first) definition. That number is the
+\emph{down} edge --- it points at the scrap where the code lives. In the
+HTML and hyperlinked-\LaTeX\ weaves it is a clickable link; on paper it is
+the scrap number to turn to.
+
+Reading the two directions together lets you traverse the whole web:
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\textbf{down} & a \hbox{$\langle$\,\textit{Name N}\,$\rangle$} reference $\rightarrow$ the fragment's definition. \\
+\textbf{up} & a footer's \textit{used in} $\rightarrow$ the scraps that reference it. \\
+\end{tabular}
+\end{quote}
+
+\noindent Start at an \verb|@@o| file, follow its \hbox{$\langle\ \rangle$}
+references down into the fragments, and you have read exactly what
+tangling will assemble --- in the order a human chose, not the compiler.
+
+\section{The indices: the graph's node lists}
+
+Three commands print the graph's nodes as navigable lists, usually near
+the end of the document:
+
+\begin{quote}
+\begin{tabular}{@@{}ll@@{}}
+\verb|@@f| & every output \emph{file}, with the scraps that define it. \\
+\verb|@@m| & every \emph{fragment}, with its defining and referencing scraps. \\
+\verb|@@u| & every indexed \emph{identifier}, with its uses (definitions underlined). \\
+\end{tabular}
+\end{quote}
+
+\noindent Where the footers give the local view, the indices give the
+global one: a directory of every node and a link to each. They are the
+natural entry points --- pick a fragment from the \verb|@@m| index and
+follow it into the narrative.
+
+\section{A definition grown in pieces}
+
+A fragment (or a file) may be defined by several scraps; tangling
+concatenates them in source order. The \(\equiv\) marker opens the
+fragment and each later piece carries \(+\!\equiv\), so a glance
+distinguishes the first definition from a continuation, and the
+\textit{defined at} footer lists all the pieces. This is how a header
+accumulates declarations, or a switch grows case by case, across the
+narrative --- the graph records every piece.
+
+\section{From eye to tooling}
+
+Everything above is the graph rendered for a reader. The \emph{same}
+graph is available machine-readable, for editors, scripts, and AI agents:
+\verb|-m| emits it whole as JSON (files, fragments, uses, transitive
+dependencies), \verb|-e name --callers| prints the \emph{up}-tree for one
+fragment, and \verb|--lint| checks the graph for orphans and dangling
+references. When reading by eye is not enough --- a web too large to hold
+at once --- reach for those; see Chapter~\ref{ch:ai}.

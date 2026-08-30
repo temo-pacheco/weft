@@ -65,10 +65,11 @@
 @i literate/guide/04-language.weft
 @i literate/guide/05-languages.weft
 @i literate/guide/06-running.weft
-@i literate/guide/07-ai-toolkit.weft
-@i literate/guide/08-debugging.weft
-@i literate/guide/09-examples.weft
-@i literate/guide/10-reference.weft
+@i literate/guide/07-navigating.weft
+@i literate/guide/08-ai-toolkit.weft
+@i literate/guide/09-debugging.weft
+@i literate/guide/10-examples.weft
+@i literate/guide/11-reference.weft
 \bibliographystyle{amsplain}
 \bibliography{litprog,master,misc}
 \end{document}
