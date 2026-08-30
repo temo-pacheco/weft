@@ -1,0 +1,94 @@
+<h1>A word-frequency counter</h1>
+
+<p>This little program reads text from standard input and prints how many
+words it saw. It is written as a literate program: the narrative below is
+the source of truth, and weft <em>tangles</em> it into
+<code>wordcount.c</code> and <em>weaves</em> this very page.</p>
+
+<h2>The shape of the program</h2>
+
+<p>Every C program is a few includes, some state, and a
+<code>main</code> that drives it. We name each part and assemble them,
+so <code>main</code> reads like a summary you can expand on demand:</p>
+
+@o wordcount.c @{
+@<Includes@>
+
+int main(void) {
+    @<Program state@>
+    @<Count the words@>
+    @<Report the total@>
+    return 0;
+}
+@}
+
+<p>The rest of the chapter fills in each named fragment.</p>
+
+<h2>State and includes</h2>
+
+<p>We need the standard I/O and character-classification headers, and a
+single counter. Both fragments start here and may grow later as the
+program does.</p>
+
+@d Includes @{
+#include <stdio.h>
+#include <ctype.h>
+@}
+
+@d Program state @{
+long words = 0;      /* words seen so far */
+int  in_word = 0;    /* are we inside a word right now? */
+@| words in_word @}
+
+<h2>Counting</h2>
+
+<p>A word is a maximal run of non-space characters. We walk the input one
+character at a time and count each <em>transition</em> from outside a word
+to inside one &mdash; that way runs of spaces never inflate the total.</p>
+
+@d Count the words @{
+int c;
+while ((c = getchar()) != EOF) {
+    if (isspace(c)) {
+        in_word = 0;
+    } else if (!in_word) {
+        in_word = 1;
+        words++;
+    }
+}
+@}
+
+<h2>Reporting</h2>
+
+<p>Finally we print the total. The reporting fragment is deliberately
+tiny &mdash; but suppose we also want a friendly message when the input
+was empty. We <em>grow</em> the same fragment with a second piece; weft
+marks the continuation with <code>+&equiv;</code> and lists both parts in
+the footer.</p>
+
+@d Report the total @{
+printf("%ld words\n", words);
+@}
+
+@d Report the total @{
+if (words == 0)
+    printf("(no input)\n");
+@}
+
+<h2>Build and run</h2>
+
+<p>Referencing @<Count the words@> and @<Report the total@> from the
+prose gives clickable links to their definitions. To build:</p>
+
+<pre><code class="language-sh">weft wordcount.weft        # tangle -> wordcount.c
+cc -o wc wordcount.c
+echo "one two three" | ./wc
+3 words</code></pre>
+
+<h2>Indices</h2>
+
+<h3>Fragments</h3>
+@m
+
+<h3>Identifiers</h3>
+@u
