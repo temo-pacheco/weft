@@ -883,7 +883,7 @@ may be needed when the next fragment is started.
               comment_flag = 0;
               break;
     case '<': @<Copy macro into \verb|file|@>
-              @<Insert debugging information if required@>
+              @<Resync the line number after a fragment reference@>
               indent = oldin;
               comment_flag = oldcf;
               break;
@@ -903,6 +903,26 @@ may be needed when the next fragment is started.
           /* ignore, since we should already have a warning */
               break;
   }
+}@}
+
+The \verb|#line| marker that keeps the C preprocessor's line count in
+step is emitted \emph{after} a fragment reference expands, to resync to
+the parent scrap's current line.  That is right when the reference sat on
+a line of its own, but for a \emph{mid-line} reference ---
+\hbox{\tt int port = @@<port@@>;} or \hbox{\tt \#define V "@@<version@@>"}
+--- an unconditional resync would inject a stray \verb|\n#line\n| into the
+middle of the line, splitting the expression or string literal across two
+lines (and breaking the C it produces).  So we resync only when the
+reference \emph{began} its line (\verb|newline| is still set): a mid-line
+reference then splices its fragment's value in place and the surrounding
+text stays on one line, exactly as \hbox{\tt @@<port@@>} becoming
+\hbox{\tt 4000} should.  The child expansion already suppresses its own
+markers mid-line (see \verb|Copy macro into file|); this closes the
+remaining gap left by the trailing resync.
+
+@d Resync the line number after a fragment reference
+@{if (newline) {
+  @<Insert debugging information if required@>
 }@}
 
 @d Copy label from scrap into file

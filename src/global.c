@@ -1,11 +1,11 @@
 
 #line 171 "literate/architecture.weft"
-/* {14: literate/architecture.weft:171} */
+/* {15: literate/architecture.weft:171} */
 #include "global.h"
 /* Operating System Dependencies */
 
 #line 25 "literate/main.weft"
-/* {16: literate/main.weft:25} */
+/* {17: literate/main.weft:25} */
 
 #if defined(VMS)
 #define PATH_SEP(c) (c==']'||c==':')
@@ -20,14 +20,14 @@
 #define PATH_SEP_CHAR "/"
 #define DEFAULT_PATH "."
 #endif
-/* {:16} */
+/* {:17} */
 
 #line 172 "literate/architecture.weft"
 
 /* Global variable definitions */
 
 #line 140 "literate/main.weft"
-/* {18: literate/main.weft:140} */
+/* {19: literate/main.weft:140} */
 int tex_flag = TRUE;
 int output_flag = TRUE;
 int compare_flag = TRUE;
@@ -41,7 +41,7 @@ char * dirpath = DEFAULT_PATH; /* Default directory path */
 char * path_sep = PATH_SEP_CHAR;
 int listings_flag = FALSE;
 int version_info_flag = FALSE;
-char default_version_string[] = "no version";
+char default_version_string[] = WEFT_VERSION;
 char *  version_string = default_version_string;
 int hyperref_flag = FALSE;
 int hyperopt_flag = FALSE;
@@ -64,60 +64,60 @@ int diff_flag = FALSE;
 int callers_flag = FALSE;
 int lint_flag = FALSE;
 int errors_flag = FALSE;
-/* {:18} */
+/* {:19} */
 
 #line 184 "literate/main.weft"
-/* {20: literate/main.weft:184} */
+/* {21: literate/main.weft:184} */
 int nw_char='@';
-/* {:20} */
+/* {:21} */
 
 #line 195 "literate/main.weft"
-/* {22: literate/main.weft:195} */
+/* {23: literate/main.weft:195} */
 char *command_name = NULL;
-/* {:22} */
+/* {:23} */
 
 #line 219 "literate/parser.weft"
-/* {55: literate/parser.weft:219} */
+/* {56: literate/parser.weft:219} */
 unsigned char current_sector = 1;
 unsigned char prev_sector = 1;
-/* {:55} */
+/* {:56} */
 
 #line 427 "literate/parser.weft"
-/* {69: literate/parser.weft:427} */
+/* {70: literate/parser.weft:427} */
 char blockBuff[6400];
-/* {:69} */
+/* {:70} */
 
 #line 636 "literate/latex-output.weft"
-/* {107: literate/latex-output.weft:636} */
+/* {108: literate/latex-output.weft:636} */
 int extra_scraps = 0;
- /* {:107} */
+ /* {:108} */
 
 #line 24 "literate/source-io.weft"
-/* {243: literate/source-io.weft:24} */
+/* {244: literate/source-io.weft:24} */
 char *source_name = NULL;
 int source_line = 0;
-/* {:243} */
+/* {:244} */
 
 #line 165 "literate/scraps.weft"
-/* {271: literate/scraps.weft:165} */
+/* {272: literate/scraps.weft:165} */
 int already_warned = 0;
-/* {:271} */
+/* {:272} */
 
 #line 69 "literate/names.weft"
-/* {335: literate/names.weft:69} */
+/* {337: literate/names.weft:69} */
 Name *file_names = NULL;
 Name *macro_names = NULL;
 Name *user_names = NULL;
 int scrap_name_has_parameters;
 int scrap_ended_with;
 char pending_lang[64] = "";
-/* {:335} */
+/* {:337} */
 
 #line 173 "literate/architecture.weft"
 
-/* {:14} */
+/* {:15} */
 
 #line 2 "literate/arena.weft"
-/* {425: literate/arena.weft:2} */
+/* {427: literate/arena.weft:2} */
 label_node * label_tab = NULL;
-/* {:425} */
+/* {:427} */

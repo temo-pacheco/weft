@@ -150,7 +150,7 @@ char * dirpath = DEFAULT_PATH; /* Default directory path */
 char * path_sep = PATH_SEP_CHAR;
 int listings_flag = FALSE;
 int version_info_flag = FALSE;
-char default_version_string[] = "no version";
+char default_version_string[] = WEFT_VERSION;
 char *  version_string = default_version_string;
 int hyperref_flag = FALSE;
 int hyperopt_flag = FALSE;
@@ -375,7 +375,7 @@ printf("    @@{ code @@} as argument       Pass anonymous inline scrap as argume
 printf("  Inside scraps:\n");
 printf("    @@f                            Current output file name\n");
 printf("    @@t                            Current fragment title (as invoked)\n");
-printf("    @@v                            Version string (set by -V flag)\n");
+printf("    @@v                            Version string (defaults to weft's version; -V overrides)\n");
 printf("    @@c                            Expand block comment at current indent\n");
 printf("    @@#                            Suppress auto-indent for this line\n");
 printf("    @@%%                            Comment to end of line (omitted)\n");

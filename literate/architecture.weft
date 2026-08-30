@@ -92,7 +92,7 @@ weft; they no longer drive weft's own version.)
 #define MAX_NAME_LEN 1024
 #endif
 
-#define WEFT_VERSION "1.1.0"
+#define WEFT_VERSION "@<version@>"
 @| MAX_NAME_LEN WEFT_VERSION @}
 
 

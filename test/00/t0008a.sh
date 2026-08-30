@@ -160,12 +160,12 @@ cat > test.expected.without.tex <<"EOF"
 }
 \documentclass{article}
 \begin{document}
-Here >>no version<< is the version information.
+Here >>__WEFTVER__<< is the version information.
 \WEFTbegin
 \label{scrap1}
 \WEFTtarget{weft?}{}\WEFTlangle{\WEFTtint{weftaccent}\verb@test.c@}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}?}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)},language=C]
-Here >>no version<< is the version information in code.
+Here >>__WEFTVER__<< is the version information in code.
 
 \end{lstlisting}
 \WEFTmetabegin{?}\WEFTmetaend
@@ -174,7 +174,7 @@ Here >>no version<< is the version information in code.
 EOF
 
 cat > test.expected.without.c <<"EOF"
-Here >>no version<< is the version information in code.
+Here >>__WEFTVER__<< is the version information in code.
 EOF
 
 # [Add other files here.  Avoid any extra processing such as
@@ -189,6 +189,13 @@ if test $? -ne 0 ; then fail; fi
 
 diff -a --context test.expected.with.c test.c
 if test $? -ne 0 ; then fail; fi
+
+# Without -V, @v defaults to weft's own version (WEFT_VERSION). Resolve it
+# at run time so this test never hard-codes a version number.
+ver=`$bin/weft --version | awk '{print $2}'`
+for f in test.expected.without.tex test.expected.without.c; do
+  sed "s/__WEFTVER__/$ver/g" "$f" > "$f.new" && mv "$f.new" "$f"
+done
 
 $bin/weft -w tex test.w
 if test $? -ne 0 ; then fail; fi

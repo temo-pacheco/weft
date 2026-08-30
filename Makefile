@@ -23,9 +23,11 @@ bootstrap: $(OBJS)
 	$(CC) -o weft $(OBJS)
 
 # Normal development: tangle .weft sources into src/, then compile.
-# The binary's own version is a hard-coded literal (WEFT_VERSION in
-# literate/architecture.weft), so it is baked in on every build, with
-# or without VERSION.  VERSION / -V only stamps @v in woven documents.
+# The version lives in one place: the @<version@> fragment in weft.weft,
+# which WEFT_VERSION (literate/architecture.weft) splices in, so it is
+# baked into the binary on every build.  The doc targets show it via @v
+# (which defaults to WEFT_VERSION), so no VERSION= is needed; passing
+# VERSION=x only overrides @v in the woven documents.
 weft:
 	./weft -t $(if $(VERSION),-V "$(VERSION)") -p $(SRCDIR)/ weft.weft
 	@$(MAKE) --no-print-directory bootstrap
@@ -58,14 +60,10 @@ check:
 
 # Developer reference (full source with code listings)
 doc:
-	@if [ -z "$(VERSION)" ]; then \
-	  echo "Error: VERSION is required.  Usage: make doc VERSION=1.0.2"; \
-	  exit 1; \
-	fi
-	./weft -o -w tex -r -V "$(VERSION)" weft.weft
+	./weft -o -w tex -r $(if $(VERSION),-V "$(VERSION)") weft.weft
 	-$(TEXENV) pdflatex -interaction=nonstopmode weft.tex
 	-$(TEXENV) bibtex weft
-	./weft -o -w tex -r -V "$(VERSION)" weft.weft
+	./weft -o -w tex -r $(if $(VERSION),-V "$(VERSION)") weft.weft
 	-$(TEXENV) pdflatex -interaction=nonstopmode weft.tex
 	-$(TEXENV) pdflatex -interaction=nonstopmode weft.tex
 	@rm -f weft.tex weft.aux weft.log weft.out weft.toc weft.brf \
@@ -74,11 +72,7 @@ doc:
 
 # User guide (introduction chapter only)
 user-guide:
-	@if [ -z "$(VERSION)" ]; then \
-	  echo "Error: VERSION is required.  Usage: make user-guide VERSION=1.0.2"; \
-	  exit 1; \
-	fi
-	./weft -o -w tex -r -V "$(VERSION)" weft-user-guide.weft
+	./weft -o -w tex -r $(if $(VERSION),-V "$(VERSION)") weft-user-guide.weft
 	-$(TEXENV) pdflatex -interaction=nonstopmode weft-user-guide.tex
 	-$(TEXENV) bibtex weft-user-guide
 	-$(TEXENV) pdflatex -interaction=nonstopmode weft-user-guide.tex
@@ -91,20 +85,11 @@ user-guide:
 # ─── Distribution ──────────────────────────────────────────────────
 
 # Prepare the repo for release: tangle, compile, test, generate docs.
-# If ./weft doesn't exist yet, bootstrap from pre-generated src/*.c first.
+# No VERSION= needed: the version comes from the @<version@> fragment in
+# weft.weft (baked into the binary as WEFT_VERSION), so we read it back
+# from ./weft after building.  If ./weft doesn't exist yet, bootstrap from
+# the pre-generated src/*.c first.
 dist:
-	@if [ -z "$(VERSION)" ]; then \
-	  echo "Error: VERSION is required.  Usage: make dist VERSION=1.0.2"; \
-	  exit 1; \
-	fi
-	@src_ver=`sed -n 's/.*#define WEFT_VERSION "\([^"]*\)".*/\1/p' \
-	  literate/architecture.weft`; \
-	if [ "$$src_ver" != "$(VERSION)" ]; then \
-	  echo "Error: VERSION=$(VERSION) does not match the hard-coded weft"; \
-	  echo "version \"$$src_ver\" in literate/architecture.weft."; \
-	  echo "Edit that #define WEFT_VERSION line first, then re-run."; \
-	  exit 1; \
-	fi
 	@if [ ! -x ./weft ]; then \
 	  echo "No weft binary found, bootstrapping from src/..."; \
 	  $(MAKE) --no-print-directory bootstrap; \
@@ -112,14 +97,15 @@ dist:
 	$(MAKE) --no-print-directory weft
 	$(MAKE) --no-print-directory clean
 	$(MAKE) --no-print-directory check
-	$(MAKE) --no-print-directory doc VERSION=$(VERSION)
-	$(MAKE) --no-print-directory user-guide VERSION=$(VERSION)
-	@echo ""
-	@echo "Distribution ready (version $(VERSION)). Generated files:"
-	@echo "  weft                  (binary)"
-	@echo "  src/*.c src/*.h       (bootstrap sources)"
-	@echo "  weft.pdf              (developer reference)"
-	@echo "  weft-user-guide.pdf   (user guide)"
+	$(MAKE) --no-print-directory doc
+	$(MAKE) --no-print-directory user-guide
+	@v=`./weft --version | awk '{print $$2}'`; \
+	echo ""; \
+	echo "Distribution ready (version $$v). Generated files:"; \
+	echo "  weft                  (binary)"; \
+	echo "  src/*.c src/*.h       (bootstrap sources)"; \
+	echo "  weft.pdf              (developer reference)"; \
+	echo "  weft-user-guide.pdf   (user guide)"
 
 # ─── Clean ──────────────────────────────────────────────────────────
 

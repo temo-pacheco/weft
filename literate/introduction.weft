@@ -62,6 +62,8 @@ in the first place.
 
 \section{weft}
 
+@d version @{1.1.1@}
+
 weft works with any programming language and produces documentation in
 \LaTeX~\cite{Lamport:LDP85} or Markdown format. \LaTeX\ was the
 original choice because it supports a multi-level sectioning scheme

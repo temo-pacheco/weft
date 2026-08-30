@@ -1,27 +1,27 @@
 
 #line 146 "literate/architecture.weft"
-/* {10: literate/architecture.weft:146} */
+/* {11: literate/architecture.weft:146} */
 #include "global.h"
-/* {:10} */
+/* {:11} */
 
 #line 32 "literate/source-io.weft"
-/* {244: literate/source-io.weft:32} */
+/* {245: literate/source-io.weft:32} */
 static FILE *source_file;  /* the current input file */
 static int double_at;
 static int include_depth;
-/* {:244} */
+/* {:245} */
 
 #line 39 "literate/source-io.weft"
-/* {245: literate/source-io.weft:39} */
+/* {246: literate/source-io.weft:39} */
 static struct {
   FILE *file;
   char *name;
   int line;
 } stack[10];
-/* {:245} */
+/* {:246} */
 
 #line 56 "literate/source-io.weft"
-/* {246: literate/source-io.weft:56} */
+/* {247: literate/source-io.weft:56} */
 
 int source_peek;
 int source_last;
@@ -41,8 +41,6 @@ int source_get(void)
                    c = source_get();
                  }
                }
-#line 64 "literate/source-io.weft"
-
                return c;
     case '\n': source_line++;
                FALLTHROUGH;
@@ -52,7 +50,7 @@ int source_get(void)
                /* Handle an ``at'' character */
                
 #line 104 "literate/source-io.weft"
-               /* {249: literate/source-io.weft:104} */
+               /* {250: literate/source-io.weft:104} */
 {
                  c = getc(source_file);
                  if (double_at) {
@@ -115,8 +113,6 @@ int source_get(void)
                                  source_peek = getc(source_file);
                                  c = source_get();
                                }
-#line 113 "literate/source-io.weft"
-
                                break;
                      case '#': case 'f': case 'm': case 'u': case 'v':
                      case 'd': case 'o': case 'D': case 'O': case 's':
@@ -147,7 +143,7 @@ int source_get(void)
                                     command_name, nw_char, c, c, source_name, source_line);
                             exit(-1);
                    }
-               }/* {:249} */
+               }/* {:250} */
 
 #line 71 "literate/source-io.weft"
 
@@ -157,10 +153,10 @@ int source_get(void)
                return c;
   }
 }
-/* {:246} */
+/* {:247} */
 
 #line 88 "literate/source-io.weft"
-/* {248: literate/source-io.weft:88} */
+/* {249: literate/source-io.weft:88} */
 void source_ungetc(int *c)
 {
   ungetc(source_peek, source_file);
@@ -168,10 +164,10 @@ void source_ungetc(int *c)
     source_line--;
   source_peek=*c;
 }
-/* {:248} */
+/* {:249} */
 
 #line 227 "literate/source-io.weft"
-/* {253: literate/source-io.weft:227} */
+/* {254: literate/source-io.weft:227} */
 void source_open(char *name)
 {
   source_file = fopen(name, "r");
@@ -186,4 +182,4 @@ void source_open(char *name)
   double_at = FALSE;
   include_depth = 0;
 }
-/* {:253} */
+/* {:254} */
