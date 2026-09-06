@@ -24,6 +24,12 @@ ask for a document.} It generates the files named by \verb|@@o| and
 nothing else, so it drops quietly into a normal build. Weaving happens
 only with \verb|-w|, and then tangling and weaving run in a single pass.
 
+Output files are written to \emph{existing} directories: a subdirectory in
+an \verb|@@o| name (\verb|@@o src/gen/foo.c|) or a \verb|-p| prefix whose
+directory is missing is an error --- the strict default catches typos.
+Pass \verb|--mkdirs| to have weft create those directories itself
+(\verb|mkdir -p|) before writing.
+
 \section{Choosing what to produce}
 
 Three flags select the work:
@@ -126,6 +132,7 @@ known (Chapter~\ref{ch:languages}).
 \verb|-o| & Suppress tangling. \\
 \verb|-c| & Do not test output files for change before writing. \\
 \verb|-p| \textit{path} & Prepend \textit{path} to every output file name. \\
+\verb|--mkdirs| & Create missing output directories (\verb|mkdir -p|). \\
 \verb|-V| \textit{str} & Value for \verb|@@v| (defaults to weft's version). \\
 \verb|-n| & Number scraps sequentially instead of by page. \\
 \verb|-r| & Emit hyperlinks (needs \verb|hyperref|). \\

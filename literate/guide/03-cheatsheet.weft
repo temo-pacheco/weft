@@ -102,6 +102,7 @@ anonymous scrap \verb|@@{text@@}|, or a forwarded argument
 \verb|-t|               & Suppress weaving. \\
 \verb|-o|               & Suppress tangling (weave only). \\
 \verb|-p| \textit{path} & Prefix output file names with \textit{path}. \\
+\verb|--mkdirs|        & Create missing output directories (\verb|mkdir -p|). \\
 \verb|-I| \textit{dir}  & Add a directory to the \verb|@@i| include search path. \\
 \verb|-V| \textit{str}  & Set the \verb|@@v| version string. \\
 \verb|-n|               & Number scraps 1,2,3\ldots\ instead of by page. \\

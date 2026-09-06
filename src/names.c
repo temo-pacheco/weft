@@ -5,7 +5,7 @@
 /* {:14} */
 
 #line 90 "literate/names.weft"
-/* {361: literate/names.weft:90} */
+/* {362: literate/names.weft:90} */
 enum { LESS, GREATER, EQUAL, PREFIX, EXTENSION };
 
 static int compare(char *x, char *y)
@@ -31,20 +31,20 @@ static int compare(char *x, char *y)
   }
   else return EQUAL;
 }
-/* {:361} */
+/* {:362} */
 
 #line 119 "literate/names.weft"
-/* {362: literate/names.weft:119} */
+/* {363: literate/names.weft:119} */
 char *save_string(char *s)
 {
   char *new_str = (char *) arena_getmem((strlen(s) + 1) * sizeof(char));
   strcpy(new_str, s);
   return new_str;
 }
-/* {:362} */
+/* {:363} */
 
 #line 128 "literate/names.weft"
-/* {363: literate/names.weft:128} */
+/* {364: literate/names.weft:128} */
 static int ambiguous_prefix(Name *node, char *spelling, unsigned char sector);
 
 static char * found_name = NULL;
@@ -88,7 +88,7 @@ Name *prefix_add(Name **rt, char *spelling, unsigned char sector)
   /* Create new name entry */
   
 #line 294 "literate/names.weft"
-  /* {370: literate/names.weft:294} */
+  /* {371: literate/names.weft:294} */
 {
     node = (Name *) arena_getmem(sizeof(Name));
     if (found_name && robs_strcmp(found_name, spelling) == 0)
@@ -119,15 +119,15 @@ Name *prefix_add(Name **rt, char *spelling, unsigned char sector)
     node->sector = sector;
     *rt = node;
     return node;
-  }/* {:370} */
+  }/* {:371} */
 
 #line 162 "literate/names.weft"
 
 }
-/* {:363} */
+/* {:364} */
 
 #line 180 "literate/names.weft"
-/* {365: literate/names.weft:180} */
+/* {366: literate/names.weft:180} */
 static int ambiguous_prefix(Name *node, char *spelling, unsigned char sector)
 {
   while (node) {
@@ -151,10 +151,10 @@ static int ambiguous_prefix(Name *node, char *spelling, unsigned char sector)
   }
   return FALSE;
 }
-/* {:365} */
+/* {:366} */
 
 #line 228 "literate/names.weft"
-/* {367: literate/names.weft:228} */
+/* {368: literate/names.weft:228} */
 int robs_strcmp(char* x, char* y)
 {
    int cmp = 0;
@@ -164,20 +164,20 @@ int robs_strcmp(char* x, char* y)
       /* Skip invisibles on 'x' */
       
 #line 262 "literate/names.weft"
-      /* {368: literate/names.weft:262} */
+      /* {369: literate/names.weft:262} */
 if (*x == '|')
          x++;
-      /* {:368} */
+      /* {:369} */
 
 #line 234 "literate/names.weft"
 
       /* Skip invisibles on 'y' */
       
 #line 262 "literate/names.weft"
-      /* {368: literate/names.weft:262} */
+      /* {369: literate/names.weft:262} */
 if (*y == '|')
          y++;
-      /* {:368} */
+      /* {:369} */
 
 #line 235 "literate/names.weft"
 
@@ -201,10 +201,10 @@ if (*y == '|')
       return -2;
    return cmp;
 }
-/* {:367} */
+/* {:368} */
 
 #line 267 "literate/names.weft"
-/* {369: literate/names.weft:267} */
+/* {370: literate/names.weft:267} */
 Name *name_add(Name **rt, char *spelling, unsigned char sector)
 {
   Name *node = *rt;
@@ -229,7 +229,7 @@ Name *name_add(Name **rt, char *spelling, unsigned char sector)
   /* Create new name entry */
   
 #line 294 "literate/names.weft"
-  /* {370: literate/names.weft:294} */
+  /* {371: literate/names.weft:294} */
 {
     node = (Name *) arena_getmem(sizeof(Name));
     if (found_name && robs_strcmp(found_name, spelling) == 0)
@@ -260,15 +260,15 @@ Name *name_add(Name **rt, char *spelling, unsigned char sector)
     node->sector = sector;
     *rt = node;
     return node;
-  }/* {:370} */
+  }/* {:371} */
 
 #line 288 "literate/names.weft"
 
 }
-/* {:369} */
+/* {:370} */
 
 #line 355 "literate/names.weft"
-/* {371: literate/names.weft:355} */
+/* {372: literate/names.weft:355} */
 typedef struct {
   const char *name;
   unsigned char comment;
@@ -628,10 +628,10 @@ static void lang_to_flags(const char *lang,
     *location_flag = TRUE;
   }
 }
-/* {:371} */
+/* {:372} */
 
 #line 753 "literate/names.weft"
-/* {372: literate/names.weft:753} */
+/* {373: literate/names.weft:753} */
 void collect_lang_def(void)
 {
   char name[64];
@@ -715,10 +715,10 @@ void collect_lang_def(void)
             source_name, source_line);
   }
 }
-/* {:372} */
+/* {:373} */
 
 #line 846 "literate/names.weft"
-/* {373: literate/names.weft:846} */
+/* {374: literate/names.weft:846} */
 void collect_weave_format(void)
 {
   char token[64];
@@ -763,10 +763,10 @@ void collect_weave_format(void)
     fprintf(stderr, "  Valid formats: md tex html\n");
   }
 }
-/* {:373} */
+/* {:374} */
 
 #line 900 "literate/names.weft"
-/* {374: literate/names.weft:900} */
+/* {375: literate/names.weft:900} */
 Name *collect_file_name(void)
 {
   Name *new_name;
@@ -791,7 +791,7 @@ Name *collect_file_name(void)
   /* Handle optional per-file flags */
   
 #line 934 "literate/names.weft"
-  /* {375: literate/names.weft:934} */
+  /* {376: literate/names.weft:934} */
 {
     while (1) {
       while (isspace(c))
@@ -829,14 +829,14 @@ Name *collect_file_name(void)
       }
       else break;
     }
-  }/* {:375} */
+  }/* {:376} */
 
 #line 921 "literate/names.weft"
 
   /* Apply pending language if no explicit flags */
   
 #line 991 "literate/names.weft"
-  /* {377: literate/names.weft:991} */
+  /* {378: literate/names.weft:991} */
 if (pending_lang[0] != '\0') {
     strncpy(new_name->lang, pending_lang, 63);
     new_name->lang[63] = '\0';
@@ -866,7 +866,7 @@ if (pending_lang[0] != '\0') {
   if (new_name->suppress_markers) {
     new_name->debug_flag = FALSE;
     new_name->location_flag = FALSE;
-  }/* {:377} */
+  }/* {:378} */
 
 #line 922 "literate/names.weft"
 
@@ -878,10 +878,10 @@ if (pending_lang[0] != '\0') {
   }
   return new_name;
 }
-/* {:374} */
+/* {:375} */
 
 #line 1078 "literate/names.weft"
-/* {380: literate/names.weft:1078} */
+/* {381: literate/names.weft:1078} */
 Name *collect_macro_name(void)
 {
   char name[MAX_NAME_LEN];
@@ -953,7 +953,7 @@ Name *collect_macro_name(void)
              /* Check for terminating at-sequence and return name */
              
 #line 1126 "literate/names.weft"
-             /* {381: literate/names.weft:1126} */
+             /* {382: literate/names.weft:1126} */
 {
                c = source_get();
                switch (c) {
@@ -977,7 +977,7 @@ Name *collect_macro_name(void)
                           /* Apply pending language to macro */
                           
 #line 1030 "literate/names.weft"
-                          /* {378: literate/names.weft:1030} */
+                          /* {379: literate/names.weft:1030} */
 if (pending_lang[0] != '\0') {
                             strncpy(node->lang, pending_lang, 63);
                             node->lang[63] = '\0';
@@ -988,7 +988,7 @@ if (pending_lang[0] != '\0') {
                                             &node->location_flag);
                             }
                             pending_lang[0] = '\0';
-                          }/* {:378} */
+                          }/* {:379} */
 
 #line 1132 "literate/names.weft"
 
@@ -1026,7 +1026,7 @@ if (pending_lang[0] != '\0') {
                                    command_name, nw_char, c, source_name, start_line);
                            exit(-1);
                }
-             }/* {:381} */
+             }/* {:382} */
 
 #line 1109 "literate/names.weft"
 
@@ -1042,10 +1042,10 @@ if (pending_lang[0] != '\0') {
   exit(-1);
   return NULL;  /* unreachable return to avoid warnings on some compilers */
 }
-/* {:380} */
+/* {:381} */
 
 #line 1217 "literate/names.weft"
-/* {388: literate/names.weft:1217} */
+/* {389: literate/names.weft:1217} */
 Name *install_args(Name * name, int argc, char *arg[9])
 {
   int i;
@@ -1056,10 +1056,10 @@ Name *install_args(Name * name, int argc, char *arg[9])
   }
   return name;
 }
-/* {:388} */
+/* {:389} */
 
 #line 1238 "literate/names.weft"
-/* {390: literate/names.weft:1238} */
+/* {391: literate/names.weft:1238} */
 Arglist * buildArglist(Name * name, Arglist * a)
 {
   Arglist * args = (Arglist *)arena_getmem(sizeof(Arglist));
@@ -1069,10 +1069,10 @@ Arglist * buildArglist(Name * name, Arglist * a)
   args->name = name;
   return args;
 }
-/* {:390} */
+/* {:391} */
 
 #line 1251 "literate/names.weft"
-/* {391: literate/names.weft:1251} */
+/* {392: literate/names.weft:1251} */
 Arglist * collect_scrap_name(int current_scrap)
 {
   char name[MAX_NAME_LEN];
@@ -1103,7 +1103,7 @@ Arglist * collect_scrap_name(int current_scrap)
              /* Look for end of scrap name and return */
              
 #line 1300 "literate/names.weft"
-             /* {392: literate/names.weft:1300} */
+             /* {393: literate/names.weft:1300} */
 {
                Name * node;
 
@@ -1114,7 +1114,7 @@ Arglist * collect_scrap_name(int current_scrap)
                        /* Add plain string argument */
                        
 #line 1357 "literate/names.weft"
-                       /* {393: literate/names.weft:1357} */
+                       /* {394: literate/names.weft:1357} */
 char buff[MAX_NAME_LEN];
                        char * s = buff;
                        int c, c2;
@@ -1133,13 +1133,13 @@ char buff[MAX_NAME_LEN];
                        /* Add buff to current arg list */
 
 #line 1408 "literate/names.weft"
-                       /* {398: literate/names.weft:1408} */
+                       /* {399: literate/names.weft:1408} */
                        *tail = buildArglist(NULL, (Arglist *)save_string(buff));
                        tail = &(*tail)->next;
-                       /* {:398} */
+                       /* {:399} */
 
 #line 1372 "literate/names.weft"
-                       /* {:393} */
+                       /* {:394} */
 
 #line 1307 "literate/names.weft"
 
@@ -1153,7 +1153,7 @@ char buff[MAX_NAME_LEN];
                        /* Add a propagated argument */
                        
 #line 1378 "literate/names.weft"
-                       /* {394: literate/names.weft:1378} */
+                       /* {395: literate/names.weft:1378} */
 char buff[3];
                        buff[0] = ARG_CHR;
                        buff[1] = c;
@@ -1161,13 +1161,13 @@ char buff[3];
                        /* Add buff to current arg list */
 
 #line 1408 "literate/names.weft"
-                       /* {398: literate/names.weft:1408} */
+                       /* {399: literate/names.weft:1408} */
                        *tail = buildArglist(NULL, (Arglist *)save_string(buff));
                        tail = &(*tail)->next;
-                       /* {:398} */
+                       /* {:399} */
 
 #line 1382 "literate/names.weft"
-                       /* {:394} */
+                       /* {:395} */
 
 #line 1315 "literate/names.weft"
 
@@ -1179,14 +1179,14 @@ char buff[3];
                      /* Add an inline scrap argument */
                      
 #line 1385 "literate/names.weft"
-                     /* {395: literate/names.weft:1385} */
+                     /* {396: literate/names.weft:1385} */
 int s = collect_scrap();
                      Scrap_Node * d = (Scrap_Node *)arena_getmem(sizeof(Scrap_Node));
                      d->scrap = s;
                      d->quoted = 0;
                      d->next = NULL;
                      *tail = buildArglist((Name *)1, (Arglist *)d);
-                     tail = &(*tail)->next;/* {:395} */
+                     tail = &(*tail)->next;/* {:396} */
 
 #line 1321 "literate/names.weft"
 
@@ -1198,12 +1198,12 @@ int s = collect_scrap();
                      /* Add macro call argument */
                      
 #line 1401 "literate/names.weft"
-                     /* {397: literate/names.weft:1401} */
+                     /* {398: literate/names.weft:1401} */
 *tail = collect_scrap_name(current_scrap);
                      if (current_scrap >= 0)
                        add_to_use((*tail)->name, current_scrap);
                      tail = &(*tail)->next;
-                     /* {:397} */
+                     /* {:398} */
 
 #line 1327 "literate/names.weft"
 
@@ -1215,7 +1215,7 @@ int s = collect_scrap();
                      /* Cleanup and install name */
                      
 #line 1180 "literate/names.weft"
-                     /* {385: literate/names.weft:1180} */
+                     /* {386: literate/names.weft:1180} */
 {
                        if (p > name && p[-1] == ' ')
                          p--;
@@ -1230,7 +1230,7 @@ int s = collect_scrap();
                        }
                        *p = '\0';
                        node = prefix_add(&macro_names, name, sector);
-                     }/* {:385} */
+                     }/* {:386} */
 
 #line 1333 "literate/names.weft"
 
@@ -1240,7 +1240,7 @@ int s = collect_scrap();
                      /* Cleanup and install name */
                      
 #line 1180 "literate/names.weft"
-                     /* {385: literate/names.weft:1180} */
+                     /* {386: literate/names.weft:1180} */
 {
                        if (p > name && p[-1] == ' ')
                          p--;
@@ -1255,7 +1255,7 @@ int s = collect_scrap();
                        }
                        *p = '\0';
                        node = prefix_add(&macro_names, name, sector);
-                     }/* {:385} */
+                     }/* {:386} */
 
 #line 1337 "literate/names.weft"
 
@@ -1273,7 +1273,7 @@ int s = collect_scrap();
                                    command_name, nw_char, c, source_name, source_line);
                            exit(-1);
                }
-             }/* {:392} */
+             }/* {:393} */
 
 #line 1278 "literate/names.weft"
 
@@ -1295,10 +1295,10 @@ int s = collect_scrap();
   exit(-1);
   return NULL;  /* unreachable return to avoid warnings on some compilers */
 }
-/* {:391} */
+/* {:392} */
 
 #line 1413 "literate/names.weft"
-/* {399: literate/names.weft:1413} */
+/* {400: literate/names.weft:1413} */
 static Scrap_Node *reverse(Scrap_Node *a); /* a forward declaration */
 
 void reverse_lists(Name *names)
@@ -1310,10 +1310,10 @@ void reverse_lists(Name *names)
     names = names->rlink;
   }
 }
-/* {:399} */
+/* {:400} */
 
 #line 1430 "literate/names.weft"
-/* {400: literate/names.weft:1430} */
+/* {401: literate/names.weft:1430} */
 static Scrap_Node *reverse(Scrap_Node *a)
 {
   if (a) {
@@ -1328,4 +1328,4 @@ static Scrap_Node *reverse(Scrap_Node *a)
   }
   return a;
 }
-/* {:400} */
+/* {:401} */

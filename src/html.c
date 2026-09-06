@@ -93,7 +93,7 @@ fputs(
 #line 84 "literate/html-output.weft"
 
     source_open(file_name);
-    /* Copy source into html_file */
+    /* Copy source into \verb|html_file| */
     
 #line 136 "literate/html-output.weft"
     /* {219: literate/html-output.weft:136} */

@@ -711,14 +711,16 @@ void write_error_annotator(void)
 
 #line 17 "literate/output-files.weft"
 /* {256: literate/output-files.weft:17} */
+static void make_parent_dirs(const char *path);   /* defined below */
+
 void write_files(Name *files)
 {
   while (files) {
     write_files(files->llink);
     /* Write out \verb|files->spelling| */
     
-#line 42 "literate/output-files.weft"
-    /* {258: literate/output-files.weft:42} */
+#line 81 "literate/output-files.weft"
+    /* {259: literate/output-files.weft:81} */
 {
       static char temp_name[FILENAME_MAX];
       static char real_name[FILENAME_MAX];
@@ -726,10 +728,14 @@ void write_files(Name *files)
       char indent_chars[MAX_INDENT];
       FILE *temp_file;
 
+      sprintf(real_name, "%s%s%s", dirpath, path_sep, files->spelling);
+      if (mkdirs_flag)
+        make_parent_dirs(real_name);
+
       /* Find a free temporary file */
       
-#line 63 "literate/output-files.weft"
-/* {259: literate/output-files.weft:63} */
+#line 105 "literate/output-files.weft"
+/* {260: literate/output-files.weft:105} */
 
       for( temp_name_count = 0; temp_name_count < 10000; temp_name_count++) {
         sprintf(temp_name,"%s%snw%06d", dirpath, path_sep, temp_name_count);
@@ -754,12 +760,11 @@ void write_files(Name *files)
                 command_name, temp_name);
         exit(-1);
       }
-      /* {:259} */
+      /* {:260} */
 
-#line 49 "literate/output-files.weft"
+#line 92 "literate/output-files.weft"
 
 
-      sprintf(real_name, "%s%s%s", dirpath, path_sep, files->spelling);
       if (verbose_flag)
         fprintf(stderr, "writing %s [%s]\n", files->spelling, temp_name);
       write_scraps(temp_file, files->spelling, files->defs, 0, indent_chars,
@@ -770,14 +775,14 @@ void write_files(Name *files)
 
       /* Move the temporary file to the target, if required */
       
-#line 93 "literate/output-files.weft"
-/* {260: literate/output-files.weft:93} */
+#line 135 "literate/output-files.weft"
+/* {261: literate/output-files.weft:135} */
 
       if (diff_flag) {
         /* Show diff of temp file vs real file */
         
-#line 105 "literate/output-files.weft"
-        /* {261: literate/output-files.weft:105} */
+#line 147 "literate/output-files.weft"
+        /* {262: literate/output-files.weft:147} */
 {
           FILE *old_file = fopen(real_name, "r");
           if (!old_file) {
@@ -804,15 +809,15 @@ void write_files(Name *files)
             }
           }
           remove(temp_name);
-        }/* {:261} */
+        }/* {:262} */
 
-#line 95 "literate/output-files.weft"
+#line 137 "literate/output-files.weft"
 
       } else if (compare_flag)
         /* Compare the temp file and the old file */
         
-#line 135 "literate/output-files.weft"
-        /* {262: literate/output-files.weft:135} */
+#line 177 "literate/output-files.weft"
+        /* {263: literate/output-files.weft:177} */
 {
           FILE *old_file = fopen(real_name, "r");
           if (old_file) {
@@ -830,62 +835,102 @@ void write_files(Name *files)
               remove(real_name);
               /* Rename the temporary file to the target */
               
-#line 157 "literate/output-files.weft"
-/* {263: literate/output-files.weft:157} */
+#line 199 "literate/output-files.weft"
+/* {264: literate/output-files.weft:199} */
 
               if (0 != rename(temp_name, real_name)) {
                 fprintf(stderr, "%s: can't rename output file to %s\n",
                         command_name, real_name);
+                if (mkdirs_flag == FALSE)
+                  fprintf(stderr, "  (does its directory exist? try --mkdirs)\n");
+                remove(temp_name);
+                exit(-1);
               }
-              /* {:263} */
+              /* {:264} */
 
-#line 150 "literate/output-files.weft"
+#line 192 "literate/output-files.weft"
 
             }
           }
           else
             /* Rename the temporary file to the target */
             
-#line 157 "literate/output-files.weft"
-/* {263: literate/output-files.weft:157} */
+#line 199 "literate/output-files.weft"
+/* {264: literate/output-files.weft:199} */
 
             if (0 != rename(temp_name, real_name)) {
               fprintf(stderr, "%s: can't rename output file to %s\n",
                       command_name, real_name);
+              if (mkdirs_flag == FALSE)
+                fprintf(stderr, "  (does its directory exist? try --mkdirs)\n");
+              remove(temp_name);
+              exit(-1);
             }
-            /* {:263} */
+            /* {:264} */
 
-#line 154 "literate/output-files.weft"
+#line 196 "literate/output-files.weft"
 
-        }/* {:262} */
+        }/* {:263} */
 
-#line 97 "literate/output-files.weft"
+#line 139 "literate/output-files.weft"
 
       else {
         remove(real_name);
         /* Rename the temporary file to the target */
         
-#line 157 "literate/output-files.weft"
-/* {263: literate/output-files.weft:157} */
+#line 199 "literate/output-files.weft"
+/* {264: literate/output-files.weft:199} */
 
         if (0 != rename(temp_name, real_name)) {
           fprintf(stderr, "%s: can't rename output file to %s\n",
                   command_name, real_name);
+          if (mkdirs_flag == FALSE)
+            fprintf(stderr, "  (does its directory exist? try --mkdirs)\n");
+          remove(temp_name);
+          exit(-1);
         }
-        /* {:263} */
+        /* {:264} */
 
-#line 100 "literate/output-files.weft"
+#line 142 "literate/output-files.weft"
 
       }
-      /* {:260} */
+      /* {:261} */
 
-#line 60 "literate/output-files.weft"
+#line 102 "literate/output-files.weft"
 
-    }/* {:258} */
+    }/* {:259} */
 
-#line 21 "literate/output-files.weft"
+#line 23 "literate/output-files.weft"
 
     files = files->rlink;
   }
 }
 /* {:256} */
+
+#line 54 "literate/output-files.weft"
+/* {258: literate/output-files.weft:54} */
+#include <sys/stat.h>
+#ifdef _WIN32
+#include <direct.h>
+#define WEFT_MKDIR(p) _mkdir(p)
+#else
+#define WEFT_MKDIR(p) mkdir((p), 0777)
+#endif
+
+static void make_parent_dirs(const char *path)
+{
+  char buf[FILENAME_MAX];
+  char *p;
+  if (strlen(path) >= sizeof(buf))
+    return;
+  strcpy(buf, path);
+  for (p = buf + 1; *p != '\0'; p++) {
+    if (*p == path_sep[0]) {
+      *p = '\0';
+      if (buf[0] != '\0')
+        (void) WEFT_MKDIR(buf);
+      *p = path_sep[0];
+    }
+  }
+}
+/* {:258} */

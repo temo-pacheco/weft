@@ -54,6 +54,11 @@ There are numerous possible command-line arguments:
 \item[\tt -x] Include cross-reference numbers in scrap comments.
 \item[\tt -p {\it path}] Prepend \textit{path} to the filenames for
 all the output files.
+\item[\tt --mkdirs] Create output directories as needed (a recursive
+\verb|mkdir -p|) before writing each tangled file --- both the \verb|-p|
+prefix and any subdirectory embedded in an \verb|@@o| name. Without it,
+the directories must already exist (the strict default, which catches
+mistyped paths); a missing directory is then a hard error.
 \item[\tt -h {\it options}] Provide options for the hyperref
 package.
 \item[\tt -r] Turn on hyperlinks. You must include the |usepackage|
@@ -127,12 +132,14 @@ extern int diff_flag;      /* if TRUE, show diff instead of writing files */
 extern int callers_flag;   /* if TRUE, show callers with -e */
 extern int lint_flag;      /* if TRUE, run static analysis */
 extern int errors_flag;    /* if TRUE, annotate compiler errors from stdin */
+extern int mkdirs_flag;    /* if TRUE, create output directories as needed */
 @| tex_flag output_flag compare_flag verbose_flag number_flag
 scrap_flag dangling_flag xref_flag version_info_flag
 version_string hyperref_flag hyperopt_flag hyperoptions includepath_flag
 incl markdown_flag weave_flag weave_format weave_format_from_cli
 map_flag extract_flag extract_name reverse_map_flag reverse_map_arg
-bodies_flag prose_flag diff_flag callers_flag lint_flag errors_flag @}
+bodies_flag prose_flag diff_flag callers_flag lint_flag errors_flag
+mkdirs_flag @}
 
 The flags are all initialized for correct default behavior.
 
@@ -173,6 +180,7 @@ int diff_flag = FALSE;
 int callers_flag = FALSE;
 int lint_flag = FALSE;
 int errors_flag = FALSE;
+int mkdirs_flag = FALSE;
 @}
 
 A global variable \verb|nw_char| will be used for the weft
@@ -269,6 +277,11 @@ Currently \verb|--help| and \verb|--version| are the only long options.
     arg++;
     continue;
   }
+  if (strcmp(s + 1, "mkdirs") == 0) {
+    mkdirs_flag = TRUE;
+    arg++;
+    continue;
+  }
 }@}
 
 The help message itself.  We write to \verb|stdout| (not \verb|stderr|)
@@ -302,6 +315,7 @@ printf("  Tangle control:\n");
 printf("    -o              Suppress output file generation (parse only)\n");
 printf("    -c              Overwrite files without comparing first\n");
 printf("    -p path         Prepend path to all output file names\n");
+printf("    --mkdirs        Create output directories as needed (mkdir -p)\n");
 printf("    -I path         Add directory to include search path (repeatable)\n");
 printf("    -x              Include cross-reference numbers in section markers\n\n");
 printf("  Weave control:\n");

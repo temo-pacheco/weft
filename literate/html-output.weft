@@ -83,7 +83,7 @@ void write_html(char *file_name, char *html_name, unsigned char sector)
       fprintf(stderr, "writing %s\n", html_name);
     @<Write the HTML document head@>
     source_open(file_name);
-    @<Copy source into html_file@>
+    @<Copy source into \verb|html_file|@>
     @<Write the HTML document tail@>
     fclose(html_file);
   }
@@ -132,7 +132,7 @@ reader's light or dark theme.
 We make our second pass over the source, copying prose straight through
 (it is already HTML) and acting on at-sequences.
 
-@d Copy source into html_file
+@d Copy source into \verb|html_file|
 @{{
   int c = source_get();
   while (c != EOF) {

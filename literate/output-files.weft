@@ -14,7 +14,9 @@ extern void write_error_annotator(void);
 @}
 
 @o output.c
-@{void write_files(Name *files)
+@{static void make_parent_dirs(const char *path);   /* defined below */
+
+void write_files(Name *files)
 {
   while (files) {
     write_files(files->llink);
@@ -38,6 +40,43 @@ of causing a fatal error.
 #define MAX_INDENT 8192
 @| MAX_INDENT @}
 
+When \verb|--mkdirs| is given, weft creates the output directories itself
+before writing --- both the \verb|-p| prefix path and any subdirectories
+embedded in an \verb|@@o| name (\verb|@@o src/gen/foo.c|). Without the
+flag, the directories must already exist (the strict, typo-catching
+default). The helper is a portable recursive \verb|mkdir -p|: it walks the
+path and creates each parent component, ignoring errors such as
+\verb|EEXIST| (a real problem, like a permission error, surfaces later at
+the temporary-file or rename step). The final component --- the file
+itself --- is never created.
+
+@o output.c
+@{#include <sys/stat.h>
+#ifdef _WIN32
+#include <direct.h>
+#define WEFT_MKDIR(p) _mkdir(p)
+#else
+#define WEFT_MKDIR(p) mkdir((p), 0777)
+#endif
+
+static void make_parent_dirs(const char *path)
+{
+  char buf[FILENAME_MAX];
+  char *p;
+  if (strlen(path) >= sizeof(buf))
+    return;
+  strcpy(buf, path);
+  for (p = buf + 1; *p != '\0'; p++) {
+    if (*p == path_sep[0]) {
+      *p = '\0';
+      if (buf[0] != '\0')
+        (void) WEFT_MKDIR(buf);
+      *p = path_sep[0];
+    }
+  }
+}
+@| make_parent_dirs @}
+
 @d Write out \verb|files->spelling|
 @{{
   static char temp_name[FILENAME_MAX];
@@ -46,9 +85,12 @@ of causing a fatal error.
   char indent_chars[MAX_INDENT];
   FILE *temp_file;
 
+  sprintf(real_name, "%s%s%s", dirpath, path_sep, files->spelling);
+  if (mkdirs_flag)
+    make_parent_dirs(real_name);
+
   @< Find a free temporary file @>
 
-  sprintf(real_name, "%s%s%s", dirpath, path_sep, files->spelling);
   if (verbose_flag)
     fprintf(stderr, "writing %s [%s]\n", files->spelling, temp_name);
   write_scraps(temp_file, files->spelling, files->defs, 0, indent_chars,
@@ -158,6 +200,10 @@ Again, we use a call to \verb|remove| before \verb|rename|.
 if (0 != rename(temp_name, real_name)) {
   fprintf(stderr, "%s: can't rename output file to %s\n",
           command_name, real_name);
+  if (mkdirs_flag == FALSE)
+    fprintf(stderr, "  (does its directory exist? try --mkdirs)\n");
+  remove(temp_name);
+  exit(-1);
 }
 @|@}
 
