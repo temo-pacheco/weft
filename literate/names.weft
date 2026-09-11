@@ -677,7 +677,7 @@ static const LangEntry lang_table[] = {
 };
 
 /* User-defined languages via @@L command */
-#define MAX_USER_LANGS 32
+#define MAX_USER_LANGS 256
 static LangEntry user_langs[MAX_USER_LANGS];
 static char user_lang_names[MAX_USER_LANGS][64];
 static int user_lang_count = 0;
@@ -831,6 +831,7 @@ any \verb|@@o| or \verb|@@d| directives that depend on it).
     fprintf(stderr, "%s: too many %cL definitions (max %d) (%s, %d)\n",
             command_name, nw_char, MAX_USER_LANGS,
             source_name, source_line);
+    exit(1);
   }
 }
 @| collect_lang_def @}

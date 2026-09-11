@@ -79,13 +79,13 @@ typedef struct name {
 } Name;
 /* {:358} */
 
-#line 1169 "literate/names.weft"
-/* {384: literate/names.weft:1169} */
+#line 1170 "literate/names.weft"
+/* {384: literate/names.weft:1170} */
 #define ARG_CHR '\001'
 /* {:384} */
 
-#line 1230 "literate/names.weft"
-/* {390: literate/names.weft:1230} */
+#line 1231 "literate/names.weft"
+/* {390: literate/names.weft:1231} */
 typedef struct arglist
 {Name * name;
 struct arglist * args;
@@ -93,8 +93,8 @@ struct arglist * next;
 } Arglist;
 /* {:390} */
 
-#line 1394 "literate/names.weft"
-/* {397: literate/names.weft:1394} */
+#line 1395 "literate/names.weft"
+/* {397: literate/names.weft:1395} */
 typedef struct embed {
    Scrap_Node * defs;
    Arglist * args;
@@ -362,8 +362,8 @@ extern void collect_weave_format(void);
 extern int robs_strcmp(char*, char*);
 /* {:367} */
 
-#line 1213 "literate/names.weft"
-/* {388: literate/names.weft:1213} */
+#line 1214 "literate/names.weft"
+/* {388: literate/names.weft:1214} */
 extern Name *install_args(Name *name, int argc, char *arg[9]);
 /* {:388} */
 

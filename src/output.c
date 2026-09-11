@@ -844,7 +844,7 @@ void write_files(Name *files)
                 if (mkdirs_flag == FALSE)
                   fprintf(stderr, "  (does its directory exist? try --mkdirs)\n");
                 remove(temp_name);
-                exit(-1);
+                exit(1);
               }
               /* {:264} */
 
@@ -864,7 +864,7 @@ void write_files(Name *files)
               if (mkdirs_flag == FALSE)
                 fprintf(stderr, "  (does its directory exist? try --mkdirs)\n");
               remove(temp_name);
-              exit(-1);
+              exit(1);
             }
             /* {:264} */
 
@@ -887,7 +887,7 @@ void write_files(Name *files)
           if (mkdirs_flag == FALSE)
             fprintf(stderr, "  (does its directory exist? try --mkdirs)\n");
           remove(temp_name);
-          exit(-1);
+          exit(1);
         }
         /* {:264} */
 

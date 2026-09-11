@@ -142,8 +142,8 @@ char * p = name->spelling;
 }
 /* {:347} */
 
-#line 1071 "literate/names.weft"
-/* {380: literate/names.weft:1071} */
+#line 1072 "literate/names.weft"
+/* {380: literate/names.weft:1072} */
 char * comment_begin[6] = { "", "/* ", "// ", "# ", "-- ", "<!-- "};
 char * comment_mid[6] = { "", " * ", "// ", "# ", "-- ", "     "};
 char * comment_end[6] = { "", " */", "", "", "", " -->"};
