@@ -62,7 +62,12 @@ in the first place.
 
 \section{weft}
 
-@d version @{1.1.1@}
+The version number is defined once, as a single fragment, and threaded
+everywhere it is needed: the binary's \verb|--version|, the default value of
+the \verb|@@v| directive (via \verb|WEFT_VERSION|), and the generated
+documentation. Cutting a release is therefore a one-line edit to this scrap.
+
+@d version @{2.0.0@}
 
 weft works with any programming language and produces documentation in
 \LaTeX~\cite{Lamport:LDP85} or Markdown format. \LaTeX\ was the

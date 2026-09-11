@@ -130,7 +130,7 @@ typedef struct l_node
 #define MAX_NAME_LEN 1024
 #endif
 
-#define WEFT_VERSION "1.1.1"
+#define WEFT_VERSION "2.0.0"
 /* {:5} */
 
 #line 25 "literate/architecture.weft"

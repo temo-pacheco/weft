@@ -2,6 +2,57 @@
 
 All notable changes to weft are documented in this file.
 
+## [2.0.0] - 2026-09-11
+
+### Added
+
+- **Native HTML weave (`-w html`)** — weave a web to a single, self-contained
+  `.html` page: doctype, an embedded style sheet (fragment names in an accent
+  colour, soft code blocks, light/dark aware), and body, with no \TeX\ and no
+  Markdown processor. Fragment references in the prose become clickable links
+  to their definitions; scrap footers and the `@f`/`@m`/`@u` indices link via
+  `#weftN` anchors. As with every weave, prose is copied through verbatim, so
+  an HTML web is authored in HTML prose. Selectable with `-w html` or by
+  declaring `@W html` in the source.
+- **`--mkdirs`** — an opt-in, recursive `mkdir -p` that creates the parent
+  directories of each output file before writing (both the `-p` prefix and any
+  subdirectory in an `@o` name). Off by default, so the safe behaviour is
+  unchanged. Portable (`mkdir` on POSIX, `_mkdir` on Windows).
+- **Single-source version** — the version lives once, in the `@<version@>`
+  fragment, which `WEFT_VERSION` splices into the binary. As a
+  result `make doc`, `make user-guide`, and `make dist` no longer require a
+  `VERSION=` argument; `-V` still overrides `@v` when needed.
+- **Rewritten user guide** — restructured into eleven navigable chapters
+  (what weft is, quickstart, cheatsheet, the language, section markers,
+  running weft, navigating a web, the AI toolkit, debugging, examples, and a
+  reference), plus a woven HTML edition. A new `examples/wordcount.weft`
+  ships a small literate HTML example.
+
+### Changed
+
+- **Modernized LaTeX weave** — a cleaner, contemporary code presentation:
+  uniform chunk-name typography, the scrap number set on the baseline (no
+  longer a superscript), no code indentation, no rules or coloured
+  background, tighter code leading, and no footer hairlines. Chunk headers
+  now carry a definition marker — `≡` for a definition, `+≡` for an additive
+  continuation — and the fragment name and its number are set with a wider
+  separation. Because the weave output changes, documents will re-render
+  differently — hence the major version bump.
+- **Prose fragment references are rendered, not expanded** — a `@<name@>`
+  written in the prose (outside a scrap) is now typeset as a reference to the
+  fragment rather than having its body spliced in.
+
+### Fixed
+
+- **Mid-line fragment splice** — a `@<name@>` reference appearing after
+  visible characters on a line (e.g. `#define WEFT_VERSION "@<version@>"`) no
+  longer emits a spurious `#line`/section-marker resync; the resync is kept
+  only at the start of a line, so the reference splices seamlessly.
+- **Output rename failure hygiene** — when the final `rename` of an output
+  file fails, weft now removes the stray temporary file, prints a hint
+  (`try --mkdirs`), and exits non-zero, instead of leaving the temp behind
+  and — in the missing-subdirectory case — exiting silently with status 0.
+
 ## [1.1.0] - 2026-07-31
 
 ### Changed
