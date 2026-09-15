@@ -88,8 +88,8 @@ unsigned char prev_sector = 1;
 char blockBuff[6400];
 /* {:71} */
 
-#line 636 "literate/latex-output.weft"
-/* {109: literate/latex-output.weft:636} */
+#line 657 "literate/latex-output.weft"
+/* {109: literate/latex-output.weft:657} */
 int extra_scraps = 0;
  /* {:109} */
 

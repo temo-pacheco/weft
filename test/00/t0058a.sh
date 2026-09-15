@@ -65,11 +65,13 @@ cat > test.expected.md <<'EOF'
 **"main.py"** **1** =
 <pre><code class="language-py">&lt;<a href="#weft2"><i>Setup</i> 2</a>&gt;
 </code></pre>
+<div align="left">&#9633;</div>
 
 <a id="weft2"></a>
 **&lt;*Setup* 2&gt;** =
 <pre><code class="language-python">import sys
 </code></pre>
+<div align="left">&#9633;</div>
 > *Fragment referenced in* <a href="#weft1">1</a>.
 EOF
 

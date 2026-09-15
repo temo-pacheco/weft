@@ -59,6 +59,7 @@ cat > test.expected.md <<"EOF"
 **&lt;*Hello World* 1&gt;** =
 <pre><code>printf("Hello, World!\n");
 </code></pre>
+<div align="left">&#9633;</div>
 > *Fragment never referenced*.
 EOF
 

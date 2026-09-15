@@ -102,7 +102,9 @@ fputs("\\newcommand{\\WEFTtxtFileDefBy}{defined at}\n", tex_file);
 fputs("\\newcommand{\\WEFTtxtIdentsUsed}{uses}\n", tex_file);
 fputs("\\newcommand{\\WEFTtxtIdentsNotUsed}{never used}\n", tex_file);
 fputs("\\newcommand{\\WEFTtxtIdentsDefed}{defines}\n", tex_file);
-fputs("\\newcommand{\\WEFTsep}{}\n", tex_file);
+fputs("\\newcommand{\\WEFTsep}{\\par\\nobreak\\noindent{\\WEFTtint{weftcom}"
+      "\\fboxsep=0pt\\fboxrule=.3pt\\fbox{\\rule{0pt}{.85ex}\\kern.85ex}}"
+      "\\par}\n", tex_file);
 fputs("\\newcommand{\\WEFTnotglobal}{(not defined globally)}\n", tex_file);
 @<Write the modern decoration macros@>
 @<Write the scrap formatting macros@>
@@ -187,6 +189,22 @@ additive-continuation (\(+\!\equiv\)) markers; \verb|\WEFTdot| is the
 mid-dot that separates footer items; and \verb|\WEFTmetabegin|/%
 \verb|\WEFTmetaend| open and close the small grey metadata line, which
 opens with the scrap's own number.
+
+\verb|\WEFTsep| is the end-of-scrap tombstone: a small \emph{hollow}
+square, tinted like the metadata, on a line of its own flushed to the
+\emph{left} margin directly below the code.  It replaces the old floating
+diamond, whose math-axis glyph read as noise.  The tombstone belongs to the
+chunk --- it closes the code --- so the metadata footer, which is
+information \emph{about} the chunk rather than part of it, is set below the
+tombstone (the code emits \verb|\WEFTsep| right after
+\verb|\end{lstlisting}|, before \verb|\WEFTmetabegin|).  It is drawn as an
+empty \verb|\fbox| (zero \verb|\fboxsep|, a hairline \verb|\fboxrule|)
+around an invisible strut, so it needs no maths or symbol package.  Note
+that a stand-alone glyph adds vertical
+height, and because weft resolves a scrap's local/global sector number from
+the \emph{page} its \verb|\label| lands on, that height can shift a page
+break and renumber scraps in a multi-page, multi-sector document --- a
+deliberate trade for the clearer layout.
 
 @d Write the modern decoration macros
 @{fputs("\\newcommand{\\WEFTtint}[1]{}\n", tex_file);
@@ -574,12 +592,11 @@ starts fresh; without it a scrap beginning with \verb|#| (a C
 \verb|listings| reads that \verb|#| as a macro parameter and aborts with
 \emph{Illegal parameter number}.  Symmetrically, \verb|\end{lstlisting}|
 must start its own line, so we emit a newline before it even when the scrap
-body did not end in one.  The modern layout draws no end-of-scrap glyph:
-the old diamond (\verb|\WEFTsep|) is retired --- its macro is still
-defined, but empty, for backward compatibility --- and the metadata
-footer that follows delimits the scrap on its own.  A non-code block
+body did not end in one.  Immediately after the listing we emit the
+end-of-scrap tombstone \verb|\WEFTsep| (see above) on its own line, closing
+the code; the metadata footer then follows below it.  A non-code block
 scrap (the unusual \verb|@@d name @@[...@@]| or \verb|@@(...@@)| forms) is
-emitted as before, without a listing.
+emitted as before, without a listing and without a tombstone.
 
 @d Fill in the middle of the scrap environment
 @{{
@@ -597,12 +614,16 @@ emitted as before, without a listing.
   }
   extra_scraps = 0;
   copy_scrap(tex_file, TRUE, name);
-  if (is_code)
+  if (is_code) {
     /* the closing tag is split across two literals so that this very
        line does not end a listing when weft typesets its own source
        (the same reason this comment says "the closing tag" rather than
        spelling it out); the leading newline keeps it on its own line */
     fputs("\n\\end{ls" "tlisting}\n", tex_file);
+    /* the end-of-scrap tombstone (\WEFTsep): a left-flushed square on its
+       own line, closing the code above the metadata footer that follows */
+    fputs("\\WEFTsep\n", tex_file);
+  }
 }@}
 
 \newpage

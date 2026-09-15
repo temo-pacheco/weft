@@ -59,6 +59,7 @@ cat > test.expected.md <<"EOF"
 **&lt;*Test with <i>alpha</i>* 1&gt;** =
 <pre><code>Use <i>alpha</i> here.
 </code></pre>
+<div align="left">&#9633;</div>
 > *Fragment never referenced*.
 EOF
 

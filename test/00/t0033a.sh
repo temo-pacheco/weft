@@ -100,7 +100,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsUsed}{uses}
 \newcommand{\WEFTtxtIdentsNotUsed}{never used}
 \newcommand{\WEFTtxtIdentsDefed}{defines}
-\newcommand{\WEFTsep}{}
+\newcommand{\WEFTsep}{\par\nobreak\noindent{\WEFTtint{weftcom}\fboxsep=0pt\fboxrule=.3pt\fbox{\rule{0pt}{.85ex}\kern.85ex}}\par}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
 \newcommand{\WEFTtint}[1]{}
 \newcommand{\WEFTtintOn}[1]{\color{#1}}
@@ -140,6 +140,7 @@ Define abc cba
 End
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1a}\WEFTdot \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTdot \WEFTtxtIdentsDefed\nobreak\  {\WEFTtint{weftkw}\verb@abc@}\nobreak\ \WEFTlink{weft1b}{1b}, {\WEFTtint{weftkw}\verb@cba@}\nobreak\ \WEFTlink{weft1b}{1b}\WEFTdot \WEFTtxtIdentsUsed\nobreak\  {\WEFTtint{weftkw}\verb@def@}\nobreak\ \WEFTlink{weft1b}{1b}, {\WEFTtint{weftkw}\verb@fed@}\nobreak\ \WEFTlink{weft1b}{1b}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -153,6 +154,7 @@ Use abc cba
 Finish
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1b}\WEFTdot \WEFTtxtMacroDefBy\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1e}{e}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTdot \WEFTtxtIdentsDefed\nobreak\  {\WEFTtint{weftkw}\verb@def@}\nobreak\ \WEFTlink{weft1a}{1a}, {\WEFTtint{weftkw}\verb@fed@}\nobreak\ \WEFTlink{weft1a}{1a}\WEFTdot \WEFTtxtIdentsUsed\nobreak\  {\WEFTtint{weftkw}\verb@abc@}\nobreak\ \WEFTlink{weft1a}{1a}, {\WEFTtint{weftkw}\verb@cba@}\nobreak\ \WEFTlink{weft1a}{1a}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -161,6 +163,7 @@ Finish
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 XX>>(*<\hbox{\slshape\sffamily Stuff\/}>*)<<YY
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1c}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft1b}{1b}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -170,6 +173,7 @@ XX>>(*<\hbox{\slshape\sffamily Stuff\/}>*)<<YY
 More stuff
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1d}\WEFTdot \WEFTtxtFileDefBy\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1d}{d}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -180,6 +184,7 @@ Added stuff to force fragment defined
 cross-reference entry.
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1e}\WEFTdot \WEFTtxtMacroDefBy\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1e}{e}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTmetaend
 \WEFTend
 

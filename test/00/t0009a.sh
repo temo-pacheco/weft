@@ -81,7 +81,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsUsed}{uses}
 \newcommand{\WEFTtxtIdentsNotUsed}{never used}
 \newcommand{\WEFTtxtIdentsDefed}{defines}
-\newcommand{\WEFTsep}{}
+\newcommand{\WEFTsep}{\par\nobreak\noindent{\WEFTtint{weftcom}\fboxsep=0pt\fboxrule=.3pt\fbox{\rule{0pt}{.85ex}\kern.85ex}}\par}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
 \newcommand{\WEFTtint}[1]{}
 \newcommand{\WEFTtintOn}[1]{\color{#1}}
@@ -119,6 +119,7 @@ This defines ident.
 (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Use the thing defined}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}}\WEFTrangle}>*)
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1a}\WEFTdot \WEFTtxtIdentsDefed\nobreak\  {\WEFTtint{weftkw}\verb@ident@}\nobreak\ \WEFTlink{weft1b}{1b}\WEFTmetaend
 \WEFTend
 Now use it without it actually appearing in the text.
@@ -130,6 +131,7 @@ Now use it without it actually appearing in the text.
 Pretend that we use it here.
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1b}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTdot \WEFTtxtIdentsUsed\nobreak\  {\WEFTtint{weftkw}\verb@ident@}\nobreak\ \WEFTlink{weft1a}{1a}\WEFTmetaend
 \WEFTend
 \end{document}

@@ -61,6 +61,7 @@ cat > test.expected.md <<"EOF"
 <pre><code class="language-c">#include &lt;stdio.h&gt;
 int main() { return 0; }
 </code></pre>
+<div align="left">&#9633;</div>
 EOF
 
 $bin/weft -w md test.w

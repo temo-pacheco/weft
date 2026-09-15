@@ -72,7 +72,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsUsed}{uses}
 \newcommand{\WEFTtxtIdentsNotUsed}{never used}
 \newcommand{\WEFTtxtIdentsDefed}{defines}
-\newcommand{\WEFTsep}{}
+\newcommand{\WEFTsep}{\par\nobreak\noindent{\WEFTtint{weftcom}\fboxsep=0pt\fboxrule=.3pt\fbox{\rule{0pt}{.85ex}\kern.85ex}}\par}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
 \newcommand{\WEFTtint}[1]{}
 \newcommand{\WEFTtintOn}[1]{\color{#1}}
@@ -107,6 +107,7 @@ cat > test.expected.tex <<"EOF"
 This scrap contains @<.
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTmetaend
 \WEFTend
 \end{document}

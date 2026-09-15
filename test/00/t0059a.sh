@@ -59,6 +59,7 @@ cat > test.expected.md <<'EOF'
 **&lt;*My fragment* 1&gt;** =
 <pre><code>some code here
 </code></pre>
+<div align="left">&#9633;</div>
 > *Fragment never referenced*.
 EOF
 

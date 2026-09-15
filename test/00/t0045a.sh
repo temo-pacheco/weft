@@ -58,6 +58,7 @@ Some prose.
 **&lt;*My fragment* 1&gt;** =
 <pre><code class="language-c">code here
 </code></pre>
+<div align="left">&#9633;</div>
 > *Fragment never referenced*.
 
 More prose.

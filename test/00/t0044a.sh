@@ -59,6 +59,7 @@ cat > test.expected.md <<"EOF"
 **"test.c"** **1** =
 <pre><code class="language-c">int main() { return 0; }
 </code></pre>
+<div align="left">&#9633;</div>
 EOF
 
 cat > test.expected.c <<"EOF"

@@ -84,7 +84,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsUsed}{uses}
 \newcommand{\WEFTtxtIdentsNotUsed}{never used}
 \newcommand{\WEFTtxtIdentsDefed}{defines}
-\newcommand{\WEFTsep}{}
+\newcommand{\WEFTsep}{\par\nobreak\noindent{\WEFTtint{weftcom}\fboxsep=0pt\fboxrule=.3pt\fbox{\rule{0pt}{.85ex}\kern.85ex}}\par}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
 \newcommand{\WEFTtint}[1]{}
 \newcommand{\WEFTtintOn}[1]{\color{#1}}
@@ -127,6 +127,7 @@ Here we use another fragment.
 (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Define our target}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}}\WEFTrangle}>*)
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1a}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -136,6 +137,7 @@ Here we use another fragment.
 This fragment defines 'target'.
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1b}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTdot \WEFTtxtIdentsDefed\nobreak\  {\WEFTtint{weftkw}\verb@target@}\nobreak\ \WEFTtxtIdentsNotUsed\WEFTmetaend
 \WEFTend
 \end{document}

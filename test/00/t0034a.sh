@@ -98,7 +98,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsUsed}{uses}
 \newcommand{\WEFTtxtIdentsNotUsed}{never used}
 \newcommand{\WEFTtxtIdentsDefed}{defines}
-\newcommand{\WEFTsep}{}
+\newcommand{\WEFTsep}{\par\nobreak\noindent{\WEFTtint{weftcom}\fboxsep=0pt\fboxrule=.3pt\fbox{\rule{0pt}{.85ex}\kern.85ex}}\par}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
 \newcommand{\WEFTtint}[1]{}
 \newcommand{\WEFTtintOn}[1]{\color{#1}}
@@ -141,6 +141,7 @@ main(int argc, char ** argv)
 }
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -156,6 +157,7 @@ while (scanf("%x", &in) == 1)
 }
 return 0;
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -168,6 +170,7 @@ for (int i = 0; i < n; i++)
    printf("%02x", out[i]);
 printf("\n");
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}\WEFTmetaend
 \WEFTend
 \end{document}

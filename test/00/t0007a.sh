@@ -87,7 +87,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsUsed}{uses}
 \newcommand{\WEFTtxtIdentsNotUsed}{never used}
 \newcommand{\WEFTtxtIdentsDefed}{defines}
-\newcommand{\WEFTsep}{}
+\newcommand{\WEFTsep}{\par\nobreak\noindent{\WEFTtint{weftcom}\fboxsep=0pt\fboxrule=.3pt\fbox{\rule{0pt}{.85ex}\kern.85ex}}\par}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
 \newcommand{\WEFTtint}[1]{}
 \newcommand{\WEFTtintOn}[1]{\color{#1}}
@@ -124,6 +124,7 @@ Here is a macro that defines something.
 something anything
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1a}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft1c}{1c}\WEFTdot \WEFTtxtIdentsDefed\nobreak\  {\WEFTtint{weftkw}\verb@anything@}\nobreak\ \WEFTlink{weft1b}{1b}, {\WEFTtint{weftkw}\verb@something@}\nobreak\ \WEFTlink{weft1c}{1c}\WEFTmetaend
 \WEFTend
 Here is a macro that uses an argument
@@ -135,6 +136,7 @@ Use (*<\hbox{\slshape\sffamily thing\/}>*)
 Use anything
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1b}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft1c}{1c}\WEFTdot \WEFTtxtIdentsUsed\nobreak\  {\WEFTtint{weftkw}\verb@anything@}\nobreak\ \WEFTlink{weft1a}{1a}\WEFTmetaend
 \WEFTend
 Now use the something in an argument
@@ -147,6 +149,7 @@ Now use the something in an argument
 (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Use the something}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}}\WEFTrangle}>*)
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1c}\WEFTdot \WEFTtxtIdentsUsed\nobreak\  {\WEFTtint{weftkw}\verb@something@}\nobreak\ \WEFTlink{weft1a}{1a}\WEFTmetaend
 \WEFTend
 \end{document}

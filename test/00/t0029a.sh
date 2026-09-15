@@ -107,7 +107,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsUsed}{uses}
 \newcommand{\WEFTtxtIdentsNotUsed}{never used}
 \newcommand{\WEFTtxtIdentsDefed}{defines}
-\newcommand{\WEFTsep}{}
+\newcommand{\WEFTsep}{\par\nobreak\noindent{\WEFTtint{weftcom}\fboxsep=0pt\fboxrule=.3pt\fbox{\rule{0pt}{.85ex}\kern.85ex}}\par}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
 \newcommand{\WEFTtint}[1]{}
 \newcommand{\WEFTtintOn}[1]{\color{#1}}
@@ -141,6 +141,7 @@ cat > test.expected.tex <<"EOF"
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -149,6 +150,7 @@ cat > test.expected.tex <<"EOF"
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -157,6 +159,7 @@ cat > test.expected.tex <<"EOF"
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -166,6 +169,7 @@ cat > test.expected.tex <<"EOF"
 
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -174,6 +178,7 @@ cat > test.expected.tex <<"EOF"
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -182,6 +187,7 @@ cat > test.expected.tex <<"EOF"
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -190,6 +196,7 @@ cat > test.expected.tex <<"EOF"
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -198,6 +205,7 @@ cat > test.expected.tex <<"EOF"
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -214,6 +222,7 @@ cat > test.expected.tex <<"EOF"
 (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Atomic}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle}>*)
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTmetaend
 \WEFTend
 

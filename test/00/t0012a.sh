@@ -93,7 +93,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsUsed}{uses}
 \newcommand{\WEFTtxtIdentsNotUsed}{never used}
 \newcommand{\WEFTtxtIdentsDefed}{defines}
-\newcommand{\WEFTsep}{}
+\newcommand{\WEFTsep}{\par\nobreak\noindent{\WEFTtint{weftcom}\fboxsep=0pt\fboxrule=.3pt\fbox{\rule{0pt}{.85ex}\kern.85ex}}\par}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
 \newcommand{\WEFTtint}[1]{}
 \newcommand{\WEFTtintOn}[1]{\color{#1}}
@@ -144,6 +144,7 @@ Here is the end of the stuff.
 Here ((*<\hbox{\sffamily\slshape (Comment)}>*)) is a block comment in code.
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot \WEFTtxtFileDefBy\ \WEFTlink{weft?}{?}\WEFTlink{weft?}{, ?}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -156,6 +157,7 @@ newline. (So long as its length is right.
 This --(*<\hbox{\sffamily\slshape (Comment)}>*)-- is where it is used.
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot \WEFTtxtFileDefBy\ \WEFTlink{weft?}{?}\WEFTlink{weft?}{, ?}\WEFTmetaend
 \WEFTend
 \end{document}

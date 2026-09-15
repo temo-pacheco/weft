@@ -130,7 +130,7 @@ typedef struct l_node
 #define MAX_NAME_LEN 1024
 #endif
 
-#define WEFT_VERSION "2.0.0"
+#define WEFT_VERSION "2.0.1"
 /* {:5} */
 
 #line 25 "literate/architecture.weft"
@@ -200,8 +200,8 @@ extern unsigned char prev_sector;
 extern char blockBuff[6400];
 /* {:70} */
 
-#line 632 "literate/latex-output.weft"
-/* {108: literate/latex-output.weft:632} */
+#line 653 "literate/latex-output.weft"
+/* {108: literate/latex-output.weft:653} */
 extern int extra_scraps;
 /* {:108} */
 
@@ -245,18 +245,18 @@ extern void pass1(char *file_name);
 extern void write_tex(char *file_name, char *tex_name, unsigned char sector);
 /* {:85} */
 
-#line 855 "literate/latex-output.weft"
-/* {121: literate/latex-output.weft:855} */
+#line 876 "literate/latex-output.weft"
+/* {121: literate/latex-output.weft:876} */
 void initialise_delimit_scrap_array(void);
 /* {:121} */
 
-#line 976 "literate/latex-output.weft"
-/* {127: literate/latex-output.weft:976} */
+#line 997 "literate/latex-output.weft"
+/* {127: literate/latex-output.weft:997} */
 void update_delimit_scrap(void);
 /* {:127} */
 
-#line 1459 "literate/latex-output.weft"
-/* {155: literate/latex-output.weft:1459} */
+#line 1480 "literate/latex-output.weft"
+/* {155: literate/latex-output.weft:1480} */
 extern int has_sector(Name *, unsigned char);
 /* {:155} */
 

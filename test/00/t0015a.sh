@@ -89,7 +89,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsUsed}{uses}
 \newcommand{\WEFTtxtIdentsNotUsed}{never used}
 \newcommand{\WEFTtxtIdentsDefed}{defines}
-\newcommand{\WEFTsep}{}
+\newcommand{\WEFTsep}{\par\nobreak\noindent{\WEFTtint{weftcom}\fboxsep=0pt\fboxrule=.3pt\fbox{\rule{0pt}{.85ex}\kern.85ex}}\par}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
 \newcommand{\WEFTtint}[1]{}
 \newcommand{\WEFTtintOn}[1]{\color{#1}}
@@ -139,6 +139,7 @@ for (int j = 1; j < (*<\hbox{\slshape\sffamily n\/}>*); j++)
 }
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot {\WEFTtxtMacroNoRef}\WEFTmetaend
 \WEFTend
 Test in-text (*<\WEFTlangle{\WEFTtint{weftaccent}\itshape Sort key of size n for ordering}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle>*) usage.

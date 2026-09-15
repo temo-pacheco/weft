@@ -83,6 +83,8 @@ fputs(
     "pre code i{color:var(--acc);font-style:italic} pre code a{color:var(--acc)}\n"
     ".weft-meta{color:var(--com);font-size:.82rem;margin:.15rem 0 .6rem}\n"
     ".weft-meta a{color:var(--acc)} .weft-meta code{color:var(--kw)}\n"
+    ".weft-end{color:var(--com);text-align:left;line-height:1;\n"
+    " font-size:.75rem;margin:-.05rem 0 .1rem}\n"
     "code{background:var(--bg);padding:.1em .35em;border-radius:5px;\n"
     " font:0.9em ui-monospace,Menlo,Consolas,monospace}\n"
     "@media(prefers-color-scheme:dark){body{background:#0d1117;color:#e6edf3}\n"
@@ -95,8 +97,8 @@ fputs(
     source_open(file_name);
     /* Copy source into \verb|html_file| */
     
-#line 136 "literate/html-output.weft"
-    /* {219: literate/html-output.weft:136} */
+#line 138 "literate/html-output.weft"
+    /* {219: literate/html-output.weft:138} */
 {
       int c = source_get();
       while (c != EOF) {
@@ -104,8 +106,8 @@ fputs(
           {
           /* Interpret html at-sequence */
           
-#line 151 "literate/html-output.weft"
-          /* {220: literate/html-output.weft:151} */
+#line 153 "literate/html-output.weft"
+          /* {220: literate/html-output.weft:153} */
 {
             int big_definition = FALSE;
             c = source_get();
@@ -134,6 +136,9 @@ fputs(
                             extra_scraps = 0;
                             md_copy_scrap(html_file, TRUE, name);
                             fputs("</code></pre>\n", html_file);
+                            /* end-of-scrap tombstone: a small grey square flushed left, the HTML
+                               twin of the LaTeX \WEFTsep, closing the code before the metadata line */
+                            fputs("<div class=\"weft-end\">&#9633;</div>\n", html_file);
                           }
                           {
                             fputs("<div class=\"weft-meta\">", html_file);
@@ -175,6 +180,9 @@ fputs(
                             extra_scraps = 0;
                             md_copy_scrap(html_file, TRUE, name);
                             fputs("</code></pre>\n", html_file);
+                            /* end-of-scrap tombstone: a small grey square flushed left, the HTML
+                               twin of the LaTeX \WEFTsep, closing the code before the metadata line */
+                            fputs("<div class=\"weft-end\">&#9633;</div>\n", html_file);
                           }
                           {
                             fputs("<div class=\"weft-meta\">", html_file);
@@ -269,7 +277,7 @@ fputs(
             }
           }/* {:220} */
 
-#line 141 "literate/html-output.weft"
+#line 143 "literate/html-output.weft"
 
           }
         else {
@@ -283,8 +291,8 @@ fputs(
 
     /* Write the HTML document tail */
     
-#line 129 "literate/html-output.weft"
-    /* {218: literate/html-output.weft:129} */
+#line 131 "literate/html-output.weft"
+    /* {218: literate/html-output.weft:131} */
 fputs("</body>\n</html>\n", html_file);
     /* {:218} */
 
@@ -297,8 +305,8 @@ fputs("</body>\n</html>\n", html_file);
 }
 /* {:216} */
 
-#line 298 "literate/html-output.weft"
-/* {229: literate/html-output.weft:298} */
+#line 305 "literate/html-output.weft"
+/* {229: literate/html-output.weft:305} */
 static void html_format_file_entry(Name *name, FILE *f)
 {
   while (name) {
@@ -313,8 +321,8 @@ static void html_format_file_entry(Name *name, FILE *f)
 }
 /* {:229} */
 
-#line 326 "literate/html-output.weft"
-/* {231: literate/html-output.weft:326} */
+#line 333 "literate/html-output.weft"
+/* {231: literate/html-output.weft:333} */
 static void html_format_entry(Name *name, FILE *f, unsigned char sector)
 {
   while (name) {
@@ -332,8 +340,8 @@ static void html_format_entry(Name *name, FILE *f, unsigned char sector)
 }
 /* {:231} */
 
-#line 356 "literate/html-output.weft"
-/* {233: literate/html-output.weft:356} */
+#line 363 "literate/html-output.weft"
+/* {233: literate/html-output.weft:363} */
 static void html_format_user_entry(Name *name, FILE *f, unsigned char sector)
 {
   while (name) {

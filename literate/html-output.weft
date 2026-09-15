@@ -118,6 +118,8 @@ reader's light or dark theme.
 "pre code i{color:var(--acc);font-style:italic} pre code a{color:var(--acc)}\n"
 ".weft-meta{color:var(--com);font-size:.82rem;margin:.15rem 0 .6rem}\n"
 ".weft-meta a{color:var(--acc)} .weft-meta code{color:var(--kw)}\n"
+".weft-end{color:var(--com);text-align:left;line-height:1;\n"
+" font-size:.75rem;margin:-.05rem 0 .1rem}\n"
 "code{background:var(--bg);padding:.1em .35em;border-radius:5px;\n"
 " font:0.9em ui-monospace,Menlo,Consolas,monospace}\n"
 "@@media(prefers-color-scheme:dark){body{background:#0d1117;color:#e6edf3}\n"
@@ -186,7 +188,9 @@ We make our second pass over the source, copying prose straight through
 
 A file or fragment definition writes an anchor, a header line naming the
 scrap (with the definition/continuation marker), the code in a
-\verb|<pre><code>| block, and a one-line metadata footer.
+\verb|<pre><code>| block closed by a left-flushed end-of-scrap tombstone
+(\verb|.weft-end|, the HTML twin of the \LaTeX\ \verb|\WEFTsep| square),
+and a one-line metadata footer.
 
 @d Write html output file definition
 @{{
@@ -237,6 +241,9 @@ scrap (with the definition/continuation marker), the code in a
   extra_scraps = 0;
   md_copy_scrap(html_file, TRUE, name);
   fputs("</code></pre>\n", html_file);
+  /* end-of-scrap tombstone: a small grey square flushed left, the HTML
+     twin of the LaTeX \WEFTsep, closing the code before the metadata line */
+  fputs("<div class=\"weft-end\">&#9633;</div>\n", html_file);
 }@}
 
 @d Finish html scrap

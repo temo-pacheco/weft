@@ -204,6 +204,7 @@ A file definition header looks like:
 <a id="weft1"></a>
 **"filename"** **1** =
 <pre><code>...code...</code></pre>
+<div align="left">&#9633;</div>
 \end{verbatim}
 
 A fragment definition header looks like:
@@ -211,7 +212,12 @@ A fragment definition header looks like:
 <a id="weft1"></a>
 **&lt;*Fragment Name* 1&gt;** =
 <pre><code>...code...</code></pre>
+<div align="left">&#9633;</div>
 \end{verbatim}
+
+The left-flushed \verb|&#9633;| square is the end-of-scrap tombstone,
+closing the code before the cross-reference blockquotes --- the Markdown
+twin of the \LaTeX\ \verb|\WEFTsep| and the HTML \verb|.weft-end|.
 
 @d Write md output file definition
 @{{
@@ -299,6 +305,10 @@ A fragment definition header looks like:
   extra_scraps = 0;
   md_copy_scrap(md_file, TRUE, name);
   fputs("</code></pre>\n", md_file);
+  /* end-of-scrap tombstone: a left-aligned square closing the code, the
+     Markdown twin of the LaTeX \WEFTsep and the HTML .weft-end.  We use the
+     GitHub-safe <div align> since a Markdown file carries no stylesheet */
+  fputs("<div align=\"left\">&#9633;</div>\n", md_file);
 }@}
 
 

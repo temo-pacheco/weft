@@ -65,6 +65,7 @@ cat > test.expected.md <<"EOF"
 **"test.c"** **1** =
 <pre><code class="language-c">int x = 1;
 </code></pre>
+<div align="left">&#9633;</div>
 > *Defines:*  `x` *Never used*.
 
 - `"test.c"` *Defined by* <a href="#weft1">1</a>.

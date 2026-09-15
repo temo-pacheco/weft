@@ -83,7 +83,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsUsed}{uses}
 \newcommand{\WEFTtxtIdentsNotUsed}{never used}
 \newcommand{\WEFTtxtIdentsDefed}{defines}
-\newcommand{\WEFTsep}{}
+\newcommand{\WEFTsep}{\par\nobreak\noindent{\WEFTtint{weftcom}\fboxsep=0pt\fboxrule=.3pt\fbox{\rule{0pt}{.85ex}\kern.85ex}}\par}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
 \newcommand{\WEFTtint}[1]{}
 \newcommand{\WEFTtintOn}[1]{\color{#1}}
@@ -120,6 +120,7 @@ Start
 End
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -130,6 +131,7 @@ End
 (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Use ZZZ as parameter}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle}>*)
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -139,6 +141,7 @@ End
 (*<\hbox{\slshape\sffamily yyy\/}>*) is here.
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}\WEFTmetaend
 \WEFTend
 \end{document}

@@ -79,7 +79,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsUsed}{uses}
 \newcommand{\WEFTtxtIdentsNotUsed}{never used}
 \newcommand{\WEFTtxtIdentsDefed}{defines}
-\newcommand{\WEFTsep}{}
+\newcommand{\WEFTsep}{\par\nobreak\noindent{\WEFTtint{weftcom}\fboxsep=0pt\fboxrule=.3pt\fbox{\rule{0pt}{.85ex}\kern.85ex}}\par}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
 \newcommand{\WEFTtint}[1]{}
 \newcommand{\WEFTtintOn}[1]{\color{#1}}
@@ -115,6 +115,7 @@ Here is the first arg:(*<\hbox{\slshape\sffamily arg1\/}>*).
 Here is the second arg:(*<\hbox{\slshape\sffamily \$arg2\/}>*).
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -126,6 +127,7 @@ Front
 Back
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTmetaend
 \WEFTend
 \end{document}

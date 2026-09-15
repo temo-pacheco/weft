@@ -59,6 +59,7 @@ cat > test.expected.md <<'EOF'
 **"app.js"** **1** =
 <pre><code class="language-js">console.log("hello");
 </code></pre>
+<div align="left">&#9633;</div>
 EOF
 
 $bin/weft -w md test.w

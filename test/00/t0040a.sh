@@ -73,11 +73,13 @@ cat > test.expected.md <<"EOF"
 <pre><code class="language-c">&lt;<a href="#weft2"><i>Part A</i> 2, ...</a>&gt;
 &lt;<a href="#weft4"><i>Part B</i> 4</a>&gt;
 </code></pre>
+<div align="left">&#9633;</div>
 
 <a id="weft2"></a>
 **&lt;*Part A* 2&gt;** =
 <pre><code>int x = 1;
 </code></pre>
+<div align="left">&#9633;</div>
 > *Fragment defined by* <a href="#weft2">2</a><a href="#weft3">, 3</a>.
 > *Fragment referenced in* <a href="#weft1">1</a>.
 
@@ -85,6 +87,7 @@ cat > test.expected.md <<"EOF"
 **&lt;*Part A* 3&gt;** =
 <pre><code>int y = 2;
 </code></pre>
+<div align="left">&#9633;</div>
 > *Fragment defined by* <a href="#weft2">2</a><a href="#weft3">, 3</a>.
 > *Fragment referenced in* <a href="#weft1">1</a>.
 
@@ -92,6 +95,7 @@ cat > test.expected.md <<"EOF"
 **&lt;*Part B* 4&gt;** =
 <pre><code>int z = 3;
 </code></pre>
+<div align="left">&#9633;</div>
 > *Fragment referenced in* <a href="#weft1">1</a>.
 EOF
 

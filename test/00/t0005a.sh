@@ -90,7 +90,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsUsed}{uses}
 \newcommand{\WEFTtxtIdentsNotUsed}{never used}
 \newcommand{\WEFTtxtIdentsDefed}{defines}
-\newcommand{\WEFTsep}{}
+\newcommand{\WEFTsep}{\par\nobreak\noindent{\WEFTtint{weftcom}\fboxsep=0pt\fboxrule=.3pt\fbox{\rule{0pt}{.85ex}\kern.85ex}}\par}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
 \newcommand{\WEFTtint}[1]{}
 \newcommand{\WEFTtintOn}[1]{\color{#1}}
@@ -128,6 +128,7 @@ Call the macro
    (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Third frag with $\langle\,${\itshape A macro argument}\nobreak\ {\footnotesize \WEFTlink{weft?}{?}}$\,\rangle$ as parameter}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft?}{?}}\WEFTrangle}>*)
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -137,6 +138,7 @@ Call the macro
 (*<\hbox{\slshape\sffamily Begin macro\/}>*)<<<Here 'tis.
 That argument was at the beginning of the fragment
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -147,6 +149,7 @@ Here is the beginning of the second macro
 (*<\hbox{\slshape\sffamily Begin line\/}>*)<<<That is the argument
 And this is the end of the second frag
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -155,6 +158,7 @@ And this is the end of the second frag
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 Here is the argument>>>(*<\hbox{\slshape\sffamily Embedded\/}>*)<<<That was it.
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -163,6 +167,7 @@ Here is the argument>>>(*<\hbox{\slshape\sffamily Embedded\/}>*)<<<That was it.
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 Hello folks
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{?}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft?}{?}\WEFTmetaend
 \WEFTend
 \end{document}

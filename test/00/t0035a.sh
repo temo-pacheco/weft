@@ -77,7 +77,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsUsed}{uses}
 \newcommand{\WEFTtxtIdentsNotUsed}{never used}
 \newcommand{\WEFTtxtIdentsDefed}{defines}
-\newcommand{\WEFTsep}{}
+\newcommand{\WEFTsep}{\par\nobreak\noindent{\WEFTtint{weftcom}\fboxsep=0pt\fboxrule=.3pt\fbox{\rule{0pt}{.85ex}\kern.85ex}}\par}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
 \newcommand{\WEFTtint}[1]{}
 \newcommand{\WEFTtintOn}[1]{\color{#1}}
@@ -114,6 +114,7 @@ cat > test.expected.tex <<"EOF"
 (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Use a fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}}\WEFTrangle}>*)
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1a}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -123,6 +124,7 @@ cat > test.expected.tex <<"EOF"
 Here is a fragment.
    Make sure it is referenced properly.
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1b}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTmetaend
 \WEFTend
 \end{document}

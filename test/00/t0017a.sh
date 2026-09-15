@@ -112,7 +112,7 @@ cat > test.expected.tex <<"EOF"
 \newcommand{\WEFTtxtIdentsUsed}{uses}
 \newcommand{\WEFTtxtIdentsNotUsed}{never used}
 \newcommand{\WEFTtxtIdentsDefed}{defines}
-\newcommand{\WEFTsep}{}
+\newcommand{\WEFTsep}{\par\nobreak\noindent{\WEFTtint{weftcom}\fboxsep=0pt\fboxrule=.3pt\fbox{\rule{0pt}{.85ex}\kern.85ex}}\par}
 \newcommand{\WEFTnotglobal}{(not defined globally)}
 \newcommand{\WEFTtint}[1]{}
 \newcommand{\WEFTtintOn}[1]{\color{#1}}
@@ -149,10 +149,11 @@ Test of quoted fragments.
    (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert first fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1b}{1b}}\WEFTrangle}>*)
    (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert second fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1c}{1c}}\WEFTrangle}>*)
    (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert third fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1d}{1d}}\WEFTrangle}>*)
-   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert parameter whatsit fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1g}{1g}}\WEFTrangle}>*)
+   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert parameter whatsit fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft2}{2}}\WEFTrangle}>*)
 End of test.
 
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1a}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -162,10 +163,11 @@ End of test.
 This fragment is not quoted.
    (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert unquoted fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1e}{1e}}\WEFTrangle}>*)
    (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert quoted fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1f}{1f}}\WEFTrangle}>*)
-   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert parameter 1 fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1g}{1g}}\WEFTrangle}>*)
-   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert parameter thing fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1g}{1g}}\WEFTrangle}>*)
+   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert parameter 1 fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft2}{2}}\WEFTrangle}>*)
+   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert parameter thing fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft2}{2}}\WEFTrangle}>*)
 End of first fragment.
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1b}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -175,10 +177,11 @@ End of first fragment.
 This fragment is quoted.
    (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert unquoted fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1e}{1e}}\WEFTrangle}>*)
    (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert quoted fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1f}{1f}}\WEFTrangle}>*)
-   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert parameter 2 fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1g}{1g}}\WEFTrangle}>*)
-   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert parameter thing fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1g}{1g}}\WEFTrangle}>*)
+   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert parameter 2 fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft2}{2}}\WEFTrangle}>*)
+   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert parameter thing fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft2}{2}}\WEFTrangle}>*)
 End of second fragment.
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1c}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -188,10 +191,11 @@ End of second fragment.
 This fragment is not quoted.
    (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert unquoted fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1e}{1e}}\WEFTrangle}>*)
    (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert quoted fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1f}{1f}}\WEFTrangle}>*)
-   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert parameter 3 fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1g}{1g}}\WEFTrangle}>*)
-   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert parameter thing fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft1g}{1g}}\WEFTrangle}>*)
+   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert parameter 3 fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft2}{2}}\WEFTrangle}>*)
+   (*<\hbox{\normalfont \WEFTlangle{\WEFTtint{weftaccent}\itshape Insert parameter thing fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}\WEFTlink{weft2}{2}}\WEFTrangle}>*)
 End of third fragment.
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1d}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -200,6 +204,7 @@ End of third fragment.
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 This fragment in file (*<\hbox{\sffamily\slshape file name}>*) is not quoted
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1e}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1c}{c}\WEFTlink{weft1d}{d}\WEFTmetaend
 \WEFTend
 \WEFTbegin
@@ -208,15 +213,17 @@ This fragment in file (*<\hbox{\sffamily\slshape file name}>*) is not quoted
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 This fragment in file (*<\hbox{\sffamily\slshape file name}>*) is quoted
 \end{lstlisting}
+\WEFTsep
 \WEFTmetabegin{1f}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft1b}{1b}\WEFTlink{weft1c}{c}\WEFTlink{weft1d}{d}\WEFTmetaend
 \WEFTend
 \WEFTbegin
 \label{scrap7}
-\WEFTtarget{weft1g}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Insert parameter \hbox{\slshape\sffamily thing\/} fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}1g}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
+\WEFTtarget{weft2}{}\WEFTlangle{\WEFTtint{weftaccent}\itshape Insert parameter \hbox{\slshape\sffamily thing\/} fragment}\nobreak\WEFTnumsep{\footnotesize\WEFTtint{weftcom}2}\WEFTrangle\WEFTeq\par\nobreak\vspace{0.6ex}\nobreak
 \begin{lstlisting}[escapeinside={(*<}{>*)}]
 Here >>(*<\hbox{\slshape\sffamily thing\/}>*)<< is the parameter
 \end{lstlisting}
-\WEFTmetabegin{1g}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1b}{b}\WEFTlink{weft1c}{c}\WEFTlink{weft1d}{d}\WEFTmetaend
+\WEFTsep
+\WEFTmetabegin{2}\WEFTdot \WEFTtxtMacroRefIn\ \WEFTlink{weft1a}{1a}\WEFTlink{weft1b}{b}\WEFTlink{weft1c}{c}\WEFTlink{weft1d}{d}\WEFTmetaend
 \WEFTend
 \end{document}
 EOF
