@@ -1,0 +1,39 @@
+@c ======================================================================
+@c  02-architecture.weft — ARCHITECTURE (step 03).
+@c  The system's shape, the technology, and every decision WITH its
+@c  rationale. Prose-only: NO @o, NO @d.
+@c ======================================================================
+
+\chapter{Architecture}
+
+\section{The shape}
+
+<How the concepts of the previous chapter are arranged: layers, processes,
+boundaries, what talks to what. A figure (tikz) earns its place here if it
+shows the real shape and not a box diagram that flatters it.>
+
+\section{Dependencies between concepts}
+
+<Which concept may depend on which, and --- stated explicitly --- which
+dependencies are FORBIDDEN and why (``the domain must not depend on its API
+surface''; ``accounts must not know about transactions''). If nothing is
+forbidden, no architectural decision has been made. A reader, and the AI,
+should be able to tell from this section alone whether a reference crosses a
+boundary it shouldn't.>
+
+\section{Technology}
+
+<The stack, and why. Keep it short; the detail belongs in the decision
+records below.>
+
+\section{Decision records}
+
+<One subsection per significant decision. State the choice, the alternatives
+considered, and WHY the others were rejected. A decision without its
+alternatives is not a decision, it is a preference. This is the ``why'' that
+lives WITH the code, versioned --- not in a docs/adr/ folder that drifts.>
+
+\subsection{Decision: <title>}
+
+<\textbf{Chosen:} ... \quad \textbf{Considered:} ... \quad \textbf{Rejected
+because:} ... \quad \textbf{Consequence we accept:} ...>

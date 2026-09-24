@@ -48,13 +48,13 @@ from \texttt{acc\_apply}.
 
 \section{The dependency contract}
 
-A concept may reference another only along an allowed edge. Anything not
-listed is forbidden and fails the conformance gate. The forbidden directions
-are the design: \textbf{Accounts must not know about Ledger} (the store is
-ignorant of transactions), and \textbf{no concept below Api may depend on
-Api} (the domain must not reach up into its surface).
+A concept may reference another only along an allowed edge. Exactly three are
+allowed here: \textbf{Ledger $\to$ Accounts}, \textbf{Api $\to$ Ledger} and
+\textbf{Api $\to$ Accounts}. Every other direction is forbidden, and the
+forbidden ones are the design: \textbf{Accounts must not know about Ledger}
+(the store is ignorant of transactions), and \textbf{no concept below Api may
+depend on Api} (the domain must not reach up into its surface).
 
-% --- machine-readable policy: enforced by `ldd conformance` ---
-% ARCH-ALLOW: Ledger -> Accounts
-% ARCH-ALLOW: Api -> Ledger
-% ARCH-ALLOW: Api -> Accounts
+Reviewing this is a reading task, not a tool task: \texttt{weft -e NAME
+--callers} shows who reaches into a chunk, and a reference that crosses one of
+the forbidden directions is a defect even when it compiles.

@@ -63,28 +63,51 @@ extrae fragmentos exactos, traza quién los usa y traduce errores de compilador
 de vuelta a la línea `.weft`. El fallo clásico —«editó el archivo
 generado»— se vuelve imposible por construcción.
 
-**4 · La coherencia prosa↔código es un invariante verificable.**
-El «terminado» (prosa actualizada) es un gate de CI, no una buena costumbre.
-Un chunk cambiado sin actualizar su prosa es un build roto.
+**4 · La coherencia prosa↔código es una obligación, no una costumbre.**
+El «terminado» incluye la prosa actualizada. Un chunk cambiado sin actualizar
+su prosa no está terminado: se editó la capa derivada y se dejó la fuente
+mintiendo. Es el mismo pecado que editar el código generado.
 
 
-## El ciclo
+## El método
 
-El análogo de *red–green–refactor*:
+Tres fases. Cada una entrega algo real antes de que empiece la siguiente:
 
 ```
-  1. NARRAR      humano: prosa + nombres de chunk       ← el "spec"
-  2. ORIENTAR    IA: mapa dirigido (barato en tokens)   ← contexto
-  3. RELLENAR    IA: implementa cuerpos de chunk        ← "green"
-  4. VERIFICAR   tangle → build/test; errores→fuente    ← determinista
-  5. RECONCILIAR IA: lint + drift prosa/código          ← "refactor"
-  6. COMMIT      granularidad de chunk / concepto
+  FASE 1 · Enmarcar el dominio    (en prosa, antes de una línea de código)
+     01 determinar el dominio      02 analizarlo
+     03 determinar la arquitectura 04 planear las etapas
+     → un documento de dominio, en cualquier formato
+
+  FASE 2 · Armar el proyecto      (convertir el pensamiento en libro)
+     05 escribir los primeros capítulos   06 generar el primer documento
+     → el primer libro tejido
+
+  FASE 3 · Escribir el libro      (capítulo a capítulo)
+     07 escribir el capítulo       08 revisar y avanzar
+     → el código literario completo
+```
+
+Dentro de un capítulo, cada unidad de trabajo se mueve así —el análogo de
+*red–green–refactor*:
+
+```
+  NARRAR      humano: prosa + nombres de chunk       ← el "spec"
+  ORIENTAR    IA: mapa dirigido (barato en tokens)   ← contexto
+  RELLENAR    IA: implementa cuerpos de chunk        ← "green"
+  VERIFICAR   tangle → build/test; errores→fuente    ← determinista
+  RECONCILIAR IA: lint + coherencia prosa/código     ← "refactor"
 ```
 
 Los dos pasos que ningún otro paradigma tiene son **Orientar** y
 **Reconciliar**. Orientar sustituye «leer quince archivos» por una consulta
 al grafo. Reconciliar comprueba que la prosa *sigue describiendo* lo que el
 código hace: es el refactor, pero sobre la coherencia narrativa.
+
+Y una sola frontera: un capítulo no se cierra con huecos abiertos. No hay
+deuda técnica diferida a la etapa tres; cada etapa es una *edición* del libro
+—teje, compila y se lee completa para lo que existe— y la siguiente se escribe
+sobre terreno firme.
 
 
 ## Las cuatro promesas
@@ -131,5 +154,6 @@ la IA como co-autora, ese coste tiende a cero mientras la garantía permanece.
 
 ---
 
-*Este manifiesto acompaña al skill `ldd` y a la herramienta `weft`. Se
-construyó, como todo lo demás, en programación literaria.*
+*Este manifiesto acompaña al skill `literate-driven-development` y a la
+herramienta `weft`. Se construyó, como todo lo demás, en programación
+literaria.*

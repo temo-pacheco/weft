@@ -1,11 +1,15 @@
 ---
 name: literate-programming
 description: >
-  Literate programming paradigm with weft for any project.
-  Each .weft file is a self-contained narrative crossing all architectural
-  layers. Pipeline: .weft → weft tangle → output files.
-  Triggers: "literate programming", "programacion literaria", "weft",
-  "nuweb", ".weft files", "weft skill", "literate skill".
+  The literate programming paradigm with weft, on its own: the metalanguage
+  (@o, @d, @<@>, @i), the syntax reference, chunk naming, the craft of the
+  prose, the tangle/weave pipeline and the navigation flags. Pure paradigm —
+  no development methodology; for the full method of building a project this
+  way with an AI, the `literate-driven-development` skill carries all of this
+  plus the process.
+  Triggers: "literate programming", "programacion literaria", "weft syntax",
+  "weft directive", "nuweb", ".weft files", "tangle", "weave", "chunk",
+  "weft skill", "literate skill".
 ---
 
 
@@ -17,6 +21,15 @@ output and optionally weaves them into documentation.
 
 This skill covers the generic paradigm (any language). It was itself
 built with weft.
+
+> **Scope.** This is the paradigm and the tool, and nothing else: how to write
+> `.weft`, how to name chunks, how to organize by concept, how to build and
+> how to debug. It prescribes no development process — no phases, no design
+> chapters, no review protocol. If you want the full method for building a
+> project this way *with an AI* (the three phases, the review, the co-authoring
+> discipline), use the **`literate-driven-development`** skill instead: it
+> carries everything in this skill plus the methodology, so you never need to
+> load both.
 
 
 

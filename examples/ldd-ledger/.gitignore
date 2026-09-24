@@ -7,9 +7,8 @@ project.tex
 # compiled objects and the demo binary
 *.o
 ledger
-# NOTE: src/ (tangled C), project.pdf, and .ldd-prose-lock are kept on
-# purpose — the tangled output enables the Sync gate, the PDF is the book,
-# and the lock is the Prime Directive's baseline.
+# NOTE: src/ (the tangled C) and project.pdf are kept on purpose — the tangled
+# output is what makes `weft --diff` a meaningful check, and the PDF is the book.
 # weft weave scratch files
 nw??????
 texput.log

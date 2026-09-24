@@ -395,58 +395,77 @@ src/                      <- generated C (bootstrap for fresh clones)
 ├── main.c, pass1.c, ...
 └── global.h
 build/                    <- object files (created by make, gitignored)
-skill/                    <- Claude Code skill for literate programming
-├── SKILL.md              <- main skill reference
-└── references/           <- detailed guides
+skills/                   <- Claude Code skills (see skills/README.md)
+├── literate-programming/        <- the paradigm alone
+└── literate-driven-development/ <- the method, self-contained
 bib/                      <- bibliography for make doc
 test/
 └── 00/                   <- 62 automated tests
 ```
 
-## Literate Programming Guide
+## The skills
 
-The `skill/` directory is a self-contained reference for literate
-programming with weft. It is useful both as documentation for humans
-and as a skill for AI assistants.
+The `skills/` directory ships two Claude Code skills. They overlap on
+purpose, and one line governs them:
 
-### Contents
+> **`literate-programming` is the paradigm alone.
+> `literate-driven-development` is the paradigm *plus* the method — and it
+> carries the paradigm inside it, so it stands alone too.**
 
-- **Complete weft syntax** — all commands, flags, scrap modes, and CLI options
-- **Architecture guide** — concept-oriented organization, assembly pattern
-- **Build pipeline** — justfile templates for Go, Rust, Python, Flutter, etc.
-- **Debugging workflow** — tracing errors from tangled output back to `.weft` source
-- **AI navigation** — using `-m` (JSON map), `-e` (fragment extraction), and `-R` (reverse map)
+Load one. Never both.
+
+### `literate-programming` — pure literate programming
+
+The language and the tool, with no process attached: how to write `.weft`,
+how to name chunks, how to organize a system by concept, how to build, and how
+to debug. Use it when you want literate programming itself.
+
+- **Complete weft syntax** — every directive, flag, scrap mode and CLI option
+- **Architecture guide** — concept-oriented organization, the assembly pattern
+- **Build pipeline** — tangle → format → build, per language
+- **Debugging workflow** — tracing errors from tangled output back to `.weft`
+- **AI navigation** — `-m` (JSON map), `-e` (extraction), `-R` (reverse map)
 - **Naming conventions** — chunk naming, narrative rules, anti-patterns
-- **Worked example** — a single concept spanning Go + Flutter + SQL + Protobuf
+- **Literate craft** — writing the prose to publishable quality
+- **Worked example** — one concept spanning Go + Flutter + SQL + Protobuf
 
-### As documentation
+### `literate-driven-development` — the LDD method
 
-Read `skill/SKILL.md` for an overview, then dive into `skill/references/`
-for detailed guides:
+The method for building a whole project this way **with an AI**, in three
+phases — *Frame the domain → Scaffold the project → Write the book, chapter by
+chapter* — under one rule: **a task is not complete until its prose is
+updated**.
 
-```
-skill/
-├── SKILL.md                          <- overview and quick start
-└── references/
-    ├── weft-syntax.md                <- complete syntax reference
-    ├── concept-architecture.md       <- organizing code by concept
-    ├── build-pipeline.md             <- build automation templates
-    ├── debugging-tangled-code.md     <- tracing errors to .weft source
-    ├── literate-philosophy.md        <- LP philosophy and principles
-    ├── naming-conventions.md         <- chunk naming and narrative rules
-    └── worked-example.md             <- cross-system example
-```
+It is **self-contained**: it carries all eight paradigm references above,
+verbatim, alongside its own. There is no prerequisite skill and no "load this
+first" step, and its only tool is the `weft` binary — no scripts, no task
+runner, no hooks, no CI harness.
 
-### As a Claude Code skill
+- `SKILL.md` — the three phases, the review checklist, the Prime Directive
+- `QUICKSTART.md` — the commands you actually type, day to day
+- `MANIFESTO.md` — why the method exists
+- `templates/` — the four design-chapter skeletons
+- `references/` — the method (`ldd-design`, `ldd-cycle`, `ldd-review`,
+  `ldd-notes`) plus the paradigm, carried whole
 
-Install it so [Claude Code](https://claude.com/claude-code) can create,
-navigate, and maintain literate projects autonomously:
+A complete project built this way is in `examples/ldd-ledger/`: a double-entry
+ledger in C, its design chapters, and its typeset book — from one source.
+
+### Installing
 
 ```sh
-cp -r skill/ ~/.claude/skills/literate-programming/
+cp -r skills/literate-programming        ~/.claude/skills/
+cp -r skills/literate-driven-development ~/.claude/skills/
 ```
 
-Example prompts:
+Both keep their own directory names — a skill's directory name is its
+identity, and it must match the `name:` its SKILL.md declares. Re-copy after
+every change: the installed copies are snapshots.
+
+See [skills/README.md](skills/README.md) for how the shared references are kept
+in sync between the two.
+
+### Example prompts
 
 ```
 > Create a literate project for a REST API in Go with auth and payments
@@ -457,6 +476,8 @@ Example prompts:
 > Add a notifications concept to my literate project
 
 > Show me the dependency graph of my literate project
+
+> Let's build this with LDD: frame the domain first, then scaffold the book
 
 > I have an existing Express app in src/. Reorganize it into .weft concept files so I can benefit from literate programming
 ```

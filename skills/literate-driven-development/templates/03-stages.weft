@@ -1,0 +1,52 @@
+@c ======================================================================
+@c  03-stages.weft — DEVELOPMENT STAGES (step 04).
+@c  The incremental plan: stages that each RUN and are PROVEN before the
+@c  next begins. Prose-only: NO @o, NO @d.
+@c ======================================================================
+
+\chapter{Development stages}
+
+Each stage is an \emph{edition} of this book: at its boundary everything
+tangles, builds green, and reads complete for what exists. No stage begins
+before the previous one is proven --- software is evolutionary, and every
+stage stands on ground already solid.
+
+\section{Stage 1 --- the walking skeleton}
+
+<The thinnest vertical slice that tangles to a RUNNING system. It must touch
+every Stage-1 concept, however thinly: a skeleton that skips a concept proves
+nothing about the architecture. Say what running it demonstrates.>
+
+\paragraph{Proven when} <the observable fact that closes this stage: a command
+runs, an invariant holds under test, a round trip returns the right value.>
+
+\section{Stage 2 --- <name>}
+
+<What it adds, and what it proves.>
+
+\paragraph{Proven when} <...>
+
+\section{Stage 3 --- <name>}
+
+<...>
+
+\paragraph{Proven when} <...>
+
+\section{State of the work}
+
+<A short table of where each concept stands, so a reader --- and the AI ---
+can orient before touching anything. Keep it honest; it is the map of intent,
+complementing \texttt{weft -m}, the map of the code.
+Lifecycle: \texttt{planned → drafted → implemented → stable}.>
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+Concept & Status & Stage & Chapter \\
+\midrule
+<concept-a> & planned & 1 & --- \\
+<concept-b> & planned & 1 & --- \\
+<concept-c> & planned & 2 & --- \\
+\bottomrule
+\end{tabular}
+\end{center}

@@ -1,0 +1,29 @@
+@c ======================================================================
+@c  00-domain.weft — THE PROJECT DOMAIN (step 01).
+@c  What this is, its purpose and its scope, in the reader's language.
+@c  Pure exposition: NO @o, NO @d. Weaves into the book's front matter;
+@c  tangles to nothing. Fill the placeholders and delete these comments.
+@c ======================================================================
+
+\chapter{The domain: <one line naming the world this system lives in>}
+
+<Describe the domain as you would to a smart colleague new to it. What are the
+actors, the objects, the events? What is the world this program lives in,
+before any technology is chosen?>
+
+\section{Purpose}
+
+<What this system is for, stated as the outcome its reader gets — not the
+mechanism. One paragraph. If you cannot say it in one paragraph, the domain is
+still two domains.>
+
+\section{The problem}
+
+<The concrete problem this solves. What is done today, why it hurts, and what
+``solved'' looks like.>
+
+\section{Scope}
+
+<What is in, and — just as important — what is deliberately OUT. A domain with
+no edges cannot be framed, and a scope with no exclusions is a wish. Name the
+things a reader might reasonably expect here that this system will not do.>

@@ -1,24 +1,22 @@
 # LDD bootstrap: a double-entry ledger
 
 The reference project for **Literate Driven Development**. One source
-(`.weft`) produces both a working C program and a typeset book. Built with
-`weft`, gated by `ldd`.
+(`.weft`) produces both a working C program and a typeset book. The only tool
+is `weft`.
 
 ## Layout
 
 ```
 project.weft                 master: LaTeX + @i includes (weaves the book)
 literate/
-├── 00-domain.weft           FRAME — the domain and the problem (prose only)
-├── 01-architecture.weft     DECOMPOSE — concepts, ADRs, % ARCH-ALLOW policy
-├── 02-roadmap.weft          SEQUENCE — stages + the concept ledger
+├── 00-domain.weft           the domain and the problem (prose only)
+├── 01-architecture.weft     concepts, decision records, dependency contract
+├── 02-roadmap.weft          the stages + the state of the work
 ├── concepts/
 │   ├── accounts.weft        the store and its balance operations
 │   ├── ledger.weft          transactions + the double-entry invariant
 │   └── api.weft             the walking-skeleton main
 └── assembly.weft            the ONLY file with @o (routes chunks → src/*)
-ldd.py                       the five-gate CLI (Python stdlib)
-pre-commit                   git hook enforcing the Prime Directive
 ```
 
 ## Pipeline
@@ -30,11 +28,21 @@ mkdir -p src                                # weft does not create parent dirs
 weft project.weft                           # tangle → src/*.c, src/*.h
 cc -Wall src/*.c -o ledger && ./ledger      # build + run the skeleton
 
-python3 ldd.py prose lock                   # baseline the Prime Directive
-python3 ldd.py verify --build "cc -Wall src/*.c -o ledger"   # the five gates
-
 weft -w tex project.weft && pdflatex project.tex   # weave the book
 ```
+
+## The review, before a chapter closes
+
+```bash
+weft --lint project.weft          # invented chunk names, orphan chunks
+weft --diff project.weft          # empty = the tangled src/ is current
+cc -Wall src/*.c -o ledger 2>&1 | weft --errors    # errors → .weft lines
+#  + re-read the prose of every chunk touched   (the Prime Directive)
+#  + read the chapter straight through          (does it read as a book?)
+```
+
+No runner, no hook, no lock file: five checks, three of them one `weft`
+command each, two of them reading.
 
 ## What the skeleton proves
 

@@ -1,0 +1,46 @@
+@c ======================================================================
+@c  01-domain-analysis.weft — GENERAL DOMAIN ANALYSIS (step 02).
+@c  The concepts, entities and invariants the system turns on, plus the
+@c  vocabulary the whole book will speak. Prose-only: NO @o, NO @d.
+@c ======================================================================
+
+\chapter{Domain analysis}
+
+\section{Concepts}
+
+<The concepts the domain decomposes into. One concept = one chapter later =
+one narrative crossing every layer and language. Name each one and say what it
+OWNS — ownership is what makes a boundary real.>
+
+\begin{itemize}
+  \item \textbf{<concept-a>} --- <what it owns>
+  \item \textbf{<concept-b>} --- <what it owns>
+\end{itemize}
+
+\section{Entities}
+
+<The things that have identity and state: what they are, what they hold, and
+which concept is responsible for them.>
+
+\section{Invariants}
+
+<The laws that must always hold. Hunt for the one that DEFINES the domain: the
+rule whose violation means you no longer have the thing at all (a ledger that
+can go unbalanced is not a ledger with a bug --- it is not a ledger). For each
+invariant, say WHERE it is enforced and WHY there.>
+
+\begin{description}
+  \item[<invariant>] <statement>. Enforced in <concept>, because <why there>.
+\end{description}
+
+\section{Vocabulary}
+
+<Every core term the rest of the book will use. These become the glossary
+entries and the DOMAIN prefixes of chunk names (term ``posting'' → chunks named
+``Ledger: post entry''). Every domain word a chunk name later uses MUST trace
+back to a definition here --- that is what keeps one language across the book.>
+
+\begin{description}
+  \item[<term>] <definition>.
+  \item[<term>] <definition>.
+\end{description}
