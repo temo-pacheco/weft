@@ -2,6 +2,50 @@
 
 All notable changes to weft are documented in this file.
 
+## [2.0.2] - 2026-09-24
+
+### Changed
+
+- **Two pure skills, reorganized under `skills/`** — the Claude Code material
+  is now split by need, and each half stands on its own.
+  `literate-programming` is the paradigm alone: the weft metalanguage, the
+  syntax reference, chunk naming, the craft of the prose, the build pipeline
+  and the navigation flags, with no development process attached.
+  `literate-driven-development` is the LDD method — three phases (frame the
+  domain, scaffold the project, write the book chapter by chapter) under one
+  rule, *a task is not complete until its prose is updated* — and it carries
+  the whole paradigm inside it, so it has no prerequisite skill and no "load
+  this first" step. The old `skill/` and `ldd/` directories are gone.
+- **LDD runs on `weft` alone** — the Python gate CLI, the pre-commit hook, the
+  CI workflow and the `% ARCH-ALLOW:` conformance machinery were removed. The
+  five gates became a review checklist of three plain weft commands
+  (`--lint`, `--diff`, `--errors`) plus two readings: the prose of every chunk
+  touched, and the chapter straight through. The chapter templates follow the
+  four design movements (domain, domain analysis, architecture, stages), and
+  `examples/ldd-ledger` was cleaned of the same tooling.
+
+## [2.0.1] - 2026-09-14
+
+### Added
+
+- **End-of-scrap tombstone** — every scrap now closes with a small hollow
+  square (□) flushed left on its own line, in all three weaves: `\WEFTsep` in
+  LaTeX, a grey square in HTML, and the same mark in Markdown. It replaces the
+  earlier glyph set on the math axis, which read as noise. Scraps emitted
+  without a listing carry no tombstone.
+
+### Changed
+
+- **`MAX_USER_LANGS` raised from 32 to 256** — room for far more `@L`
+  user-defined languages in one web.
+
+### Fixed
+
+- **Fatal errors exit non-zero** — the error paths that reported a fatal
+  condition and then carried on (or returned success) now `exit(1)`, so a
+  failed run is visible to `make`, CI, and any caller that checks the status.
+  Thanks to @alexisreal (PR #2).
+
 ## [2.0.0] - 2026-09-11
 
 ### Added

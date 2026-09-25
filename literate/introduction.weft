@@ -67,7 +67,7 @@ everywhere it is needed: the binary's \verb|--version|, the default value of
 the \verb|@@v| directive (via \verb|WEFT_VERSION|), and the generated
 documentation. Cutting a release is therefore a one-line edit to this scrap.
 
-@d version @{2.0.1@}
+@d version @{2.0.2@}
 
 weft works with any programming language and produces documentation in
 \LaTeX~\cite{Lamport:LDP85} or Markdown format. \LaTeX\ was the
